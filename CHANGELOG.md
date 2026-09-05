@@ -39,14 +39,19 @@ Reason: `os_unfair_lock` requires iOS 10.0+ / macOS 10.12+. All other APIs used 
 
 Verified API availability (from Apple Developer Documentation):
 
-| API | iOS | macOS |
-|-----|-----|-------|
-| `os_unfair_lock` | 10.0+ | 10.12+ |
-| `NSSecureCoding` | 6.0+ | 10.8+ |
-| `decodeObjectOfClass:forKey:` | 6.0+ | 10.8+ |
-| `archivedDataWithRootObject:requiringSecureCoding:error:` | 11.0+ | 10.13+ |
-| `dispatch_once` | 4.0+ | 10.6+ |
-| `NSGetSizeAndAlignment` | 2.0+ | 10.0+ |
+| API | iOS | macOS | Used In |
+|-----|-----|-------|---------|
+| `os_unfair_lock` | 10.0+ | 10.12+ | **Core library** (F5, F6, F8) |
+| `NSSecureCoding` | 6.0+ | 10.8+ | **Core library** (F2) |
+| `decodeObjectOfClass:forKey:` | 6.0+ | 10.8+ | **Core library** (F2) |
+| `NSGetSizeAndAlignment` | 2.0+ | 10.0+ | **Core library** (F3) |
+| `dispatch_once` | 4.0+ | 10.6+ | **Core library** |
+| `NSJSONSerialization` | 5.0+ | 10.7+ | **Core library** |
+| `archivedDataWithRootObject:requiringSecureCoding:error:` | 11.0+ | 10.13+ | **Demo tests only** |
+| `unarchivedObjectOfClass:fromData:error:` | 11.0+ | 10.13+ | **Demo tests only** |
+| `NSURLSession` | 7.0+ | 10.9+ | **Demo tests only** |
+
+> **Note**: APIs requiring iOS 11.0+ are only used in the test demo (`Demo/main.m`), with `@available` fallbacks for iOS 10.0. The core library has no iOS 11.0+ dependency.
 | `NSJSONSerialization` | 5.0+ | 10.7+ |
 | `NSDataDetector` | 4.0+ | 10.7+ |
 

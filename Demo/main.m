@@ -247,21 +247,25 @@ static void TestT10_NSCoding(void) {
     User *original = [User yy_modelWithJSON:json];
     TEST_ASSERT(original != nil, @"Original user created");
 
-    // Encode
+    // Encode — requires iOS 11.0+ for NSSecureCoding archiving API.
+    // Use compile-time check so the demo builds on iOS 10+ deployment targets.
     NSData *archived = nil;
-    @try {
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 110000 || __MAC_OS_X_VERSION_MIN_REQUIRED >= 101300
+    archived = [NSKeyedArchiver archivedDataWithRootObject:original requiringSecureCoding:YES error:NULL];
+#else
+    if (@available(iOS 11.0, macOS 10.13, *)) {
         archived = [NSKeyedArchiver archivedDataWithRootObject:original requiringSecureCoding:YES error:NULL];
-    } @catch (NSException *e) {
-        // Fallback for older runtime
+    } else {
         archived = [NSKeyedArchiver archivedDataWithRootObject:original];
     }
+#endif
     TEST_ASSERT(archived != nil && archived.length > 0, @"Archived data created");
 
-    // Decode
+    // Decode — decodeObjectOfClass:forKey: requires iOS 6.0+ (always available).
     User *decoded = nil;
-    @try {
+    if (@available(iOS 11.0, macOS 10.13, *)) {
         decoded = [NSKeyedUnarchiver unarchivedObjectOfClass:[User class] fromData:archived error:NULL];
-    } @catch (NSException *e) {
+    } else {
         decoded = [NSKeyedUnarchiver unarchiveObjectWithData:archived];
     }
     TEST_ASSERT(decoded != nil,                 @"Decoded user");

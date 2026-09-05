@@ -8,7 +8,7 @@
 
 CC = clang
 CFLAGS = -fobjc-arc -framework Foundation -Wall -Wno-deprecated-declarations
-YYMODEL_DIR = ../YYModel-iOS27-Fix/YYModel
+YYMODEL_DIR = ../YYModel
 SOURCES = $(YYMODEL_DIR)/YYClassInfo.m $(YYMODEL_DIR)/NSObject+YYModel.m YYModelTestModels.m main.m
 INCLUDES = -I$(YYMODEL_DIR)
 TARGET = yymodel_test

@@ -34,21 +34,22 @@ This fork fixes all known compatibility issues with modern Xcode / Clang while p
 
 ### API Availability (Verified)
 
-Each API used in this fork has been verified against Apple's official documentation:
+Each API used in this fork has been verified against [Apple Developer Documentation](https://developer.apple.com/documentation/):
 
-| API | iOS | macOS | Used For |
-|-----|-----|-------|----------|
-| `os_unfair_lock` | **10.0+** | **10.12+** | Thread-safe caches (F5, F6, F8) |
-| `NSSecureCoding` | **6.0+** | **10.8+** | Secure archiving (F2) |
-| `decodeObjectOfClass:forKey:` | **6.0+** | **10.8+** | Type-safe unarchiving (F2) |
-| `archivedDataWithRootObject:requiringSecureCoding:error:` | **11.0+** | **10.13+** | Secure archiving API (F2) |
-| `dispatch_once` | 4.0+ | 10.6+ | One-time initialization |
-| `NSGetSizeAndAlignment` | 2.0+ | 10.0+ | Type encoding size (F3) |
-| `NSJSONSerialization` | 5.0+ | 10.7+ | JSON parsing |
-| `NSDataDetector` | 4.0+ | 10.7+ | Date string parsing |
-| `NSURLSession` | 7.0+ | 10.9+ | HTTP networking (tests) |
+| API | iOS | macOS | Used In |
+|-----|-----|-------|---------|
+| `os_unfair_lock` | **10.0+** | **10.12+** | **Core** — Thread-safe caches (F5, F6, F8) |
+| `NSSecureCoding` | **6.0+** | **10.8+** | **Core** — Secure archiving (F2) |
+| `decodeObjectOfClass:forKey:` | **6.0+** | **10.8+** | **Core** — Type-safe unarchiving (F2) |
+| `NSGetSizeAndAlignment` | 2.0+ | 10.0+ | **Core** — Type encoding size (F3) |
+| `dispatch_once` | 4.0+ | 10.6+ | **Core** — One-time initialization |
+| `NSJSONSerialization` | 5.0+ | 10.7+ | **Core** — JSON parsing |
+| `archivedDataWithRootObject:requiringSecureCoding:error:` | 11.0+ | 10.13+ | Demo tests only (with `@available` fallback) |
+| `NSURLSession` | 7.0+ | 10.9+ | Demo tests only |
 
 **Minimum deployment target: iOS 10.0 / macOS 10.12** (constrained by `os_unfair_lock`).
+
+> APIs requiring iOS 11.0+ are only used in the test demo with `@available` fallbacks. The core library has no iOS 11.0+ dependency.
 
 ### API Compatibility
 

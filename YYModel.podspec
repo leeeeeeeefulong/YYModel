@@ -6,18 +6,19 @@ Pod::Spec.new do |s|
   s.authors      = { 'ibireme' => 'ibireme@gmail.com', 'leeeeeeeefulong' => 'leeeeeeeefulong@github.com' }
   s.homepage     = 'https://github.com/leeeeeeeefulong/YYModel'
 
-  # Minimum deployment targets constrained by os_unfair_lock (iOS 10.0 / macOS 10.12)
-  # All other APIs used are available from earlier versions.
+  # Minimum deployment targets constrained by os_unfair_lock (iOS 10.0 / macOS 10.12).
+  # All other core library APIs are available from iOS 6.0 or earlier.
   #
-  # API availability (verified against Apple Developer Documentation):
-  #   os_unfair_lock:              iOS 10.0+ / macOS 10.12+
+  # Core library API availability (verified against Apple Developer Documentation):
+  #   os_unfair_lock:              iOS 10.0+ / macOS 10.12+  ← bottleneck
   #   NSSecureCoding:              iOS 6.0+  / macOS 10.8+
   #   decodeObjectOfClass:forKey:  iOS 6.0+  / macOS 10.8+
   #   NSJSONSerialization:         iOS 5.0+  / macOS 10.7+
   #   dispatch_once:               iOS 4.0+  / macOS 10.6+
   #   NSGetSizeAndAlignment:       iOS 2.0+  / macOS 10.0+
-  #   NSDataDetector:              iOS 4.0+  / macOS 10.7+
-  #   archivedDataWithRootObject:  iOS 11.0+ / macOS 10.13+ (used in tests only)
+  #
+  # Demo/test only (not in core library):
+  #   archivedDataWithRootObject:  iOS 11.0+ / macOS 10.13+  (with @available fallback)
 
   s.ios.deployment_target = '10.0'
   s.osx.deployment_target = '10.12'
