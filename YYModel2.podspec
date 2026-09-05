@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
-  s.name         = 'YYModel'
-  s.summary      = 'High performance JSON model framework for iOS/macOS.'
+  s.name         = 'YYModel2'
+  s.summary      = 'High performance JSON model framework for iOS/macOS. Maintained fork of ibireme/YYModel.'
   s.version      = '2.0.0'
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.authors      = { 'ibireme' => 'ibireme@gmail.com', 'leeeeeeeefulong' => 'leeeeeeeefulong@github.com' }
@@ -36,7 +36,7 @@ Pod::Spec.new do |s|
 
   # Privacy manifest for iOS 17+ (Required Reason API)
   s.resource_bundles = {
-    'YYModel' => ['PrivacyInfo.xcprivacy']
+    'YYModel2' => ['PrivacyInfo.xcprivacy']
   }
 
   # Swift bridge (optional, for Codable coexistence)

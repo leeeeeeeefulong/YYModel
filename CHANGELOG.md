@@ -1,6 +1,12 @@
 # Changelog
 
-## 1.0.5 — Modern iOS Compatibility (2026-09-06)
+## 2.0.0 — Modern iOS Compatibility + SPM Support (2026-09-06)
+
+### Distribution
+
+- **NEW**: Swift Package Manager support (`Package.swift`)
+- **NEW**: CocoaPods published as `YYModel2` (original `YYModel` name owned by ibireme on trunk)
+- CocoaPods trunk closes **2026-12-02** — this is the final version that can be published there
 
 ### Critical Fixes (P0)
 

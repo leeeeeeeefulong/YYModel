@@ -125,11 +125,32 @@ YYModel remains one of the fastest JSON model frameworks for Objective-C.
 
 ## Installation
 
+### Swift Package Manager (Recommended)
+
+In Xcode: **File → Add Package Dependencies...**
+
+```
+https://github.com/leeeeeeeefulong/YYModel
+```
+
+Or in `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/leeeeeeeefulong/YYModel", from: "2.0.0")
+]
+```
+
+> SPM is the long-term supported distribution channel. CocoaPods trunk closes 2026-12-02.
+
 ### CocoaPods
 
 ```ruby
-pod 'YYModel', '~> 1.0.5'
+# New pod name (original YYModel owned by ibireme on trunk)
+pod 'YYModel2', '~> 2.0.0'
 ```
+
+> **Note**: The original `YYModel` pod on CocoaPods trunk is owned by ibireme and will not receive updates. This fork is published as `YYModel2`. CocoaPods trunk becomes read-only on 2026-12-02.
 
 ### Manual
 
