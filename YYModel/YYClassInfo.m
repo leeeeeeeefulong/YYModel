@@ -9,9 +9,11 @@
 //  LICENSE file in the root directory of this source tree.
 //
 //  Modern iOS Compatible — 2026.09 Patch
+//  Minimum deployment target: iOS 11.0 / macOS 10.13
+//
 //  Changes:
-//  - FIX: 'l'/'L' type encoding uses NSGetSizeAndAlignment (iOS 2.0+) for 64-bit
-//  - FIX: dispatch_semaphore → os_unfair_lock (iOS 10.0+, priority inversion safe)
+//  - FIX: 'l'/'L' type encoding uses NSGetSizeAndAlignment for 64-bit
+//  - FIX: dispatch_semaphore → os_unfair_lock (priority inversion safe)
 //  - FIX: Null safety for type encoding strings
 //  - ADD: Swift @objc dynamic property detection
 //

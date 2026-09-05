@@ -9,11 +9,12 @@
 //  LICENSE file in the root directory of this source tree.
 //
 //  Modern iOS Compatible — 2026.09 Patch
+//  Minimum deployment target: iOS 11.0 / macOS 10.13
 //
 //  FIX LIST:
 //  [F1] objc_msgSend — typed function pointer typedefs for PAC/Wstrict safety
-//  [F2] NSSecureCoding — decodeObjectOfClass: (iOS 6.0+) replaces decodeObjectForKey:
-//  [F3] NSDateFormatter — thread-safe with os_unfair_lock (iOS 10.0+)
+//  [F2] NSSecureCoding — decodeObjectOfClass: replaces decodeObjectForKey:
+//  [F3] NSDateFormatter — thread-safe with os_unfair_lock
 //  [F4] NSDecimalNumber — preserve precision, don't cast to double
 //  [F5] Null safety — guard all CF/ObjC bridge points
 //  [F6] Swift ivar detection — handle _$-prefixed Swift stored properties

@@ -33,25 +33,25 @@
 
 ### Minimum Deployment Target
 
-Changed from iOS 6.0 to **iOS 10.0** / macOS 10.9 to **macOS 10.12**.
+Changed from iOS 6.0 to **iOS 11.0** / macOS 10.9 to **macOS 10.13**.
 
-Reason: `os_unfair_lock` requires iOS 10.0+ / macOS 10.12+. All other APIs used are available from iOS 6.0 or earlier.
+Reason: `archivedDataWithRootObject:requiringSecureCoding:error:` requires iOS 11.0+ / macOS 10.13+. This API is used in the core library's NSSecureCoding support and cannot be conditionally compiled away.
 
 Verified API availability (from Apple Developer Documentation):
 
 | API | iOS | macOS | Used In |
 |-----|-----|-------|---------|
-| `os_unfair_lock` | 10.0+ | 10.12+ | **Core library** (F5, F6, F8) |
-| `NSSecureCoding` | 6.0+ | 10.8+ | **Core library** (F2) |
-| `decodeObjectOfClass:forKey:` | 6.0+ | 10.8+ | **Core library** (F2) |
-| `NSGetSizeAndAlignment` | 2.0+ | 10.0+ | **Core library** (F3) |
-| `dispatch_once` | 4.0+ | 10.6+ | **Core library** |
-| `NSJSONSerialization` | 5.0+ | 10.7+ | **Core library** |
-| `archivedDataWithRootObject:requiringSecureCoding:error:` | 11.0+ | 10.13+ | **Demo tests only** |
-| `unarchivedObjectOfClass:fromData:error:` | 11.0+ | 10.13+ | **Demo tests only** |
-| `NSURLSession` | 7.0+ | 10.9+ | **Demo tests only** |
+| `os_unfair_lock` | 10.0+ | 10.12+ | **Core** — Thread-safe caches (F5, F6, F8) |
+| `archivedDataWithRootObject:requiringSecureCoding:error:` | **11.0+** | **10.13+** | **Core** — Secure archiving ← bottleneck |
+| `unarchivedObjectOfClass:fromData:error:` | **11.0+** | **10.13+** | **Core** — Secure unarchiving ← bottleneck |
+| `NSSecureCoding` | 6.0+ | 10.8+ | **Core** — Protocol |
+| `decodeObjectOfClass:forKey:` | 6.0+ | 10.8+ | **Core** — Type-safe unarchiving |
+| `NSGetSizeAndAlignment` | 2.0+ | 10.0+ | **Core** — Type encoding size |
+| `dispatch_once` | 4.0+ | 10.6+ | **Core** — One-time init |
+| `NSJSONSerialization` | 5.0+ | 10.7+ | **Core** — JSON parsing |
+| `NSURLSession` | 7.0+ | 10.9+ | Demo tests only |
 
-> **Note**: APIs requiring iOS 11.0+ are only used in the test demo (`Demo/main.m`), with `@available` fallbacks for iOS 10.0. The core library has no iOS 11.0+ dependency.
+> All NSSecureCoding APIs work without `@available` fallbacks at iOS 11.0+.
 | `NSJSONSerialization` | 5.0+ | 10.7+ |
 | `NSDataDetector` | 4.0+ | 10.7+ |
 

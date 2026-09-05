@@ -247,27 +247,16 @@ static void TestT10_NSCoding(void) {
     User *original = [User yy_modelWithJSON:json];
     TEST_ASSERT(original != nil, @"Original user created");
 
-    // Encode — requires iOS 11.0+ for NSSecureCoding archiving API.
-    // Use compile-time check so the demo builds on iOS 10+ deployment targets.
-    NSData *archived = nil;
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 110000 || __MAC_OS_X_VERSION_MIN_REQUIRED >= 101300
-    archived = [NSKeyedArchiver archivedDataWithRootObject:original requiringSecureCoding:YES error:NULL];
-#else
-    if (@available(iOS 11.0, macOS 10.13, *)) {
-        archived = [NSKeyedArchiver archivedDataWithRootObject:original requiringSecureCoding:YES error:NULL];
-    } else {
-        archived = [NSKeyedArchiver archivedDataWithRootObject:original];
-    }
-#endif
+    // Encode — iOS 11.0+ (minimum deployment target)
+    NSData *archived = [NSKeyedArchiver archivedDataWithRootObject:original
+                                                requiringSecureCoding:YES
+                                                                error:NULL];
     TEST_ASSERT(archived != nil && archived.length > 0, @"Archived data created");
 
-    // Decode — decodeObjectOfClass:forKey: requires iOS 6.0+ (always available).
-    User *decoded = nil;
-    if (@available(iOS 11.0, macOS 10.13, *)) {
-        decoded = [NSKeyedUnarchiver unarchivedObjectOfClass:[User class] fromData:archived error:NULL];
-    } else {
-        decoded = [NSKeyedUnarchiver unarchiveObjectWithData:archived];
-    }
+    // Decode — iOS 11.0+ (minimum deployment target)
+    User *decoded = [NSKeyedUnarchiver unarchivedObjectOfClass:[User class]
+                                                      fromData:archived
+                                                         error:NULL];
     TEST_ASSERT(decoded != nil,                 @"Decoded user");
     TEST_ASSERT(decoded.userId == original.userId,       @"userId preserved");
     TEST_ASSERT([decoded.name isEqualToString:original.name], @"name preserved");

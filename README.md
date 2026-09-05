@@ -38,18 +38,18 @@ Each API used in this fork has been verified against [Apple Developer Documentat
 
 | API | iOS | macOS | Used In |
 |-----|-----|-------|---------|
-| `os_unfair_lock` | **10.0+** | **10.12+** | **Core** — Thread-safe caches (F5, F6, F8) |
-| `NSSecureCoding` | **6.0+** | **10.8+** | **Core** — Secure archiving (F2) |
-| `decodeObjectOfClass:forKey:` | **6.0+** | **10.8+** | **Core** — Type-safe unarchiving (F2) |
+| `os_unfair_lock` | 10.0+ | 10.12+ | **Core** — Thread-safe caches (F5, F6, F8) |
+| `archivedDataWithRootObject:requiringSecureCoding:error:` | **11.0+** | **10.13+** | **Core** — Secure archiving |
+| `unarchivedObjectOfClass:fromData:error:` | **11.0+** | **10.13+** | **Core** — Secure unarchiving |
+| `NSSecureCoding` | 6.0+ | 10.8+ | **Core** — Protocol conformance |
+| `decodeObjectOfClass:forKey:` | 6.0+ | 10.8+ | **Core** — Type-safe unarchiving (F2) |
 | `NSGetSizeAndAlignment` | 2.0+ | 10.0+ | **Core** — Type encoding size (F3) |
 | `dispatch_once` | 4.0+ | 10.6+ | **Core** — One-time initialization |
 | `NSJSONSerialization` | 5.0+ | 10.7+ | **Core** — JSON parsing |
-| `archivedDataWithRootObject:requiringSecureCoding:error:` | 11.0+ | 10.13+ | Demo tests only (with `@available` fallback) |
-| `NSURLSession` | 7.0+ | 10.9+ | Demo tests only |
 
-**Minimum deployment target: iOS 10.0 / macOS 10.12** (constrained by `os_unfair_lock`).
+**Minimum deployment target: iOS 11.0 / macOS 10.13** (constrained by `archivedDataWithRootObject:requiringSecureCoding:error:`).
 
-> APIs requiring iOS 11.0+ are only used in the test demo with `@available` fallbacks. The core library has no iOS 11.0+ dependency.
+> All NSSecureCoding APIs work without `@available` fallbacks. No conditional compilation needed.
 
 ### API Compatibility
 
@@ -118,8 +118,8 @@ YYModel remains one of the fastest JSON model frameworks for Objective-C.
 
 ## Requirements
 
-- **iOS 10.0+** / **macOS 10.12+** (required by `os_unfair_lock`)
-- watchOS 3.0+ / tvOS 10.0+
+- **iOS 11.0+** / **macOS 10.13+** (required by `os_unfair_lock` + `NSSecureCoding` archiving)
+- watchOS 4.0+ / tvOS 11.0+
 - Xcode 14+ (modern Clang fully supported)
 - ARC
 
