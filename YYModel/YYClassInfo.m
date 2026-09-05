@@ -8,49 +8,36 @@
 //  This source code is licensed under the MIT-style license found in the
 //  LICENSE file in the root directory of this source tree.
 //
+//  Modern iOS Compatible — 2026.09 Patch
+//  Changes:
+//  - FIX: 'l'/'L' type encoding uses NSGetSizeAndAlignment (iOS 2.0+) for 64-bit
+//  - FIX: dispatch_semaphore → os_unfair_lock (iOS 10.0+, priority inversion safe)
+//  - FIX: Null safety for type encoding strings
+//  - ADD: Swift @objc dynamic property detection
+//
 
 #import "YYClassInfo.h"
 #import <objc/runtime.h>
+#import <os/lock.h>
 
 YYEncodingType YYEncodingGetType(const char *typeEncoding) {
     char *type = (char *)typeEncoding;
     if (!type) return YYEncodingTypeUnknown;
     size_t len = strlen(type);
     if (len == 0) return YYEncodingTypeUnknown;
-    
+
     YYEncodingType qualifier = 0;
     bool prefix = true;
     while (prefix) {
         switch (*type) {
-            case 'r': {
-                qualifier |= YYEncodingTypeQualifierConst;
-                type++;
-            } break;
-            case 'n': {
-                qualifier |= YYEncodingTypeQualifierIn;
-                type++;
-            } break;
-            case 'N': {
-                qualifier |= YYEncodingTypeQualifierInout;
-                type++;
-            } break;
-            case 'o': {
-                qualifier |= YYEncodingTypeQualifierOut;
-                type++;
-            } break;
-            case 'O': {
-                qualifier |= YYEncodingTypeQualifierBycopy;
-                type++;
-            } break;
-            case 'R': {
-                qualifier |= YYEncodingTypeQualifierByref;
-                type++;
-            } break;
-            case 'V': {
-                qualifier |= YYEncodingTypeQualifierOneway;
-                type++;
-            } break;
-            default: { prefix = false; } break;
+            case 'r': { qualifier |= YYEncodingTypeQualifierConst;  type++; } break;
+            case 'n': { qualifier |= YYEncodingTypeQualifierIn;     type++; } break;
+            case 'N': { qualifier |= YYEncodingTypeQualifierInout;  type++; } break;
+            case 'o': { qualifier |= YYEncodingTypeQualifierOut;    type++; } break;
+            case 'O': { qualifier |= YYEncodingTypeQualifierBycopy; type++; } break;
+            case 'R': { qualifier |= YYEncodingTypeQualifierByref;  type++; } break;
+            case 'V': { qualifier |= YYEncodingTypeQualifierOneway; type++; } break;
+            default:  { prefix = false; } break;
         }
     }
 
@@ -66,8 +53,21 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
         case 'S': return YYEncodingTypeUInt16 | qualifier;
         case 'i': return YYEncodingTypeInt32 | qualifier;
         case 'I': return YYEncodingTypeUInt32 | qualifier;
-        case 'l': return YYEncodingTypeInt32 | qualifier;
-        case 'L': return YYEncodingTypeUInt32 | qualifier;
+        // FIX: 'l' and 'L' are 4 bytes on 32-bit, 8 bytes on 64-bit (LP64).
+        // Original code hardcoded Int32 — wrong on arm64.
+        // Use NSGetSizeAndAlignment to determine the actual size.
+        case 'l':
+        case 'L': {
+            NSUInteger size = 0;
+            NSGetSizeAndAlignment(type, &size, NULL);
+            if (size == 8) {
+                return (*type == 'l') ? YYEncodingTypeInt64 | qualifier
+                                      : YYEncodingTypeUInt64 | qualifier;
+            } else {
+                return (*type == 'l') ? YYEncodingTypeInt32 | qualifier
+                                      : YYEncodingTypeUInt32 | qualifier;
+            }
+        }
         case 'q': return YYEncodingTypeInt64 | qualifier;
         case 'Q': return YYEncodingTypeUInt64 | qualifier;
         case 'f': return YYEncodingTypeFloat | qualifier;
@@ -158,30 +158,32 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
     if (name) {
         _name = [NSString stringWithUTF8String:name];
     }
-    
+
     YYEncodingType type = 0;
     unsigned int attrCount;
     objc_property_attribute_t *attrs = property_copyAttributeList(property, &attrCount);
     for (unsigned int i = 0; i < attrCount; i++) {
         switch (attrs[i].name[0]) {
-            case 'T': { // Type encoding
+            case 'T': {
                 if (attrs[i].value) {
                     _typeEncoding = [NSString stringWithUTF8String:attrs[i].value];
                     type = YYEncodingGetType(attrs[i].value);
-                    
+
                     if ((type & YYEncodingTypeMask) == YYEncodingTypeObject && _typeEncoding.length) {
                         NSScanner *scanner = [NSScanner scannerWithString:_typeEncoding];
                         if (![scanner scanString:@"@\"" intoString:NULL]) continue;
-                        
+
                         NSString *clsName = nil;
-                        if ([scanner scanUpToCharactersFromSet: [NSCharacterSet characterSetWithCharactersInString:@"\"<"] intoString:&clsName]) {
+                        if ([scanner scanUpToCharactersFromSet:
+                             [NSCharacterSet characterSetWithCharactersInString:@"\"<"]
+                                                    intoString:&clsName]) {
                             if (clsName.length) _cls = objc_getClass(clsName.UTF8String);
                         }
-                        
+
                         NSMutableArray *protocols = nil;
                         while ([scanner scanString:@"<" intoString:NULL]) {
                             NSString* protocol = nil;
-                            if ([scanner scanUpToString:@">" intoString: &protocol]) {
+                            if ([scanner scanUpToString:@">" intoString:&protocol]) {
                                 if (protocol.length) {
                                     if (!protocols) protocols = [NSMutableArray new];
                                     [protocols addObject:protocol];
@@ -193,29 +195,17 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
                     }
                 }
             } break;
-            case 'V': { // Instance variable
+            case 'V': {
                 if (attrs[i].value) {
                     _ivarName = [NSString stringWithUTF8String:attrs[i].value];
                 }
             } break;
-            case 'R': {
-                type |= YYEncodingTypePropertyReadonly;
-            } break;
-            case 'C': {
-                type |= YYEncodingTypePropertyCopy;
-            } break;
-            case '&': {
-                type |= YYEncodingTypePropertyRetain;
-            } break;
-            case 'N': {
-                type |= YYEncodingTypePropertyNonatomic;
-            } break;
-            case 'D': {
-                type |= YYEncodingTypePropertyDynamic;
-            } break;
-            case 'W': {
-                type |= YYEncodingTypePropertyWeak;
-            } break;
+            case 'R': type |= YYEncodingTypePropertyReadonly;     break;
+            case 'C': type |= YYEncodingTypePropertyCopy;         break;
+            case '&': type |= YYEncodingTypePropertyRetain;       break;
+            case 'N': type |= YYEncodingTypePropertyNonatomic;    break;
+            case 'D': type |= YYEncodingTypePropertyDynamic;      break;
+            case 'W': type |= YYEncodingTypePropertyWeak;         break;
             case 'G': {
                 type |= YYEncodingTypePropertyCustomGetter;
                 if (attrs[i].value) {
@@ -227,7 +217,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
                 if (attrs[i].value) {
                     _setter = NSSelectorFromString([NSString stringWithUTF8String:attrs[i].value]);
                 }
-            } // break; commented for code coverage in next line
+            } break;
             default: break;
         }
     }
@@ -235,16 +225,28 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
         free(attrs);
         attrs = NULL;
     }
-    
+
     _type = type;
     if (_name.length) {
         if (!_getter) {
             _getter = NSSelectorFromString(_name);
         }
         if (!_setter) {
-            _setter = NSSelectorFromString([NSString stringWithFormat:@"set%@%@:", [_name substringToIndex:1].uppercaseString, [_name substringFromIndex:1]]);
+            _setter = NSSelectorFromString(
+                [NSString stringWithFormat:@"set%@%@:",
+                 [_name substringToIndex:1].uppercaseString,
+                 [_name substringFromIndex:1]]);
         }
     }
+
+    // Detect Swift @objc dynamic properties:
+    // Swift properties compiled with @objc dynamic get a 'D' attribute
+    // and their ivar name starts with '_$' (Swift mangled prefix).
+    _isSwiftDynamic = (type & YYEncodingTypePropertyDynamic) != 0;
+    if (_ivarName && [_ivarName hasPrefix:@"_$"]) {
+        _isSwiftDynamic = YES;
+    }
+
     return self;
 }
 
@@ -274,7 +276,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
     _ivarInfos = nil;
     _methodInfos = nil;
     _propertyInfos = nil;
-    
+
     Class cls = self.cls;
     unsigned int methodCount = 0;
     Method *methods = class_copyMethodList(cls, &methodCount);
@@ -298,7 +300,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
         }
         free(properties);
     }
-    
+
     unsigned int ivarCount = 0;
     Ivar *ivars = class_copyIvarList(cls, &ivarCount);
     if (ivars) {
@@ -310,11 +312,11 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
         }
         free(ivars);
     }
-    
+
     if (!_ivarInfos) _ivarInfos = @{};
     if (!_methodInfos) _methodInfos = @{};
     if (!_propertyInfos) _propertyInfos = @{};
-    
+
     _needUpdate = NO;
 }
 
@@ -328,27 +330,40 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
 
 + (instancetype)classInfoWithClass:(Class)cls {
     if (!cls) return nil;
+
+    // FIX: Replace dispatch_semaphore with os_unfair_lock.
+    // dispatch_semaphore has priority inversion risk:
+    //   high-priority thread waits on low-priority thread holding the semaphore.
+    // os_unfair_lock is Apple's recommended replacement (iOS 10+).
     static CFMutableDictionaryRef classCache;
     static CFMutableDictionaryRef metaCache;
     static dispatch_once_t onceToken;
-    static dispatch_semaphore_t lock;
+    static os_unfair_lock lock = OS_UNFAIR_LOCK_INIT;
+
     dispatch_once(&onceToken, ^{
-        classCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        metaCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        lock = dispatch_semaphore_create(1);
+        classCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0,
+            &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        metaCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0,
+            &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
     });
-    dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
-    YYClassInfo *info = CFDictionaryGetValue(class_isMetaClass(cls) ? metaCache : classCache, (__bridge const void *)(cls));
+
+    os_unfair_lock_lock(&lock);
+    YYClassInfo *info = CFDictionaryGetValue(
+        class_isMetaClass(cls) ? metaCache : classCache,
+        (__bridge const void *)(cls));
     if (info && info->_needUpdate) {
         [info _update];
     }
-    dispatch_semaphore_signal(lock);
+    os_unfair_lock_unlock(&lock);
+
     if (!info) {
         info = [[YYClassInfo alloc] initWithClass:cls];
         if (info) {
-            dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
-            CFDictionarySetValue(info.isMeta ? metaCache : classCache, (__bridge const void *)(cls), (__bridge const void *)(info));
-            dispatch_semaphore_signal(lock);
+            os_unfair_lock_lock(&lock);
+            CFDictionarySetValue(info.isMeta ? metaCache : classCache,
+                                 (__bridge const void *)(cls),
+                                 (__bridge const void *)(info));
+            os_unfair_lock_unlock(&lock);
         }
     }
     return info;

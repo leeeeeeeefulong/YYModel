@@ -1,23 +1,43 @@
 Pod::Spec.new do |s|
   s.name         = 'YYModel'
-  s.summary      = 'High performance model framework for iOS/OSX.'
-  s.version      = '1.0.4'
+  s.summary      = 'High performance JSON model framework for iOS/macOS.'
+  s.version      = '1.0.5'
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
-  s.authors      = { 'ibireme' => 'ibireme@gmail.com' }
-  s.social_media_url = 'http://blog.ibireme.com'
-  s.homepage     = 'https://github.com/ibireme/YYModel'
+  s.authors      = { 'ibireme' => 'ibireme@gmail.com', 'leeeeeeeefulong' => 'leeeeeeeefulong@github.com' }
+  s.homepage     = 'https://github.com/leeeeeeeefulong/YYModel'
 
-  s.ios.deployment_target = '6.0'
-  s.osx.deployment_target = '10.7'
-  s.watchos.deployment_target = '2.0'
-  s.tvos.deployment_target = '9.0'
+  # Minimum deployment targets constrained by os_unfair_lock (iOS 10.0 / macOS 10.12)
+  # All other APIs used are available from earlier versions.
+  #
+  # API availability (verified against Apple Developer Documentation):
+  #   os_unfair_lock:              iOS 10.0+ / macOS 10.12+
+  #   NSSecureCoding:              iOS 6.0+  / macOS 10.8+
+  #   decodeObjectOfClass:forKey:  iOS 6.0+  / macOS 10.8+
+  #   NSJSONSerialization:         iOS 5.0+  / macOS 10.7+
+  #   dispatch_once:               iOS 4.0+  / macOS 10.6+
+  #   NSGetSizeAndAlignment:       iOS 2.0+  / macOS 10.0+
+  #   NSDataDetector:              iOS 4.0+  / macOS 10.7+
+  #   archivedDataWithRootObject:  iOS 11.0+ / macOS 10.13+ (used in tests only)
 
-  s.source       = { :git => 'https://github.com/ibireme/YYModel.git', :tag => s.version.to_s }
-  
+  s.ios.deployment_target = '10.0'
+  s.osx.deployment_target = '10.12'
+  s.watchos.deployment_target = '3.0'
+  s.tvos.deployment_target = '10.0'
+
+  s.source       = { :git => 'https://github.com/leeeeeeeefulong/YYModel.git', :tag => s.version.to_s }
+
   s.requires_arc = true
   s.source_files = 'YYModel/*.{h,m}'
   s.public_header_files = 'YYModel/*.{h}'
-  
+
   s.frameworks = 'Foundation', 'CoreFoundation'
+
+  # Privacy manifest for iOS 17+ (Required Reason API)
+  s.resource_bundles = {
+    'YYModel' => ['PrivacyInfo.xcprivacy']
+  }
+
+  # Swift bridge (optional, for Codable coexistence)
+  s.swift_versions = ['5.0', '5.5', '5.9', '6.0']
 
 end

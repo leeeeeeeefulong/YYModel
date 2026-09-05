@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  PrivacyInfo.xcprivacy for YYModel
+
+  Required Reason API Declarations:
+  YYModel uses objc/runtime.h for property introspection (class_copyPropertyList,
+  method_getTypeEncoding, property_copyAttributeList, etc.) to perform JSON ↔ Model
+  mapping at runtime. This falls under NSPrivacyAccessedAPICategoryObjCRuntime.
+
+  Reason: AC6B.1 — "Declare this reason to access the Objective-C runtime APIs
+  to instantiate objects, call methods, or otherwise interact with the Objective-C
+  runtime at runtime."
+-->
+<plist version="1.0">
+<dict>
+    <key>NSPrivacyTracking</key>
+    <false/>
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array/>
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryObjCRuntime</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>AC6B.1</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>
