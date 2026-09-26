@@ -2,10 +2,6 @@ import XCTest
 import YYModel
 import YYModelSwift
 
-private final class YYBox: NSObject {
-    @objc var name: String = ""
-}
-
 final class YYJSONDecoderTests: XCTestCase {
     struct Anchor: Codable, Equatable {
         var nick: String
@@ -30,11 +26,28 @@ final class YYJSONDecoderTests: XCTestCase {
         }
     }
 
-    func testCoercionAndMissingKeys() throws {
-        let json = """
-        {"floor":"3","title":8,"hot":"true","score":"1.5","extra":1,"anchors":[{"nick":"a","age":"18"},{"nick":"b"}]}
-        """.data(using: .utf8)!
-        let level = try YYJSONDecoder().decode(Level.self, from: json)
+    struct Stamp: Codable {
+        var created: Date
+    }
+
+    enum Kind: String, Codable {
+        case live
+    }
+
+    struct Link: Codable {
+        var site: URL?
+        var kind: Kind?
+    }
+
+    private func fixture(_ name: String) throws -> Data {
+        let url = try XCTUnwrap(
+            Bundle.module.url(forResource: name, withExtension: "json", subdirectory: "Fixtures")
+        )
+        return try Data(contentsOf: url)
+    }
+
+    func testS1Coercion() throws {
+        let level = try YYJSONDecoder().decode(Level.self, from: try fixture("s1-coercion"))
         XCTAssertEqual(level.floorNumber, 3)
         XCTAssertEqual(level.title, "8")
         XCTAssertNil(level.icon)
@@ -43,36 +56,70 @@ final class YYJSONDecoderTests: XCTestCase {
         XCTAssertEqual(level.anchors, [Anchor(nick: "a", age: 18), Anchor(nick: "b", age: nil)])
     }
 
-    func testNullAndEmptyObject() throws {
-        let json = #"{"floor":null,"title":null,"hot":null,"score":null,"anchors":null}"#.data(using: .utf8)!
-        let level = try YYJSONDecoder().decode(Level.self, from: json)
+    func testS2NullBecomesZero() throws {
+        let level = try YYJSONDecoder().decode(Level.self, from: try fixture("s2-null"))
         XCTAssertEqual(level, Level(floorNumber: 0, title: "", icon: nil, hot: false, score: 0, anchors: []))
     }
 
-    func testDictionaryObjectAndNestedArray() throws {
-        let object: [String: Any] = [
-            "floor": 2,
-            "title": "晚场",
-            "anchors": [["nick": "主持", "age": 1]]
-        ]
-        let level = try YYJSONDecoder().decode(Level.self, from: object)
-        XCTAssertEqual(level.floorNumber, 2)
-        XCTAssertEqual(level.anchors.first?.nick, "主持")
+    func testS3MissingObjectBecomesZero() throws {
+        let level = try YYJSONDecoder().decode(Level.self, from: try fixture("s3-missing"))
+        XCTAssertEqual(level, Level(floorNumber: 0, title: "", icon: nil, hot: false, score: 0, anchors: []))
     }
 
-    func testTopLevelArray() throws {
-        let json = #"[{"nick":"a"},{"nick":1}]"#.data(using: .utf8)!
-        let anchors = try YYJSONDecoder().decode([Anchor].self, from: json)
+    func testS4TopLevelArrayCoercion() throws {
+        let anchors = try YYJSONDecoder().decode([Anchor].self, from: try fixture("s4-anchors"))
         XCTAssertEqual(anchors, [Anchor(nick: "a", age: nil), Anchor(nick: "1", age: nil)])
     }
 
-    func testUncoercibleValueThrows() {
-        let json = #"{"floor":"nope","title":"x"}"#.data(using: .utf8)!
-        XCTAssertThrowsError(try YYJSONDecoder().decode(Level.self, from: json))
+    func testS5BoolFromZeroAndOne() throws {
+        let level = try YYJSONDecoder().decode(Level.self, from: try fixture("s5-bool-number"))
+        XCTAssertEqual(level.floorNumber, 1)
+        XCTAssertEqual(level.title, "晚场")
+        XCTAssertFalse(level.hot)
+        XCTAssertEqual(level.score, 2)
+        XCTAssertTrue(level.anchors.isEmpty)
+    }
+
+    func testS6ISODate() throws {
+        let stamp = try YYJSONDecoder().decode(Stamp.self, from: try fixture("s6-date-iso"))
+        let expected = try XCTUnwrap(ISO8601DateFormatter().date(from: "2026-09-05T12:00:00Z"))
+        XCTAssertEqual(stamp.created, expected)
+    }
+
+    func testS7UnixDate() throws {
+        let stamp = try YYJSONDecoder().decode(Stamp.self, from: try fixture("s7-date-unix"))
+        XCTAssertEqual(stamp.created, Date(timeIntervalSince1970: 1_700_000_000))
+    }
+
+    func testS8OptionalURLAndEnum() throws {
+        let link = try YYJSONDecoder().decode(Link.self, from: try fixture("s8-link"))
+        XCTAssertEqual(link.site, URL(string: "https://example.com"))
+        XCTAssertEqual(link.kind, .live)
+    }
+
+    func testS9MissingOptionalURLAndEnum() throws {
+        let link = try YYJSONDecoder().decode(Link.self, from: try fixture("s9-link-missing"))
+        XCTAssertNil(link.site)
+        XCTAssertNil(link.kind)
+    }
+
+    func testS10UncoercibleValueThrows() throws {
+        XCTAssertThrowsError(try YYJSONDecoder().decode(Level.self, from: try fixture("s10-bad-floor")))
+    }
+
+    func testParsedObjectMatchesFixtureFile() throws {
+        let object = try XCTUnwrap(try JSONSerialization.jsonObject(with: try fixture("s5-bool-number")) as? [String: Any])
+        let level = try YYJSONDecoder().decode(Level.self, from: object)
+        XCTAssertEqual(level.title, "晚场")
+        XCTAssertFalse(level.hot)
     }
 
     func testObjectiveCModelStillDecodes() throws {
         let box = try XCTUnwrap(YYBox.yy_model(withJSON: #"{"name":"yy"}"#))
         XCTAssertEqual(box.name, "yy")
     }
+}
+
+private final class YYBox: NSObject {
+    @objc var name: String = ""
 }

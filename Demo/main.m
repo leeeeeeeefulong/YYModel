@@ -3,15 +3,10 @@
 //  YYModel Test Demo
 //
 //  Tests YYModel against live JSONPlaceholder API (https://jsonplaceholder.typicode.com)
-//  and inline test cases for all features T1-T15.
+//  and inline cases T1–T17. Swift Codable fixtures live in
+//  Tests/YYJSONDecoderTests/Fixtures and run with `swift test`.
 //
-//  Build:  clang -fobjc-arc -framework Foundation -framework XCTest \
-//          -I../YYModel-iOS27-Fix/YYModel \
-//          ../YYModel-iOS27-Fix/YYModel/YYClassInfo.m \
-//          ../YYModel-iOS27-Fix/YYModel/NSObject+YYModel.m \
-//          YYModelTestModels.m main.m -o yymodel_test
-//
-//  Run:    ./yymodel_test
+//  Build:  make -C Demo
 //
 
 #import <Foundation/Foundation.h>
@@ -487,7 +482,7 @@ int main(int argc, const char * argv[]) {
     @autoreleasepool {
         NSLog(@"\n");
         NSLog(@"╔═══════════════════════════════════════════════════╗");
-        NSLog(@"║     YYModel iOS 27 Fix — Verification Test       ║");
+        NSLog(@"║     YYModel 2.1 — Objective-C verification       ║");
         NSLog(@"║     API: JSONPlaceholder (typicode.com)           ║");
         NSLog(@"╚═══════════════════════════════════════════════════╝");
 

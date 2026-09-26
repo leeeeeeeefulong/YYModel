@@ -47,7 +47,10 @@ let package = Package(
         .testTarget(
             name: "YYJSONDecoderTests",
             dependencies: ["YYModel", "YYModelSwift"],
-            path: "Tests/YYJSONDecoderTests"
+            path: "Tests/YYJSONDecoderTests",
+            resources: [
+                .copy("Fixtures")
+            ]
         )
     ]
 )

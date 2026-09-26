@@ -66,44 +66,56 @@ NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:jsonArray];
 
 ### Verified Test Results
 
-Tested against live [JSONPlaceholder API](https://jsonplaceholder.typicode.com) with 76 test cases:
+Objective-C suite: `Demo/main.m`, run on 2026-09-26 against live [JSONPlaceholder](https://jsonplaceholder.typicode.com). The file contains 78 `TEST_ASSERT`s. Two of them run only when `/users` is a dictionary, and that API returns an array, so the run reports 76.
 
 ```
-╔═══════════════════════════════════════════════════╗
-║     YYModel Verification Test                    ║
-║     API: JSONPlaceholder (typicode.com)           ║
-╚═══════════════════════════════════════════════════╝
+T1  Basic Types         NSString / NSNumber / BOOL / int
+T2  Nested Objects      Address → Geo
+T3  String Arrays       NSObject generic parsing
+T4  Object Arrays       [Post] from /posts?_limit=5
+T5  Key-Path Mapping    company.name → companyName
+T6  Multi-Key Fallback  website / homepage / url
+T7  Property Blacklist  internalNote ignored
+T8  Custom Transform    email → uppercase
+T9  Decimal Precision   NSDecimalNumber "99999999.9999999999"
+T10 NSSecureCoding      archive / unarchive
+T11 Model Copy          yy_modelCopy
+T12 Hash & Equal        yy_modelHash / yy_modelIsEqual
+T13 Full Round-Trip     model → JSON → model
+T14 Null / Missing      null → nil, missing id → 0
+T15 Date JSON           ISO8601 / unix / millisecond payloads parse
+T16 Live API            10 users, companyName filled for all 10
+T17 Performance         1000 iterations of /users
 
-  T1  ✅ Basic Types        — NSString/NSNumber/BOOL/int
-  T2  ✅ Nested Objects     — Address → Geo recursive
-  T3  ✅ String Arrays      — NSObject generic parsing
-  T4  ✅ Object Arrays      — [Post] from /posts API
-  T5  ✅ Key-Path Mapping   — company.name → companyName
-  T6  ✅ Multi-Key Fallback — @[@"website",@"homepage",@"url"]
-  T7  ✅ Property Blacklist — internalNote ignored
-  T8  ✅ Custom Transform   — email → uppercase
-  T9  ✅ Decimal Precision  — NSDecimalNumber "99999999.9999999999"
-  T10 ✅ NSSecureCoding     — Archive/Unarchive round-trip
-  T11 ✅ Model Copy         — yy_modelCopy independent
-  T12 ✅ Hash & Equal       — yy_modelHash / yy_modelIsEqual
-  T13 ✅ Full Round-Trip    — Model → JSON → Model
-  T14 ✅ Null/Missing       — null→nil, missing→default, wrong type→safe
-  T15 ✅ Date Parsing       — ISO8601 / unix timestamp / ms timestamp
-  T16 ✅ Live API (10 users) — All fields parsed, key-path 100%
-  T17 ✅ Performance        — Benchmark passed
-
-  RESULTS: ✅ 76 passed  ❌ 0 failed
+RESULTS: 76 passed, 0 failed
 ```
 
-### Performance (Apple M-series)
+Swift Codable suite: `swift test`. Input files are `Tests/YYJSONDecoderTests/Fixtures/`.
+
+| Fixture | Expected |
+|---------|----------|
+| `s1-coercion.json` | `"floor":"3"` → `floorNumber` 3, `title` 8 → `"8"`, `"hot":"true"` → `true`, `"score":"1.5"` → 1.5, `age` `"18"` → 18, missing `age` stays nil, `extra` ignored |
+| `s2-null.json` | null `floor` / `title` / `hot` / `score` / `anchors` → 0, `""`, `false`, 0, `[]` |
+| `s3-missing.json` | `{}` → the same zero value as `s2` |
+| `s4-anchors.json` | top-level array, numeric `nick` 1 → `"1"` |
+| `s5-bool-number.json` | `hot` 0 → `false`, `floor` 1 → 1, missing `anchors` → `[]` |
+| `s6-date-iso.json` | `2026-09-05T12:00:00Z` |
+| `s7-date-unix.json` | `1700000000` seconds |
+| `s8-link.json` | optional `https://example.com` and enum `live` |
+| `s9-link-missing.json` | missing optional URL and enum → nil |
+| `s10-bad-floor.json` | `"floor":"nope"` throws |
+
+`Tests/YYJSONDecoderTests` also checks that an already parsed dictionary matches `s5-bool-number.json`, and that an Objective-C `NSObject` still decodes with `yy_model(withJSON:)`.
+
+### Performance
+
+`Demo` T17, 1000 iterations, JSONPlaceholder `/users`, measured 2026-09-26:
 
 | Operation | 1000 iterations | Per iteration |
-|-----------|----------------|---------------|
-| JSON → Model | 100ms | **0.10ms** |
-| Model → JSON | 25ms | **0.025ms** |
-| Full round-trip | 128ms | **0.13ms** |
-
-YYModel remains one of the fastest JSON model frameworks for Objective-C.
+|-----------|-----------------|---------------|
+| JSON → Model | 76.51ms | 0.077ms |
+| Model → JSON | 24.82ms | 0.025ms |
+| Full round-trip | 123.88ms | 0.124ms |
 
 ---
 
@@ -282,11 +294,9 @@ Existing Objective-C models keep using `yy_modelWithJSON:` / `yy_model(with:)`.
 
 ## Demo
 
-See `Demo/` directory for a complete test suite that validates all YYModel features against the live JSONPlaceholder API.
-
 ```bash
-cd Demo
-make        # build and run all 76 tests
+cd Demo && make     # Objective-C T1–T17. Last run: 76 passed, 0 failed
+swift test          # Swift Codable fixtures under Tests/YYJSONDecoderTests/Fixtures
 ```
 
 ## License

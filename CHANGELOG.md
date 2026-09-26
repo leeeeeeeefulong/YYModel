@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- README now matches the 2026-09-26 `Demo` run: 76 assertions passed, 0 failed. T17 timings are 76.51ms / 24.82ms / 123.88ms for 1000 iterations.
+- Swift Codable fixtures `s1`–`s10` live in `Tests/YYJSONDecoderTests/Fixtures` and run with `swift test`.
+
 ## 2.1.1 — CocoaPods platforms (2026-09-26)
 
 - CocoaPods `YYModel2` declares iOS and macOS so the spec can be published where watchOS and tvOS simulators are not installed.
