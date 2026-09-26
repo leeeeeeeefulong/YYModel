@@ -482,7 +482,7 @@ int main(int argc, const char * argv[]) {
     @autoreleasepool {
         NSLog(@"\n");
         NSLog(@"╔═══════════════════════════════════════════════════╗");
-        NSLog(@"║     YYModel 2.1.1 — Objective-C only             ║");
+        NSLog(@"║     YYModel 2.1.2 — Objective-C only             ║");
         NSLog(@"║     API: JSONPlaceholder (typicode.com)           ║");
         NSLog(@"╚═══════════════════════════════════════════════════╝");
 

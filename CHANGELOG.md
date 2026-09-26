@@ -1,13 +1,12 @@
 # Changelog
 
-## Unreleased
+## 2.1.2 — JSONDecoder fast path (2026-09-26)
 
-- README is marked **2.1.1** and separates three calls: Objective-C only, Swift only, and mixed.
-- ✅ Objective-C `Demo`: 76 passed, 0 failed. T17: 76.51ms / 24.82ms / 123.88ms per 1000 iterations.
-- `YYJSONDecoder` uses `JSONDecoder` first. The tolerant walker runs only when that decode throws.
-- ✅ Same `/users` payload, 1000 iterations: native `JSONDecoder` 76.87ms (0.077ms), `YYJSONDecoder` 76.59ms (0.077ms), Objective-C `yy_model` 72.57ms (0.073ms), mixed `yy_modelArray` 82.20ms (0.082ms).
-- The previous Swift-only 350.88ms (0.351ms) was the tolerant walker on every value.
-- Swift Codable fixtures `s1`–`s10` plus `users.json`. `swift test`: 13 passed, 0 failed.
+- `YYJSONDecoder` decodes with `JSONDecoder` first. Dates in that pass are Unix seconds.
+- The tolerant walker runs only after that decode throws. It zero-fills missing keys and `null`, and coerces string, number, and bool values.
+- ✅ `/users`, 1000 iterations: native `JSONDecoder` 76.87ms (0.077ms), `YYJSONDecoder` 76.59ms (0.077ms), Objective-C `yy_model` 72.57ms (0.073ms), mixed `yy_modelArray` 82.20ms (0.082ms).
+- ✅ `Demo`: 76 passed, 0 failed. ✅ `swift test`: 13 passed, 0 failed.
+- README separates Objective-C only, Swift only, and mixed calls.
 
 ## 2.1.1 — CocoaPods platforms (2026-09-26)
 

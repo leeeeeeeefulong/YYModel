@@ -9,7 +9,7 @@ High performance JSON model framework for iOS/macOS.
 [![License](https://img.shields.io/cocoapods/l/YYModel2.svg)](https://github.com/leeeeeeeefulong/YYModel/blob/master/LICENSE)
 [![Platform](https://img.shields.io/cocoapods/p/YYModel2.svg)](https://cocoapods.org/pods/YYModel2)
 
-Current release: **2.1.1** (`pod 'YYModel2', '2.1.1'`, SPM `from: "2.1.1"`).
+Current release: **2.1.2** (`pod 'YYModel2', '2.1.2'`, SPM `from: "2.1.2"`).
 
 ---
 
@@ -66,7 +66,7 @@ NSString *str = [user yy_modelToJSONString];
 NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:jsonArray];
 ```
 
-### Verified Test Results — YYModel 2.1.1
+### Verified Test Results — YYModel 2.1.2
 
 Measured 2026-09-26. Same machine for the Objective-C demo and `swift test`.
 
@@ -121,7 +121,7 @@ Live [JSONPlaceholder](https://jsonplaceholder.typicode.com). The file has 78 `T
 ✅ `YYBox.yy_model(withJSON:)` still fills an `NSObject` from a Swift test.
 ✅ `NSArray.yy_modelArray(with: OCUser.self, json: users.json)` parses 10 users. `company.name` lands in `companyName` (`Romaguera-Crona`) through `modelCustomPropertyMapper`.
 
-### Performance — YYModel 2.1.1
+### Performance — YYModel 2.1.2
 
 1000 iterations, JSONPlaceholder `/users` (10 users, nested address and company). Measured 2026-09-26 after the fast path below. ✅ `swift test` still 13 passed, 0 failed. ✅ `Demo` still 76 passed, 0 failed.
 
@@ -175,7 +175,7 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/leeeeeeeefulong/YYModel", from: "2.1.1")
+    .package(url: "https://github.com/leeeeeeeefulong/YYModel", from: "2.1.2")
 ]
 ```
 
@@ -185,7 +185,7 @@ dependencies: [
 
 ```ruby
 # New pod name (original YYModel owned by ibireme on trunk)
-pod 'YYModel2', '2.1.1'
+pod 'YYModel2', '2.1.2'
 ```
 
 > **Note**: The original `YYModel` pod on CocoaPods trunk is owned by ibireme and will not receive updates. This fork is published as `YYModel2`. CocoaPods trunk becomes read-only on 2026-12-02.
@@ -284,7 +284,7 @@ NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:jsonArray];
 @end
 ```
 
-### Which call to use — 2.1.1
+### Which call to use — 2.1.2
 
 `YYJSONDecoder` accepts `Data` or an already parsed object. Swift models stay plain `Codable` structs and do not adopt a YYModel protocol. Missing keys and JSON `null` become `0`, `""`, `false`, `[]`, or an empty nested object. Strings, numbers, and bools are coerced. Rename keys with `CodingKeys`. `URL` and raw-value enums have no zero value; make those properties optional when the key may be absent. A value that cannot be coerced throws.
 
@@ -303,7 +303,7 @@ NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:data];
 
 | Distribution | Import |
 |--------------|--------|
-| ✅ CocoaPods `YYModel2` 2.1.1 | `#import "YYModel.h"` or `@import YYModel2;` |
+| ✅ CocoaPods `YYModel2` 2.1.2 | `#import "YYModel.h"` or `@import YYModel2;` |
 | ✅ SPM product `YYModel` | `#import <YYModel/YYModel.h>` |
 
 #### 2. Swift only
@@ -312,7 +312,7 @@ Use this when the model is a `struct` or a Swift class that is only `Codable`. D
 
 ```swift
 import YYModelSwift          // SPM product YYModelSwift
-// import YYModel2           // CocoaPods 2.1.1: YYJSONDecoder is in this module
+// import YYModel2           // CocoaPods 2.1.2: YYJSONDecoder is in this module
 
 struct Level: Codable {
     var floorNumber: Int
@@ -333,7 +333,7 @@ let same = try YYJSONDecoder().decode(Level.self, from: dictionary)
 | Distribution | Import | API |
 |--------------|--------|-----|
 | ✅ SPM | `import YYModelSwift` | `YYJSONDecoder` |
-| ✅ CocoaPods `YYModel2` 2.1.1 | `import YYModel2` | `YYJSONDecoder` |
+| ✅ CocoaPods `YYModel2` 2.1.2 | `import YYModel2` | `YYJSONDecoder` |
 
 SPM keeps the Swift decoder in its own target because a Swift package target cannot mix `.swift` and `.m`.
 
@@ -344,7 +344,7 @@ Use this when one Swift file both decodes new `Codable` structs and fills existi
 ```swift
 import YYModel                // SPM: Objective-C yy_model
 import YYModelSwift           // SPM: YYJSONDecoder
-// CocoaPods 2.1.1: a single `import YYModel2` exposes both.
+// CocoaPods 2.1.2: a single `import YYModel2` exposes both.
 
 let level = try YYJSONDecoder().decode(Level.self, from: data)
 let user = User.yy_model(withJSON: jsonString)
@@ -353,7 +353,7 @@ let users = NSArray.yy_modelArray(with: User.self, json: data) as? [User]
 
 | Distribution | What you import | What you call |
 |--------------|-----------------|---------------|
-| ✅ CocoaPods `YYModel2` 2.1.1 | `import YYModel2` | `YYJSONDecoder` and `yy_model(withJSON:)` / `yy_modelArray(with:json:)` |
+| ✅ CocoaPods `YYModel2` 2.1.2 | `import YYModel2` | `YYJSONDecoder` and `yy_model(withJSON:)` / `yy_modelArray(with:json:)` |
 | ✅ SPM | `import YYModel` and `import YYModelSwift` | same two APIs, two modules |
 
 Objective-C classes keep `modelCustomPropertyMapper` and `modelContainerPropertyGenericClass`. Swift structs keep `CodingKeys`. The two parsers do not share a mapping table.
@@ -361,8 +361,8 @@ Objective-C classes keep `modelCustomPropertyMapper` and `modelContainerProperty
 ## Demo
 
 ```bash
-cd Demo && make     # ✅ Objective-C only, T1–T17. 2.1.1 run: 76 passed, 0 failed
-swift test          # ✅ Swift only + mixed. 2.1.1 run: 13 passed, 0 failed
+cd Demo && make     # ✅ Objective-C only, T1–T17. 2.1.2 run: 76 passed, 0 failed
+swift test          # ✅ Swift only + mixed. 2.1.2 run: 13 passed, 0 failed
 ```
 
 ## License
