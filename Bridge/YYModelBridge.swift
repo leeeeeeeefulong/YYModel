@@ -2,8 +2,9 @@
 //  YYModelBridge.swift
 //  YYModel iOS 27 Bridge
 //
-//  Bridges YYModel (ObjC) with Codable (Swift).
-//  New code uses Codable; old ObjC models continue using YYModel.
+//  Not compiled into the pod or the Swift package.
+//  New Swift models use YYJSONDecoder with plain Codable.
+//  This file remains only as an unshipped ObjC helper sketch.
 //
 //  Usage:
 //    // In new Swift code — use Codable directly:

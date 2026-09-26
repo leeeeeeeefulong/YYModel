@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.1.0 — Swift Codable decoder (2026-09-26)
+
+### Added
+
+- `YYJSONDecoder` decodes plain `Codable` structs and classes. Models do not conform to a YYModel protocol.
+- Missing keys and JSON `null` use zero values for `Bool`, numbers, `String`, `Date`, `Data`, arrays, dictionaries, and nested objects.
+- String, number, and bool values are coerced (`"3"` and `3` both become `Int`).
+- `decode(_:from:)` accepts `Data` or an already parsed JSON object.
+- SPM and CocoaPods (`YYModel2`) both compile `YYModel/YYJSONDecoder.swift`.
+
+### Unchanged
+
+- Objective-C `yy_modelWithJSON:` / `yy_modelWithDictionary:` behavior.
+- `URL` and raw-value enums still need to be optional when a key may be missing. An uncoercible value throws instead of becoming zero.
+
 ## 2.0.0 — Modern iOS Compatibility + SPM Support (2026-09-06)
 
 ### Distribution

@@ -247,26 +247,38 @@ NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:jsonArray];
 @end
 ```
 
-### Swift Codable Bridge
+### Swift Codable
 
-For new Swift code, use `Codable` directly. For mixing ObjC models with Swift:
+Swift models stay plain `Codable` structs. They do not adopt a YYModel protocol.
+`YYJSONDecoder` accepts JSON `Data` or an already parsed object. Missing keys and
+JSON `null` become zero values (`0`, `""`, `false`, `[]`, empty nested objects).
+Strings, numbers, and bools are coerced. Rename keys with `CodingKeys`.
+`URL` and raw-value enums have no zero value; make those properties optional when
+the key may be absent. A value that cannot be coerced throws.
 
 ```swift
-import YYModel
+import YYModelSwift     // Swift Package Manager
+import YYModel          // Objective-C API, Swift Package Manager
+// import YYModel2      // CocoaPods: both APIs are in this module
 
-// Wrap ObjC model in Codable pipeline
-struct APIResponse: Codable {
-    let data: YYModelWrapper<OldObjCUser>
+struct Level: Codable {
+    var floorNumber: Int
+    var title: String
+    var anchors: [Anchor]
+
+    enum CodingKeys: String, CodingKey {
+        case floorNumber = "floor"
+        case title
+        case anchors
+    }
 }
 
-// Decode ObjC model from Swift
-let user = OldObjCUser.yy_model(withJSON: jsonString)
-
-// Migrate legacy NSCoding archives
-let migrated = OldUser.migrateLegacyArchive(from: legacyData)
+let level = try YYJSONDecoder().decode(Level.self, from: data)
+let same = try YYJSONDecoder().decode(Level.self, from: dictionary)
 ```
 
-See `Bridge/YYModelBridge.swift` for full API.
+Existing Objective-C models keep using `yy_modelWithJSON:` / `yy_model(with:)`.
+`Bridge/YYModelBridge.swift` is not part of the pod or the Swift package.
 
 ## Demo
 

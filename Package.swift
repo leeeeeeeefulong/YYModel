@@ -21,6 +21,10 @@ let package = Package(
         .library(
             name: "YYModel",
             targets: ["YYModel"]
+        ),
+        .library(
+            name: "YYModelSwift",
+            targets: ["YYModelSwift"]
         )
     ],
     targets: [
@@ -35,6 +39,15 @@ let package = Package(
                 .linkedFramework("Foundation"),
                 .linkedFramework("CoreFoundation")
             ]
+        ),
+        .target(
+            name: "YYModelSwift",
+            path: "YYModelSwift"
+        ),
+        .testTarget(
+            name: "YYJSONDecoderTests",
+            dependencies: ["YYModel", "YYModelSwift"],
+            path: "Tests/YYJSONDecoderTests"
         )
     ]
 )

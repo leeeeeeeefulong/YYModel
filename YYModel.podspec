@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name         = 'YYModel'
   s.summary      = 'High performance JSON model framework for iOS/macOS.'
-  s.version      = '2.0.0'
+  s.version      = '2.1.0'
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.authors      = { 'ibireme' => 'ibireme@gmail.com', 'leeeeeeeefulong' => 'leeeeeeeefulong@github.com' }
   s.homepage     = 'https://github.com/leeeeeeeefulong/YYModel'
@@ -29,7 +29,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => 'https://github.com/leeeeeeeefulong/YYModel.git', :tag => s.version.to_s }
 
   s.requires_arc = true
-  s.source_files = 'YYModel/*.{h,m}'
+  s.source_files = 'YYModel/*.{h,m}', 'YYModelSwift/*.swift'
   s.public_header_files = 'YYModel/*.{h}'
 
   s.frameworks = 'Foundation', 'CoreFoundation'
