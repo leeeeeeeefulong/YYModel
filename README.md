@@ -123,17 +123,25 @@ Live [JSONPlaceholder](https://jsonplaceholder.typicode.com). The file has 78 `T
 
 ### Performance — YYModel 2.1.1
 
-1000 iterations, JSONPlaceholder `/users` (10 users, nested address and company). 2026-09-26.
+1000 iterations, JSONPlaceholder `/users` (10 users, nested address and company). Measured 2026-09-26 after the fast path below. ✅ `swift test` still 13 passed, 0 failed. ✅ `Demo` still 76 passed, 0 failed.
 
 | Call | JSON → Model | Per iteration | Model → JSON | Per iteration |
 |------|----------------|---------------|--------------|---------------|
-| ✅ Objective-C only, `yy_model` in `Demo` T17 | 76.51ms | 0.077ms | 24.82ms | 0.025ms |
-| ✅ Mixed, Swift calls `yy_modelArray` / `yy_modelToJSONObject` | 81.19ms | 0.081ms | 32.51ms | 0.033ms |
-| ✅ Swift only, `YYJSONDecoder` / `JSONEncoder` | 350.88ms | 0.351ms | 81.54ms | 0.082ms |
+| ✅ Objective-C only, `yy_model` in `Demo` T17 | 72.57ms | 0.073ms | 24.08ms | 0.024ms |
+| ✅ Native `JSONDecoder` / `JSONEncoder` | 76.87ms | 0.077ms | 67.52ms | 0.068ms |
+| ✅ Swift `YYJSONDecoder` on this clean payload | 76.59ms | 0.077ms | 66.44ms | 0.066ms |
+| ✅ Mixed, Swift calls `yy_modelArray` / `yy_modelToJSONObject` | 82.20ms | 0.082ms | 33.06ms | 0.033ms |
 
-Objective-C full round-trip in T17: ✅ 123.88ms, 0.124ms per iteration.
+Objective-C full round-trip in T17: ✅ 123.44ms, 0.123ms per iteration.
 
-Swift → JSON uses `JSONEncoder`. `YYJSONDecoder` only decodes. The Swift model is a `Codable` struct with nested `address` and `company`. The mixed row is a Swift `NSObject` subclass using `modelCustomPropertyMapper`, so it is the same Objective-C engine called from Swift.
+On this payload the four decode paths are in the same band. `YYJSONDecoder` matches native `JSONDecoder` because the JSON already fits `Codable`, so the call never enters the tolerant walker. The earlier 350.88ms / 0.351ms figure was that walker running on every field.
+
+`YYJSONDecoder` now does two steps:
+
+1. Decode with `JSONDecoder`. Dates in this pass are Unix seconds.
+2. Only if that throws, walk the object: zero-fill missing keys and `null`, and coerce strings, numbers, and bools. ISO8601 dates, `"3"` stored in an `Int`, and `0`/`1` stored in a `Bool` take this path.
+
+A mismatched payload therefore pays for one failed `JSONDecoder` pass plus the walker. Clean payloads stay on the system decoder. Swift → JSON in the table is `JSONEncoder`, not YYModel. The mixed row is still the Objective-C engine, including `modelCustomPropertyMapper`.
 
 ---
 

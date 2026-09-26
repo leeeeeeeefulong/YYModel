@@ -123,6 +123,17 @@ final class YYJSONDecoderTests: XCTestCase {
         let data = try fixture("users")
         let iterations = 1000
 
+        let nativeDecoder = JSONDecoder()
+        nativeDecoder.dateDecodingStrategy = .secondsSince1970
+        _ = try nativeDecoder.decode([SwiftUser].self, from: data)
+        let nativeDecode = try elapsed(iterations) {
+            _ = try nativeDecoder.decode([SwiftUser].self, from: data)
+        }
+        let nativeUsers = try nativeDecoder.decode([SwiftUser].self, from: data)
+        let nativeEncode = elapsed(iterations) {
+            _ = try? JSONEncoder().encode(nativeUsers)
+        }
+
         _ = try YYJSONDecoder().decode([SwiftUser].self, from: data)
         let swiftDecode = try elapsed(iterations) {
             _ = try YYJSONDecoder().decode([SwiftUser].self, from: data)
@@ -146,6 +157,8 @@ final class YYJSONDecoderTests: XCTestCase {
             _ = (mixedUsers as NSArray).yy_modelToJSONObject()
         }
 
+        print(String(format: "NATIVE_DECODE %.2fms %.3fms", nativeDecode.total, nativeDecode.each))
+        print(String(format: "NATIVE_ENCODE %.2fms %.3fms", nativeEncode.total, nativeEncode.each))
         print(String(format: "SWIFT_DECODE %.2fms %.3fms", swiftDecode.total, swiftDecode.each))
         print(String(format: "SWIFT_ENCODE %.2fms %.3fms", swiftEncode.total, swiftEncode.each))
         print(String(format: "MIXED_DECODE %.2fms %.3fms", mixedDecode.total, mixedDecode.each))

@@ -3,9 +3,9 @@
 //  YYModel
 //
 //  Decodes plain Swift Codable values. Models do not conform to a YYModel protocol.
-//  Missing keys and JSON null become zero values for Bool, numbers, String, Data,
-//  Date, arrays, dictionaries, and nested objects. String / number / bool values
-//  are coerced. Key renames stay on Swift CodingKeys.
+//  Data that already matches Codable uses JSONDecoder (Unix seconds for dates).
+//  If that fails, a tolerant walker zero-fills missing keys and nulls, and coerces
+//  string, number, and bool values. Key renames stay on Swift CodingKeys.
 //
 //  URL and raw-value enums have no zero value: keep those properties optional
 //  when the key may be absent. A value that cannot be coerced throws.
@@ -16,13 +16,31 @@ import Foundation
 public struct YYJSONDecoder: Sendable {
     public init() {}
 
+    /// `Data` that already matches `Codable` is decoded with `JSONDecoder`.
+    /// Dates in that pass are Unix seconds. If that decode throws, the tolerant
+    /// walker runs: it zero-fills missing keys and nulls, and coerces string,
+    /// number, and bool values.
     public func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
+        if let value = try? Self.fastDecoder().decode(type, from: data) {
+            return value
+        }
         let object = try JSONSerialization.jsonObject(with: data, options: [.fragmentsAllowed])
         return try decode(type, from: object)
     }
 
     public func decode<T: Decodable>(_ type: T.Type, from object: Any) throws -> T {
-        try YYJSONValueDecoder.decode(type, from: object, codingPath: [])
+        if JSONSerialization.isValidJSONObject(object),
+           let data = try? JSONSerialization.data(withJSONObject: object),
+           let value = try? Self.fastDecoder().decode(type, from: data) {
+            return value
+        }
+        return try YYJSONValueDecoder.decode(type, from: object, codingPath: [])
+    }
+
+    private static func fastDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .secondsSince1970
+        return decoder
     }
 }
 

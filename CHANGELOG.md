@@ -4,8 +4,9 @@
 
 - README is marked **2.1.1** and separates three calls: Objective-C only, Swift only, and mixed.
 - ✅ Objective-C `Demo`: 76 passed, 0 failed. T17: 76.51ms / 24.82ms / 123.88ms per 1000 iterations.
-- ✅ Swift only `YYJSONDecoder` on `users.json`: 350.88ms decode, 81.54ms `JSONEncoder` encode, per 1000 iterations (0.351ms / 0.082ms).
-- ✅ Mixed, Swift calling `yy_modelArray`: 81.19ms decode, 32.51ms `yy_modelToJSONObject`, per 1000 iterations (0.081ms / 0.033ms).
+- `YYJSONDecoder` uses `JSONDecoder` first. The tolerant walker runs only when that decode throws.
+- ✅ Same `/users` payload, 1000 iterations: native `JSONDecoder` 76.87ms (0.077ms), `YYJSONDecoder` 76.59ms (0.077ms), Objective-C `yy_model` 72.57ms (0.073ms), mixed `yy_modelArray` 82.20ms (0.082ms).
+- The previous Swift-only 350.88ms (0.351ms) was the tolerant walker on every value.
 - Swift Codable fixtures `s1`–`s10` plus `users.json`. `swift test`: 13 passed, 0 failed.
 
 ## 2.1.1 — CocoaPods platforms (2026-09-26)
