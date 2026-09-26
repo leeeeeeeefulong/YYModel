@@ -118,6 +118,128 @@ final class YYJSONDecoderTests: XCTestCase {
         let box = try XCTUnwrap(YYBox.yy_model(withJSON: #"{"name":"yy"}"#))
         XCTAssertEqual(box.name, "yy")
     }
+
+    func testUsersFixturePerformance() throws {
+        let data = try fixture("users")
+        let iterations = 1000
+
+        _ = try YYJSONDecoder().decode([SwiftUser].self, from: data)
+        let swiftDecode = try elapsed(iterations) {
+            _ = try YYJSONDecoder().decode([SwiftUser].self, from: data)
+        }
+        let users = try YYJSONDecoder().decode([SwiftUser].self, from: data)
+        XCTAssertEqual(users.count, 10)
+        XCTAssertEqual(users[0].name, "Leanne Graham")
+        XCTAssertEqual(users[0].address.city, "Gwenborough")
+        let swiftEncode = elapsed(iterations) {
+            _ = try? JSONEncoder().encode(users)
+        }
+
+        _ = NSArray.yy_modelArray(with: OCUser.self, json: data)
+        let mixedDecode = elapsed(iterations) {
+            _ = NSArray.yy_modelArray(with: OCUser.self, json: data)
+        }
+        let mixedUsers = try XCTUnwrap(NSArray.yy_modelArray(with: OCUser.self, json: data) as? [OCUser])
+        XCTAssertEqual(mixedUsers.count, 10)
+        XCTAssertEqual(mixedUsers[0].companyName, "Romaguera-Crona")
+        let mixedEncode = elapsed(iterations) {
+            _ = (mixedUsers as NSArray).yy_modelToJSONObject()
+        }
+
+        print(String(format: "SWIFT_DECODE %.2fms %.3fms", swiftDecode.total, swiftDecode.each))
+        print(String(format: "SWIFT_ENCODE %.2fms %.3fms", swiftEncode.total, swiftEncode.each))
+        print(String(format: "MIXED_DECODE %.2fms %.3fms", mixedDecode.total, mixedDecode.each))
+        print(String(format: "MIXED_ENCODE %.2fms %.3fms", mixedEncode.total, mixedEncode.each))
+    }
+}
+
+private struct SwiftGeo: Codable {
+    var lat: String
+    var lng: String
+}
+
+private struct SwiftAddress: Codable {
+    var street: String
+    var suite: String
+    var city: String
+    var zipcode: String
+    var geo: SwiftGeo
+}
+
+private struct SwiftCompany: Codable {
+    var name: String
+    var catchPhrase: String
+    var bs: String
+}
+
+private struct SwiftUser: Codable {
+    var userId: Int
+    var name: String
+    var username: String
+    var email: String
+    var phone: String
+    var website: String
+    var address: SwiftAddress
+    var company: SwiftCompany
+
+    enum CodingKeys: String, CodingKey {
+        case userId = "id"
+        case name, username, email, phone, website, address, company
+    }
+}
+
+private final class OCGeo: NSObject {
+    @objc var lat: String = ""
+    @objc var lng: String = ""
+}
+
+private final class OCAddress: NSObject {
+    @objc var street: String = ""
+    @objc var suite: String = ""
+    @objc var city: String = ""
+    @objc var zipcode: String = ""
+    @objc var geo: OCGeo?
+}
+
+private final class OCCompany: NSObject {
+    @objc var name: String = ""
+    @objc var catchPhrase: String = ""
+    @objc var bs: String = ""
+}
+
+private final class OCUser: NSObject {
+    @objc var userId: Int = 0
+    @objc var name: String = ""
+    @objc var username: String = ""
+    @objc var email: String = ""
+    @objc var phone: String = ""
+    @objc var website: String = ""
+    @objc var address: OCAddress?
+    @objc var company: OCCompany?
+    @objc var companyName: String = ""
+    @objc var homepage: String = ""
+
+    override class func modelCustomPropertyMapper() -> [String: Any]? {
+        [
+            "userId": "id",
+            "companyName": "company.name",
+            "homepage": ["website", "homepage", "url"]
+        ]
+    }
+}
+
+private struct Timing {
+    var total: Double
+    var each: Double
+}
+
+private func elapsed(_ iterations: Int, _ body: () throws -> Void) rethrows -> Timing {
+    let start = CFAbsoluteTimeGetCurrent()
+    for _ in 0..<iterations {
+        try body()
+    }
+    let total = (CFAbsoluteTimeGetCurrent() - start) * 1000
+    return Timing(total: total, each: total / Double(iterations))
 }
 
 private final class YYBox: NSObject {

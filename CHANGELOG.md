@@ -2,8 +2,11 @@
 
 ## Unreleased
 
-- README now matches the 2026-09-26 `Demo` run: 76 assertions passed, 0 failed. T17 timings are 76.51ms / 24.82ms / 123.88ms for 1000 iterations.
-- Swift Codable fixtures `s1`–`s10` live in `Tests/YYJSONDecoderTests/Fixtures` and run with `swift test`.
+- README is marked **2.1.1** and separates three calls: Objective-C only, Swift only, and mixed.
+- ✅ Objective-C `Demo`: 76 passed, 0 failed. T17: 76.51ms / 24.82ms / 123.88ms per 1000 iterations.
+- ✅ Swift only `YYJSONDecoder` on `users.json`: 350.88ms decode, 81.54ms `JSONEncoder` encode, per 1000 iterations (0.351ms / 0.082ms).
+- ✅ Mixed, Swift calling `yy_modelArray`: 81.19ms decode, 32.51ms `yy_modelToJSONObject`, per 1000 iterations (0.081ms / 0.033ms).
+- Swift Codable fixtures `s1`–`s10` plus `users.json`. `swift test`: 13 passed, 0 failed.
 
 ## 2.1.1 — CocoaPods platforms (2026-09-26)
 
