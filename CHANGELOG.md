@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.1 — CocoaPods platforms (2026-09-26)
+
+- CocoaPods `YYModel2` declares iOS and macOS so the spec can be published where watchOS and tvOS simulators are not installed.
+- Swift Package Manager still declares watchOS and tvOS. Decoder behavior is the same as 2.1.0.
+
 ## 2.1.0 — Swift Codable decoder (2026-09-26)
 
 ### Added
@@ -8,7 +13,8 @@
 - Missing keys and JSON `null` use zero values for `Bool`, numbers, `String`, `Date`, `Data`, arrays, dictionaries, and nested objects.
 - String, number, and bool values are coerced (`"3"` and `3` both become `Int`).
 - `decode(_:from:)` accepts `Data` or an already parsed JSON object.
-- SPM and CocoaPods (`YYModel2`) both compile `YYModel/YYJSONDecoder.swift`.
+- SPM and CocoaPods (`YYModel2`) both compile `YYModelSwift/YYJSONDecoder.swift`.
+- CocoaPods declares iOS and macOS. The Swift package still declares watchOS and tvOS.
 
 ### Unchanged
 

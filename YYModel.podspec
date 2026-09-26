@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name         = 'YYModel'
   s.summary      = 'High performance JSON model framework for iOS/macOS.'
-  s.version      = '2.1.0'
+  s.version      = '2.1.1'
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.authors      = { 'ibireme' => 'ibireme@gmail.com', 'leeeeeeeefulong' => 'leeeeeeeefulong@github.com' }
   s.homepage     = 'https://github.com/leeeeeeeefulong/YYModel'
@@ -23,8 +23,6 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '11.0'
   s.osx.deployment_target = '10.13'
-  s.watchos.deployment_target = '4.0'
-  s.tvos.deployment_target = '11.0'
 
   s.source       = { :git => 'https://github.com/leeeeeeeefulong/YYModel.git', :tag => s.version.to_s }
 
