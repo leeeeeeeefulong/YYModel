@@ -144,3 +144,17 @@
 @property (nonatomic, strong) NSDecimalNumber *rate;
 @property (nonatomic, copy)   NSString *currency;
 @end
+
+// ============================================================
+#pragma mark - InheritanceModel (T18: Superclass property inheritance)
+// ============================================================
+
+@interface BaseAnimal : NSObject
+@property (nonatomic, assign) NSInteger animalId;
+@property (nonatomic, copy)   NSString *species;
+@end
+
+@interface Cat : BaseAnimal
+@property (nonatomic, copy)   NSString *name;
+@property (nonatomic, assign) NSInteger age;
+@end

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.3 — Superclass property inheritance (2026-10-03)
+
+- `_YYModelMeta` traverses superclass properties recursively up to `NSObject`.
+- Subclass properties take precedence over superclass properties of the same name.
+- Custom property mapper and blacklist/whitelist apply across the inheritance hierarchy.
+- ✅ `Demo`: 81 passed, 0 failed (added T18 for superclass property inheritance).
+- ✅ `swift test`: 13 passed, 0 failed (added inheritance assertion to `testObjectiveCModelStillDecodes`).
+
 ## 2.1.2 — JSONDecoder fast path (2026-09-26)
 
 - `YYJSONDecoder` decodes with `JSONDecoder` first. Dates in that pass are Unix seconds.

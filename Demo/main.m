@@ -478,11 +478,34 @@ static void TestT17_Performance(void) {
 #pragma mark - Main
 // ============================================================
 
+
+// ============================================================
+#pragma mark - T18: Superclass Property Inheritance
+// ============================================================
+
+static void TestT18_Inheritance(void) {
+    TEST_SECTION(@"T18 — Superclass Property Inheritance");
+
+    NSDictionary *json = @{
+        @"animalId" : @(42),
+        @"species"  : @"Felis catus",
+        @"name"     : @"Mimi",
+        @"age"      : @(3)
+    };
+
+    Cat *cat = [Cat yy_modelWithDictionary:json];
+    TEST_ASSERT(cat != nil, @"Cat parsed from dictionary");
+    TEST_ASSERT(cat.animalId == 42, @"cat.animalId == 42 (inherited from BaseAnimal)");
+    TEST_ASSERT([cat.species isEqualToString:@"Felis catus"], @"cat.species correct (inherited from BaseAnimal)");
+    TEST_ASSERT([cat.name isEqualToString:@"Mimi"], @"cat.name correct (declared on Cat)");
+    TEST_ASSERT(cat.age == 3, @"cat.age == 3 (declared on Cat)");
+}
+
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
         NSLog(@"\n");
         NSLog(@"╔═══════════════════════════════════════════════════╗");
-        NSLog(@"║     YYModel 2.1.2 — Objective-C only             ║");
+        NSLog(@"║     YYModel 2.1.3 — Objective-C only             ║");
         NSLog(@"║     API: JSONPlaceholder (typicode.com)           ║");
         NSLog(@"╚═══════════════════════════════════════════════════╝");
 
@@ -504,6 +527,7 @@ int main(int argc, const char * argv[]) {
         TestT15_DateParsing();
         TestT16_LiveAPIFull();
         TestT17_Performance();
+        TestT18_Inheritance();
 
         // Summary
         NSLog(@"\n═══════════════════════════════════════════════════");

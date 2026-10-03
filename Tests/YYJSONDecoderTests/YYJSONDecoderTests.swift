@@ -115,8 +115,9 @@ final class YYJSONDecoderTests: XCTestCase {
     }
 
     func testObjectiveCModelStillDecodes() throws {
-        let box = try XCTUnwrap(YYBox.yy_model(withJSON: #"{"name":"yy"}"#))
+        let box = try XCTUnwrap(YYBox.yy_model(withJSON: #"{"name":"yy","baseId":101}"#))
         XCTAssertEqual(box.name, "yy")
+        XCTAssertEqual(box.baseId, 101)
     }
 
     func testUsersFixturePerformance() throws {
@@ -255,6 +256,10 @@ private func elapsed(_ iterations: Int, _ body: () throws -> Void) rethrows -> T
     return Timing(total: total, each: total / Double(iterations))
 }
 
-private final class YYBox: NSObject {
+private class YYBoxBase: NSObject {
+    @objc var baseId: Int = 0
+}
+
+private final class YYBox: YYBoxBase {
     @objc var name: String = ""
 }

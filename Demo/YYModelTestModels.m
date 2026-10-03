@@ -148,3 +148,9 @@
 
 @implementation PrecisionModel
 @end
+
+@implementation BaseAnimal
+@end
+
+@implementation Cat
+@end

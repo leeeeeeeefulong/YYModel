@@ -484,15 +484,20 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained id model,
     // Build all property metas
     NSMutableDictionary *mapper = [NSMutableDictionary new];
     NSMutableArray *allPropertyMetas = [NSMutableArray new];
+    NSMutableSet *discoveredPropertyNames = [NSMutableSet new];
 
-    for (NSString *propertyName in classInfo.propertyInfos) {
-        if (blacklist && [blacklist containsObject:propertyName]) continue;
-        if (whitelist && ![whitelist containsObject:propertyName]) continue;
+    for (YYClassInfo *currentClassInfo = classInfo; currentClassInfo && currentClassInfo.superCls; currentClassInfo = currentClassInfo.superClassInfo) {
+        for (NSString *propertyName in currentClassInfo.propertyInfos) {
+            if ([discoveredPropertyNames containsObject:propertyName]) continue;
+            [discoveredPropertyNames addObject:propertyName];
 
-        YYClassPropertyInfo *propertyInfo = classInfo.propertyInfos[propertyName];
-        _YYModelPropertyMeta *meta = [_YYModelPropertyMeta metaWithClassInfo:classInfo
-                                                                propertyInfo:propertyInfo
-                                                                  genericCls:genericMapper[propertyName]];
+            if (blacklist && [blacklist containsObject:propertyName]) continue;
+            if (whitelist && ![whitelist containsObject:propertyName]) continue;
+
+            YYClassPropertyInfo *propertyInfo = currentClassInfo.propertyInfos[propertyName];
+            _YYModelPropertyMeta *meta = [_YYModelPropertyMeta metaWithClassInfo:classInfo
+                                                                    propertyInfo:propertyInfo
+                                                                      genericCls:genericMapper[propertyName]];
         if (!meta || !meta->_name) continue;
         if (!meta->_getter || !meta->_setter) continue;
 
@@ -509,6 +514,7 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained id model,
         }
 
         [allPropertyMetas addObject:meta];
+        }
     }
 
     _allPropertyMetas = allPropertyMetas;
