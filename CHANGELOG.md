@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Numeric correctness (F1–F4)
+
+- Parse decimal and C99 hexadecimal numeric strings using one ASCII-byte grammar. Reject Unicode combining marks and malformed suffixes before Foundation conversion.
+- Normalize coefficients and exponent values, including leading zeros and zero coefficients with arbitrarily large exponents.
+- Truncate decimal and hexadecimal strings to integers using exact digits/bits and destination range checks; preserve values above 2^53 and reject overflow without a Double intermediate.
+- Convert hexadecimal Decimal fields using decimal arithmetic, preserving their precision beyond binary64 while respecting Foundation Decimal's finite range and precision.
+- Add a standalone public API validation package with generated numeric boundaries and attributed, offline Open-Meteo weather fixtures. No business application is required for component acceptance.
+
 ## 2.1.8 — Strict Numeric Architecture & High-Precision Preservation (2026-10-03)
 
 ### Bug Fixes & Architectural Enhancements (E1–E4)

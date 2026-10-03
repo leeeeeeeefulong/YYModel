@@ -195,108 +195,173 @@ enum YYJSONValueDecoder {
         return nil
     }
 
-    private static func isStrictDecimalSyntax(_ s: Substring) -> Bool {
-        var str = s
-        if str.hasPrefix("+") || str.hasPrefix("-") {
-            str = str.dropFirst()
-        }
-        guard !str.isEmpty else { return false }
-
-        var hasDot = false
-        var hasExp = false
-        var intDigitCount = 0
-        var fracDigitCount = 0
-        var expDigitCount = 0
-        var expHasSign = false
-
-        for c in str {
-            if c >= "0" && c <= "9" {
-                if hasExp {
-                    expDigitCount += 1
-                } else if hasDot {
-                    fracDigitCount += 1
-                } else {
-                    intDigitCount += 1
-                }
-            } else if c == "." {
-                if hasDot || hasExp { return false }
-                hasDot = true
-            } else if c == "e" || c == "E" {
-                if hasExp { return false }
-                if intDigitCount == 0 && fracDigitCount == 0 { return false }
-                hasExp = true
-            } else if c == "+" || c == "-" {
-                if !hasExp || expDigitCount > 0 || expHasSign { return false }
-                expHasSign = true
-            } else {
-                return false
-            }
-        }
-
-        if intDigitCount == 0 && fracDigitCount == 0 { return false }
-        if hasExp && expDigitCount == 0 { return false }
-        return true
+    /// A validated ASCII coefficient and scale: base 10, or base 16 with a binary scale.
+    private struct NumericText {
+        let negative: Bool
+        let radix: Int
+        let digits: [UInt8]
+        let scale: Int
     }
 
-    private static func isStrictHexFloatSyntax(_ s: Substring) -> Bool {
-        var str = s
-        if str.hasPrefix("+") || str.hasPrefix("-") {
-            str = str.dropFirst()
+    private static func numericText(_ text: String) -> NumericText? {
+        let bytes = Array(text.utf8)
+        guard !bytes.isEmpty else { return nil }
+        var index = 0
+        let negative = bytes[0] == 45
+        if bytes[0] == 43 || negative { index += 1 }
+        var radix = 10
+        if index + 1 < bytes.count, bytes[index] == 48,
+           bytes[index + 1] == 120 || bytes[index + 1] == 88 {
+            radix = 16
+            index += 2
         }
-        guard str.hasPrefix("0x") || str.hasPrefix("0X") else { return false }
-        str = str.dropFirst(2)
-        guard !str.isEmpty else { return false }
-
+        var digits: [UInt8] = []
         var hasDot = false
-        var hasP = false
-        var hexDigitCount = 0
-        var expDigitCount = 0
-        var expHasSign = false
-
-        for c in str {
-            let isHex = (c >= "0" && c <= "9") || (c >= "a" && c <= "f") || (c >= "A" && c <= "F")
-            if isHex {
-                if hasP {
-                    if c >= "0" && c <= "9" {
-                        expDigitCount += 1
-                    } else {
-                        return false
-                    }
-                } else {
-                    hexDigitCount += 1
-                }
-            } else if c == "." {
-                if hasDot || hasP { return false }
+        var fractionalDigits = 0
+        coefficient: while index < bytes.count {
+            let byte = bytes[index]
+            let digit: UInt8
+            switch byte {
+            case 48...57: digit = byte - 48
+            case 65...70 where radix == 16: digit = byte - 55
+            case 97...102 where radix == 16: digit = byte - 87
+            case 46 where !hasDot:
                 hasDot = true
-            } else if c == "p" || c == "P" {
-                if hasP || hexDigitCount == 0 { return false }
-                hasP = true
-            } else if c == "+" || c == "-" {
-                if !hasP || expDigitCount > 0 || expHasSign { return false }
-                expHasSign = true
-            } else {
-                return false
+                index += 1
+                continue
+            default: break coefficient
+            }
+            digits.append(digit)
+            if hasDot { fractionalDigits += 1 }
+            index += 1
+        }
+        guard !digits.isEmpty else { return nil }
+        var exponent = 0
+        if index < bytes.count {
+            let marker = bytes[index]
+            guard radix == 16 ? (marker == 112 || marker == 80) : (marker == 101 || marker == 69) else { return nil }
+            index += 1
+            var negativeExponent = false
+            if index < bytes.count, bytes[index] == 43 || bytes[index] == 45 {
+                negativeExponent = bytes[index] == 45
+                index += 1
+            }
+            let start = index
+            // Beyond this bound, a nonzero coefficient is certainly out of range or truncates to zero.
+            // Saturation counts the exponent's value, not its raw length or leading zeros.
+            let limit = bytes.count * 4 + 1024
+            while index < bytes.count {
+                let byte = bytes[index]
+                guard byte >= 48 && byte <= 57 else { return nil }
+                let digit = Int(byte - 48)
+                exponent = exponent > (limit - digit) / 10 ? limit : exponent * 10 + digit
+                index += 1
+            }
+            guard index > start else { return nil }
+            if negativeExponent { exponent = -exponent }
+        } else if radix == 16 {
+            return nil // C99 hexadecimal floating syntax requires a p exponent.
+        }
+        let unit = radix == 16 ? 4 : 1
+        var scale = exponent - fractionalDigits * unit
+        let first = digits.firstIndex(where: { $0 != 0 }) ?? digits.endIndex
+        digits = Array(digits[first...])
+        while digits.last == 0 {
+            digits.removeLast()
+            scale += unit
+        }
+        return NumericText(negative: negative, radix: radix, digits: digits, scale: scale)
+    }
+
+    private static func integer<I: FixedWidthInteger>(from text: NumericText, _ type: I.Type) -> I? {
+        guard !text.digits.isEmpty else { return I(0) }
+        var magnitude: UInt64 = 0
+        if text.radix == 10 {
+            let count = text.digits.count + text.scale
+            if count <= 0 { return I(0) }
+            guard count <= 20 else { return nil }
+            for index in 0..<count {
+                let digit = index < text.digits.count ? UInt64(text.digits[index]) : 0
+                let product = magnitude.multipliedReportingOverflow(by: 10)
+                let sum = product.partialValue.addingReportingOverflow(digit)
+                guard !product.overflow && !sum.overflow else { return nil }
+                magnitude = sum.partialValue
+            }
+        } else {
+            let leadingBits = 8 - text.digits[0].leadingZeroBitCount
+            let coefficientBits = leadingBits + (text.digits.count - 1) * 4
+            let count = coefficientBits + text.scale
+            if count <= 0 { return I(0) }
+            guard count <= 64 else { return nil }
+            // Read only the surviving high bits; discarded fractional bits never enter a float.
+            for index in 0..<count {
+                let bit: UInt64
+                if index < coefficientBits {
+                    let position = index + 4 - leadingBits
+                    bit = UInt64((text.digits[position / 4] >> (3 - position % 4)) & 1)
+                } else {
+                    bit = 0
+                }
+                magnitude = (magnitude << 1) | bit
             }
         }
-        return hasP && expDigitCount > 0 && hexDigitCount > 0
+        if magnitude == 0 { return I(0) }
+        return I((text.negative ? "-" : "") + String(magnitude))
+    }
+
+    private static func decimal(from text: NumericText) -> Decimal? {
+        guard !text.digits.isEmpty else { return Decimal(0) }
+        if text.radix == 10 {
+            let coefficient = String(text.digits.map { Character(UnicodeScalar($0 + 48)) })
+            return Decimal(string: (text.negative ? "-" : "") + coefficient + "e" + String(text.scale),
+                           locale: Locale(identifier: "en_US_POSIX"))
+        }
+        // Decimal has finite precision, but binary floating point must not reduce it to 53 bits.
+        // Sum hexadecimal places from most to least significant to avoid an oversized coefficient
+        // overflowing before a compensating negative exponent can be applied.
+        let exponent = (text.digits.count - 1) * 4 + text.scale
+        guard abs(exponent) <= 1024 else { return nil }
+        var power = Decimal(1)
+        var two = Decimal(2)
+        for _ in 0..<abs(exponent) {
+            var next = Decimal()
+            let error = exponent >= 0
+                ? NSDecimalMultiply(&next, &power, &two, .plain)
+                : NSDecimalDivide(&next, &power, &two, .plain)
+            guard error == .noError || error == .lossOfPrecision else { return nil }
+            power = next
+        }
+        var result = Decimal(0)
+        var sixteen = Decimal(16)
+        for (index, digit) in text.digits.enumerated() {
+            if digit != 0 {
+                var multiplier = Decimal(Int(digit))
+                var term = Decimal()
+                let multiplyError = NSDecimalMultiply(&term, &power, &multiplier, .plain)
+                guard multiplyError == .noError || multiplyError == .lossOfPrecision else { return nil }
+                var sum = Decimal()
+                let addError = NSDecimalAdd(&sum, &result, &term, .plain)
+                guard addError == .noError || addError == .lossOfPrecision else { return nil }
+                result = sum
+            }
+            if index + 1 < text.digits.count {
+                var next = Decimal()
+                let error = NSDecimalDivide(&next, &power, &sixteen, .plain)
+                if error == .underflow { break } // Remaining places are below Decimal's range.
+                guard error == .noError || error == .lossOfPrecision else { return nil }
+                power = next
+            }
+        }
+        return text.negative ? -result : result
     }
 
     private static func decimal(from value: Any) -> Decimal? {
         if let number = value as? NSNumber, !isBoolean(number) {
             return number.decimalValue
         }
-        if let text = value as? String {
-            let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !trimmed.isEmpty else { return nil }
-            if isStrictDecimalSyntax(trimmed[...]) {
-                return Decimal(string: trimmed)
-            }
-            if isStrictHexFloatSyntax(trimmed[...]) {
-                if let d = Double(trimmed), d.isFinite {
-                    return Decimal(d)
-                }
-            }
-            return nil
+        if let text = value as? String,
+           let parsed = numericText(text.trimmingCharacters(in: .whitespacesAndNewlines)) {
+            return decimal(from: parsed)
         }
         return nil
     }
@@ -332,73 +397,8 @@ enum YYJSONValueDecoder {
 
             if let exact = I(trimmed) { return exact }
 
-            let isPureInteger: Bool = {
-                var s = trimmed[...]
-                if s.hasPrefix("+") || s.hasPrefix("-") { s = s.dropFirst() }
-                return !s.isEmpty && s.allSatisfy { $0 >= "0" && $0 <= "9" }
-            }()
-            if isPureInteger {
-                return nil
-            }
-
-            if isStrictHexFloatSyntax(trimmed[...]) {
-                guard let d = Double(trimmed), d.isFinite else { return nil }
-                return I(exactly: d.rounded(.towardZero))
-            }
-
-            guard isStrictDecimalSyntax(trimmed[...]) else { return nil }
-
-            if let eIndex = trimmed.firstIndex(where: { $0 == "e" || $0 == "E" }) {
-                let significandStr = String(trimmed[..<eIndex])
-                let expStr = String(trimmed[trimmed.index(after: eIndex)...])
-
-                var isNegativeExp = false
-                var expDigits = expStr[...]
-                if expDigits.hasPrefix("-") {
-                    isNegativeExp = true
-                    expDigits = expDigits.dropFirst()
-                } else if expDigits.hasPrefix("+") {
-                    expDigits = expDigits.dropFirst()
-                }
-
-                if isNegativeExp {
-                    var sig = significandStr[...]
-                    if sig.hasPrefix("+") || sig.hasPrefix("-") { sig = sig.dropFirst() }
-                    let dotParts = sig.split(separator: ".", omittingEmptySubsequences: false)
-                    let intPartDigits = dotParts[0].count
-
-                    if expDigits.count > 5 {
-                        return I(0)
-                    }
-                    if let expVal = Int(expDigits), expVal >= intPartDigits {
-                        return I(0)
-                    }
-                }
-
-                if let dec = Decimal(string: trimmed) {
-                    var truncated = Decimal()
-                    var copy = dec
-                    let mode: NSDecimalNumber.RoundingMode = dec.isSignMinus ? .up : .down
-                    NSDecimalRound(&truncated, &copy, 0, mode)
-                    let str = "\(truncated)"
-                    return I(str)
-                }
-                return nil
-            } else if trimmed.contains(".") {
-                let dotIndex = trimmed.firstIndex(of: ".")!
-                let intPartStr = String(trimmed[..<dotIndex])
-                var normalizedIntPart = intPartStr
-                if normalizedIntPart.isEmpty || normalizedIntPart == "+" {
-                    normalizedIntPart = "0"
-                } else if normalizedIntPart == "-" {
-                    normalizedIntPart = "-0"
-                }
-
-                if normalizedIntPart == "-0" || normalizedIntPart == "+0" || normalizedIntPart == "0" {
-                    return I(0)
-                }
-                return I(normalizedIntPart)
-            }
+            guard let parsed = numericText(trimmed) else { return nil }
+            return integer(from: parsed, type)
         }
         return nil
     }

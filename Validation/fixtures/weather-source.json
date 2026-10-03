@@ -1,0 +1,15 @@
+{
+  "source": "Open-Meteo Weather Forecast API",
+  "url": "https://api.open-meteo.com/v1/forecast?latitude=31.2304%2C40.7128%2C35.6762&longitude=121.4737%2C-74.006%2C139.6503&current=temperature_2m%2Crelative_humidity_2m%2Cis_day%2Cprecipitation%2Cweather_code%2Cwind_speed_10m&hourly=temperature_2m%2Crelative_humidity_2m%2Cprecipitation_probability%2Cprecipitation%2Cweather_code%2Cwind_speed_10m&daily=temperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Csunrise%2Csunset&forecast_days=4&timezone=UTC",
+  "fetchedAtUTC": "2026-10-03T16:24:49.551679+00:00",
+  "status": 200,
+  "sha256": "92f13b21a4dfb74647d8d55548bb5ecf2730169a7622f95e51ddd81368ceb21c",
+  "license": "CC BY 4.0",
+  "attribution": "Weather data by Open-Meteo, https://open-meteo.com/",
+  "locations": 3,
+  "hoursPerLocation": [
+    96,
+    96,
+    96
+  ]
+}

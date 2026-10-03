@@ -1,0 +1,1011 @@
+{
+  "date": "2026-10-04",
+  "baseCommit": "518c405a51ab46cb6e6a39e22a36ab9d9788f78c",
+  "sourceHashes": {
+    "YYModel/NSObject+YYModel.m": "1d46db31fe31bc1ebb0f256152b036ba89cfe3e066b1b008499b6b49daf3c838",
+    "YYModel/YYClassInfo.m": "a2e6d559282e11399bf4ce08734b27163bfc592b187da7421911ffe6a7ec07ab",
+    "YYModelSwift/YYJSONDecoder.swift": "909a72cac34079c9a540e0bdb14606dbc785513208681132bd4de7a08bcd2eb1"
+  },
+  "numericBefore": {
+    "total": 1742,
+    "passed": 1412,
+    "failed": 330,
+    "failuresByLabel": {
+      "zero-padded-negative-exponent": 4,
+      "zero-padded-negative-zero-exponent": 4,
+      "range-with-zero-padded-exponent": 8,
+      "zero-huge-exponent": 4,
+      "hex-precision": 2,
+      "hex-range": 1,
+      "unicode-digit-cluster": 8,
+      "integer-boundary": 24,
+      "exponent-zero-padding": 264,
+      "hex-boundary": 5,
+      "hex-unsigned-max": 1,
+      "decimal-invalid-syntax": 4,
+      "decimal-value": 1
+    }
+  },
+  "expandedNumericBefore": {
+    "total": 1792,
+    "passed": 1450,
+    "failed": 342,
+    "failuresByLabel": {
+      "zero-padded-negative-exponent": 4,
+      "zero-padded-negative-zero-exponent": 4,
+      "range-with-zero-padded-exponent": 8,
+      "zero-huge-exponent": 4,
+      "hex-precision": 2,
+      "hex-range": 1,
+      "unicode-digit-cluster": 8,
+      "long-zero-exponent": 4,
+      "hex-precision-fraction": 2,
+      "hex-long-coefficient": 4,
+      "integer-boundary": 24,
+      "exponent-zero-padding": 264,
+      "hex-boundary": 5,
+      "hex-unsigned-max": 1,
+      "decimal-invalid-syntax": 4,
+      "decimal-value": 3
+    }
+  },
+  "numericAfter": {
+    "macOS": {
+      "total": 1792,
+      "passed": 1792,
+      "failed": 0,
+      "failuresByLabel": {}
+    },
+    "iOSSimulator": {
+      "total": 1792,
+      "passed": 1792,
+      "failed": 0,
+      "failuresByLabel": {}
+    }
+  },
+  "preservedChecks": {
+    "swiftInt64PrecisionPreserved": true,
+    "swiftInt64NoCrash": true,
+    "emptyWhitelistBlocksMapping": true,
+    "blockEqualityMatchesOriginal": true,
+    "equalityIsSymmetric": true,
+    "originalDateFormatsPreserved": true,
+    "numberAliasesPreserved": true,
+    "secureContainerRoundTrip": true,
+    "swift6Compilation": true,
+    "OCUInt64StringPreserved": true,
+    "SwiftRejectsIntegerStringBelowMin": true,
+    "SwiftFractionalIntegerStringPreservesPrecision": true,
+    "SwiftUInt64MaxTolerantPath": true,
+    "SwiftOptionalArraySurvivesDirtySibling": true,
+    "SwiftOptionalRootAnyMatchesData": true,
+    "SwiftSuperclassSurvivesDirtySibling": true,
+    "SwiftFailedArrayDecodeDoesNotConsumeElement": true,
+    "OCSecureFoundationContainers": true,
+    "SwiftDirtyDataDoesNotRepeatSystemDecode": true,
+    "OCNumericDateStringEnhancementPreserved": true,
+    "stringFractionTruncatesLikeNumeric": true,
+    "malformedNumericSuffixRejected": true,
+    "outOfRangeDecimalStringRejected": true,
+    "failedNestedObjectDoesNotConsume": true,
+    "failedNestedArrayDoesNotConsume": true,
+    "-1": true,
+    " -1": true,
+    "\t-123": true,
+    "\n-42": true,
+    " +1": true,
+    "Sat, 03 Oct 2026 08:00:00 +0000": true,
+    "Sat Oct 03 08:00:00 2026": true,
+    "UInt64MaxPreserved": true,
+    "hexadecimalNeverSilentlyZero": true,
+    "exactDecimalNSNumberPreserved": true,
+    "exactJSONDecimalNumberPreserved": true,
+    "tinyScientificIntegerStringTruncatesToZero": true,
+    "decimalFieldMalformedSuffixRejected": true
+  },
+  "regression": {
+    "swiftReleasePassed": 16,
+    "demoPassed": 84,
+    "frameworkPassed": 27,
+    "failed": 0
+  },
+  "weather": {
+    "macOS": {
+      "correctness": {
+        "clean-swiftNative": true,
+        "clean-swiftYY": true,
+        "clean-ocCurrent": true,
+        "clean-ocOriginal": true,
+        "dirty-swiftNative": true,
+        "dirty-swiftYY": true,
+        "dirty-ocCurrent": true,
+        "dirty-ocOriginal": true,
+        "nullable-swiftNative": true,
+        "nullable-swiftYY": true,
+        "nullable-ocCurrent": true,
+        "nullable-ocOriginal": true,
+        "sparse-swiftNative": true,
+        "sparse-swiftYY": true,
+        "sparse-ocCurrent": true,
+        "sparse-ocOriginal": true,
+        "large-swiftNative": true,
+        "large-swiftYY": true,
+        "large-ocCurrent": true,
+        "large-ocOriginal": true
+      },
+      "benchmark": {
+        "clean-swiftNative": {
+          "medianMillisecondsPerDecode": 0.7896208332385868,
+          "minMillisecondsPerDecode": 0.7448475004639477,
+          "maxMillisecondsPerDecode": 0.8132829167880118,
+          "samplesMillisecondsPerDecode": [
+            0.7918412506114691,
+            0.7448475004639477,
+            0.7507912500295788,
+            0.7896208332385868,
+            0.7830458332318813,
+            0.8132829167880118,
+            0.7970799994654953
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15785
+        },
+        "clean-swiftYY": {
+          "medianMillisecondsPerDecode": 0.7946912501938641,
+          "minMillisecondsPerDecode": 0.7383050001226366,
+          "maxMillisecondsPerDecode": 0.9817891661077738,
+          "samplesMillisecondsPerDecode": [
+            0.7676008332055062,
+            0.9336787508800626,
+            0.8006220834795386,
+            0.9817891661077738,
+            0.7876808336004615,
+            0.7946912501938641,
+            0.7383050001226366
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15785
+        },
+        "clean-ocCurrent": {
+          "medianMillisecondsPerDecode": 0.25494708330370486,
+          "minMillisecondsPerDecode": 0.2476950001437217,
+          "maxMillisecondsPerDecode": 0.30911916634067893,
+          "samplesMillisecondsPerDecode": [
+            0.27259958325885236,
+            0.253272500121966,
+            0.2589629159774631,
+            0.30911916634067893,
+            0.2476950001437217,
+            0.25494708330370486,
+            0.25197458337061107
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15785
+        },
+        "clean-ocOriginal": {
+          "medianMillisecondsPerDecode": 0.26095333392731845,
+          "minMillisecondsPerDecode": 0.2534383337479085,
+          "maxMillisecondsPerDecode": 0.3399816667661071,
+          "samplesMillisecondsPerDecode": [
+            0.25379916769452393,
+            0.2534383337479085,
+            0.26095333392731845,
+            0.2907887508627027,
+            0.2649795834440738,
+            0.25985750020481646,
+            0.3399816667661071
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15785
+        },
+        "dirty-swiftYY": {
+          "medianMillisecondsPerDecode": 5.6968962494283915,
+          "minMillisecondsPerDecode": 4.25769624998793,
+          "maxMillisecondsPerDecode": 6.528355416376144,
+          "samplesMillisecondsPerDecode": [
+            4.587630416499451,
+            4.25769624998793,
+            5.6968962494283915,
+            6.513945834012702,
+            6.528355416376144,
+            5.816633750218898,
+            4.991136250318959
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15792
+        },
+        "dirty-ocCurrent": {
+          "medianMillisecondsPerDecode": 0.2664766670204699,
+          "minMillisecondsPerDecode": 0.24872041656635702,
+          "maxMillisecondsPerDecode": 0.4936466657090932,
+          "samplesMillisecondsPerDecode": [
+            0.2760058338753879,
+            0.2664766670204699,
+            0.3248229168821126,
+            0.2602345834020525,
+            0.2583812503144145,
+            0.24872041656635702,
+            0.4936466657090932
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15792
+        },
+        "dirty-ocOriginal": {
+          "medianMillisecondsPerDecode": 0.281001249095425,
+          "minMillisecondsPerDecode": 0.2517891663592309,
+          "maxMillisecondsPerDecode": 0.4627554165199399,
+          "samplesMillisecondsPerDecode": [
+            0.29903374961577356,
+            0.4627554165199399,
+            0.25991749949753284,
+            0.281001249095425,
+            0.42407416622154415,
+            0.26578041608445346,
+            0.2517891663592309
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15792
+        },
+        "nullable-swiftNative": {
+          "medianMillisecondsPerDecode": 0.8835133328102529,
+          "minMillisecondsPerDecode": 0.73000333388336,
+          "maxMillisecondsPerDecode": 1.2752133328467607,
+          "samplesMillisecondsPerDecode": [
+            0.73000333388336,
+            0.8458991663064808,
+            1.0638095834292471,
+            0.8580604160670191,
+            0.9085375000722706,
+            0.8835133328102529,
+            1.2752133328467607
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15785
+        },
+        "nullable-swiftYY": {
+          "medianMillisecondsPerDecode": 0.999254584312439,
+          "minMillisecondsPerDecode": 0.8764870837330818,
+          "maxMillisecondsPerDecode": 1.06079833349213,
+          "samplesMillisecondsPerDecode": [
+            1.0426566668320447,
+            0.9714437497314066,
+            0.999254584312439,
+            1.0313399997539818,
+            1.06079833349213,
+            0.951108334120363,
+            0.8764870837330818
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15785
+        },
+        "nullable-ocCurrent": {
+          "medianMillisecondsPerDecode": 0.2833379164803773,
+          "minMillisecondsPerDecode": 0.26305416598916054,
+          "maxMillisecondsPerDecode": 0.4680445836856961,
+          "samplesMillisecondsPerDecode": [
+            0.4680445836856961,
+            0.28131374972872436,
+            0.2833379164803773,
+            0.3614637500140816,
+            0.2655812492594123,
+            0.26305416598916054,
+            0.42660624952986836
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15785
+        },
+        "nullable-ocOriginal": {
+          "medianMillisecondsPerDecode": 0.2867670834530145,
+          "minMillisecondsPerDecode": 0.27104458305984735,
+          "maxMillisecondsPerDecode": 0.5084483325481415,
+          "samplesMillisecondsPerDecode": [
+            0.2711037499830127,
+            0.27104458305984735,
+            0.5039120826404542,
+            0.2814737509470433,
+            0.5084483325481415,
+            0.30730624916031957,
+            0.2867670834530145
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15785
+        },
+        "sparse-swiftYY": {
+          "medianMillisecondsPerDecode": 3.7665324995759875,
+          "minMillisecondsPerDecode": 3.4643045836128294,
+          "maxMillisecondsPerDecode": 3.9080887497402728,
+          "samplesMillisecondsPerDecode": [
+            3.9080887497402728,
+            3.4643045836128294,
+            3.6847862496506423,
+            3.7665324995759875,
+            3.7818358337972313,
+            3.8211212505120784,
+            3.4777966665569693
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 11758
+        },
+        "sparse-ocCurrent": {
+          "medianMillisecondsPerDecode": 0.20362416631542146,
+          "minMillisecondsPerDecode": 0.18757999991066754,
+          "maxMillisecondsPerDecode": 0.2707491663750261,
+          "samplesMillisecondsPerDecode": [
+            0.18945666612125933,
+            0.18757999991066754,
+            0.19499000045470893,
+            0.2707491663750261,
+            0.21216208348050714,
+            0.20470250048674643,
+            0.20362416631542146
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 11758
+        },
+        "sparse-ocOriginal": {
+          "medianMillisecondsPerDecode": 0.19717916613444686,
+          "minMillisecondsPerDecode": 0.18351375008933246,
+          "maxMillisecondsPerDecode": 0.23157208343036473,
+          "samplesMillisecondsPerDecode": [
+            0.19717916613444686,
+            0.19685124978423119,
+            0.18351375008933246,
+            0.23157208343036473,
+            0.22629166720435023,
+            0.214981249300763,
+            0.19130375003442168
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 11758
+        },
+        "large-swiftNative": {
+          "medianMillisecondsPerDecode": 27.20226041856222,
+          "minMillisecondsPerDecode": 25.916229162248783,
+          "maxMillisecondsPerDecode": 28.78066146513447,
+          "samplesMillisecondsPerDecode": [
+            28.78066146513447,
+            27.20226041856222,
+            27.481687502586283,
+            28.34207291016355,
+            25.985052081523463,
+            25.916229162248783,
+            26.642697921488434
+          ],
+          "iterationsPerSample": 8,
+          "bytes": 501555
+        },
+        "large-swiftYY": {
+          "medianMillisecondsPerDecode": 27.385812500142492,
+          "minMillisecondsPerDecode": 25.99285937321838,
+          "maxMillisecondsPerDecode": 30.178937493474223,
+          "samplesMillisecondsPerDecode": [
+            29.542041665990837,
+            30.178937493474223,
+            28.278052079258487,
+            26.34485936141573,
+            27.385812500142492,
+            27.18394271505531,
+            25.99285937321838
+          ],
+          "iterationsPerSample": 8,
+          "bytes": 501555
+        },
+        "large-ocCurrent": {
+          "medianMillisecondsPerDecode": 9.512958335108124,
+          "minMillisecondsPerDecode": 8.59102605318185,
+          "maxMillisecondsPerDecode": 11.22217187366914,
+          "samplesMillisecondsPerDecode": [
+            9.563765619532205,
+            8.59102605318185,
+            9.161864581983536,
+            9.512958335108124,
+            9.856395845417865,
+            8.787989572738297,
+            11.22217187366914
+          ],
+          "iterationsPerSample": 8,
+          "bytes": 501555
+        },
+        "large-ocOriginal": {
+          "medianMillisecondsPerDecode": 10.224645840935409,
+          "minMillisecondsPerDecode": 8.4032864542678,
+          "maxMillisecondsPerDecode": 10.737364587839693,
+          "samplesMillisecondsPerDecode": [
+            10.224645840935409,
+            10.462786463904195,
+            8.4032864542678,
+            8.665588553412817,
+            10.737364587839693,
+            9.097458329051733,
+            10.600395835353993
+          ],
+          "iterationsPerSample": 8,
+          "bytes": 501555
+        }
+      },
+      "allCorrect": true
+    },
+    "iOSSimulator": {
+      "correctness": {
+        "clean-swiftNative": true,
+        "clean-swiftYY": true,
+        "clean-ocCurrent": true,
+        "clean-ocOriginal": true,
+        "dirty-swiftNative": true,
+        "dirty-swiftYY": true,
+        "dirty-ocCurrent": true,
+        "dirty-ocOriginal": true,
+        "nullable-swiftNative": true,
+        "nullable-swiftYY": true,
+        "nullable-ocCurrent": true,
+        "nullable-ocOriginal": true,
+        "sparse-swiftNative": true,
+        "sparse-swiftYY": true,
+        "sparse-ocCurrent": true,
+        "sparse-ocOriginal": true,
+        "large-swiftNative": true,
+        "large-swiftYY": true,
+        "large-ocCurrent": true,
+        "large-ocOriginal": true
+      },
+      "benchmark": {
+        "clean-swiftNative": {
+          "medianMillisecondsPerDecode": 0.9209704166278243,
+          "minMillisecondsPerDecode": 0.8262100000865757,
+          "maxMillisecondsPerDecode": 1.1421383335255086,
+          "samplesMillisecondsPerDecode": [
+            0.9810916671995074,
+            0.9990162495523691,
+            1.1421383335255086,
+            0.8262100000865757,
+            0.9209704166278243,
+            0.8745404158253223,
+            0.8824095840100199
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15785
+        },
+        "clean-swiftYY": {
+          "medianMillisecondsPerDecode": 0.8642833330668509,
+          "minMillisecondsPerDecode": 0.7691470824647695,
+          "maxMillisecondsPerDecode": 0.9347949991934001,
+          "samplesMillisecondsPerDecode": [
+            0.9144824999384582,
+            0.9347949991934001,
+            0.8642833330668509,
+            0.8531670831143856,
+            0.7691470824647695,
+            0.7838254165835679,
+            0.9100549994036555
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15785
+        },
+        "clean-ocCurrent": {
+          "medianMillisecondsPerDecode": 0.3055841673631221,
+          "minMillisecondsPerDecode": 0.28533833334222436,
+          "maxMillisecondsPerDecode": 0.32858291757293046,
+          "samplesMillisecondsPerDecode": [
+            0.32094333320856094,
+            0.32858291757293046,
+            0.2886245830450207,
+            0.3055841673631221,
+            0.3004570829216391,
+            0.31225291662849486,
+            0.28533833334222436
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15785
+        },
+        "clean-ocOriginal": {
+          "medianMillisecondsPerDecode": 0.2973225002642721,
+          "minMillisecondsPerDecode": 0.28670625062659383,
+          "maxMillisecondsPerDecode": 0.40061375009827316,
+          "samplesMillisecondsPerDecode": [
+            0.2934741659555584,
+            0.2973225002642721,
+            0.31154291704297066,
+            0.28670625062659383,
+            0.3002299997024238,
+            0.2905029174871743,
+            0.40061375009827316
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15785
+        },
+        "dirty-swiftYY": {
+          "medianMillisecondsPerDecode": 4.019700833596289,
+          "minMillisecondsPerDecode": 3.8300516665913165,
+          "maxMillisecondsPerDecode": 4.715862083248794,
+          "samplesMillisecondsPerDecode": [
+            3.8300516665913165,
+            3.964704582467675,
+            3.867865416686982,
+            4.455487916711718,
+            4.715862083248794,
+            4.019700833596289,
+            4.038591249845922
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15792
+        },
+        "dirty-ocCurrent": {
+          "medianMillisecondsPerDecode": 0.2883670828305185,
+          "minMillisecondsPerDecode": 0.27663791668601334,
+          "maxMillisecondsPerDecode": 0.35906750010326505,
+          "samplesMillisecondsPerDecode": [
+            0.308177083497867,
+            0.2883670828305185,
+            0.3010308323428035,
+            0.2823212498333305,
+            0.35906750010326505,
+            0.27663791668601334,
+            0.279754166258499
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15792
+        },
+        "dirty-ocOriginal": {
+          "medianMillisecondsPerDecode": 0.2990458335261792,
+          "minMillisecondsPerDecode": 0.28996124980039895,
+          "maxMillisecondsPerDecode": 0.31777958385646343,
+          "samplesMillisecondsPerDecode": [
+            0.2959083335008472,
+            0.31104541616514325,
+            0.29284916701726615,
+            0.28996124980039895,
+            0.31777958385646343,
+            0.2990458335261792,
+            0.3008487506303936
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15792
+        },
+        "nullable-swiftNative": {
+          "medianMillisecondsPerDecode": 0.7570120831951499,
+          "minMillisecondsPerDecode": 0.7179662503767759,
+          "maxMillisecondsPerDecode": 0.8747191668953747,
+          "samplesMillisecondsPerDecode": [
+            0.7718941674102098,
+            0.7631866668816656,
+            0.7447545824106783,
+            0.7441287499386817,
+            0.7179662503767759,
+            0.8747191668953747,
+            0.7570120831951499
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15785
+        },
+        "nullable-swiftYY": {
+          "medianMillisecondsPerDecode": 0.7948850002139807,
+          "minMillisecondsPerDecode": 0.6960637506563216,
+          "maxMillisecondsPerDecode": 0.8617854164913297,
+          "samplesMillisecondsPerDecode": [
+            0.7185237505473197,
+            0.815380000276491,
+            0.8090425003319979,
+            0.7660195836797357,
+            0.6960637506563216,
+            0.7948850002139807,
+            0.8617854164913297
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15785
+        },
+        "nullable-ocCurrent": {
+          "medianMillisecondsPerDecode": 0.326739166630432,
+          "minMillisecondsPerDecode": 0.2792079164646566,
+          "maxMillisecondsPerDecode": 0.4182633338496089,
+          "samplesMillisecondsPerDecode": [
+            0.28955166693776846,
+            0.2792079164646566,
+            0.34096041694283485,
+            0.326739166630432,
+            0.30431833351030946,
+            0.339317083125934,
+            0.4182633338496089
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15785
+        },
+        "nullable-ocOriginal": {
+          "medianMillisecondsPerDecode": 0.3216475003864616,
+          "minMillisecondsPerDecode": 0.29440624988637865,
+          "maxMillisecondsPerDecode": 0.34691416658461094,
+          "samplesMillisecondsPerDecode": [
+            0.3256341675296426,
+            0.3254425001796335,
+            0.3216475003864616,
+            0.3059487498831004,
+            0.31802958343178034,
+            0.34691416658461094,
+            0.29440624988637865
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 15785
+        },
+        "sparse-swiftYY": {
+          "medianMillisecondsPerDecode": 2.807191666215658,
+          "minMillisecondsPerDecode": 2.639969999436289,
+          "maxMillisecondsPerDecode": 3.4765274997334927,
+          "samplesMillisecondsPerDecode": [
+            2.639969999436289,
+            2.7932441665325314,
+            2.807191666215658,
+            3.1135720829479396,
+            2.9724295833148062,
+            3.4765274997334927,
+            2.7925999998115003
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 11758
+        },
+        "sparse-ocCurrent": {
+          "medianMillisecondsPerDecode": 0.21072624949738383,
+          "minMillisecondsPerDecode": 0.20369624951854348,
+          "maxMillisecondsPerDecode": 0.27206333354115486,
+          "samplesMillisecondsPerDecode": [
+            0.20369624951854348,
+            0.20421583321876824,
+            0.21072624949738383,
+            0.27206333354115486,
+            0.2314558334182948,
+            0.21159500000067055,
+            0.2090045833028853
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 11758
+        },
+        "sparse-ocOriginal": {
+          "medianMillisecondsPerDecode": 0.21734833368100226,
+          "minMillisecondsPerDecode": 0.20538791664876044,
+          "maxMillisecondsPerDecode": 0.2443695836700499,
+          "samplesMillisecondsPerDecode": [
+            0.21771916653960943,
+            0.20538791664876044,
+            0.2443695836700499,
+            0.21734833368100226,
+            0.23003499954938889,
+            0.21037583355791867,
+            0.208716249326244
+          ],
+          "iterationsPerSample": 100,
+          "bytes": 11758
+        },
+        "large-swiftNative": {
+          "medianMillisecondsPerDecode": 25.269395831855945,
+          "minMillisecondsPerDecode": 23.851296879001893,
+          "maxMillisecondsPerDecode": 27.26519270800054,
+          "samplesMillisecondsPerDecode": [
+            23.851296879001893,
+            25.31936978630256,
+            27.110989583889022,
+            23.883869784185663,
+            27.26519270800054,
+            25.269395831855945,
+            24.1289427067386
+          ],
+          "iterationsPerSample": 8,
+          "bytes": 501555
+        },
+        "large-swiftYY": {
+          "medianMillisecondsPerDecode": 25.62131770537235,
+          "minMillisecondsPerDecode": 22.84395313472487,
+          "maxMillisecondsPerDecode": 29.998348967637867,
+          "samplesMillisecondsPerDecode": [
+            25.198796880431473,
+            22.84395313472487,
+            25.62131770537235,
+            24.688317702384666,
+            29.998348967637867,
+            27.79002604074776,
+            26.37683854845818
+          ],
+          "iterationsPerSample": 8,
+          "bytes": 501555
+        },
+        "large-ocCurrent": {
+          "medianMillisecondsPerDecode": 9.707010423881002,
+          "minMillisecondsPerDecode": 8.666598951094784,
+          "maxMillisecondsPerDecode": 10.628390620695427,
+          "samplesMillisecondsPerDecode": [
+            10.047078132629395,
+            8.666598951094784,
+            9.707010423881002,
+            9.345906248199753,
+            10.09419270849321,
+            9.234317709342577,
+            10.628390620695427
+          ],
+          "iterationsPerSample": 8,
+          "bytes": 501555
+        },
+        "large-ocOriginal": {
+          "medianMillisecondsPerDecode": 9.787708331714384,
+          "minMillisecondsPerDecode": 8.756166658713482,
+          "maxMillisecondsPerDecode": 13.084916659863666,
+          "samplesMillisecondsPerDecode": [
+            8.756166658713482,
+            9.787708331714384,
+            9.308692708145827,
+            9.196203129249625,
+            10.077770828502253,
+            11.17511979828123,
+            13.084916659863666
+          ],
+          "iterationsPerSample": 8,
+          "bytes": 501555
+        }
+      },
+      "allCorrect": true
+    }
+  },
+  "pairedBenchmark": {
+    "correctness": {
+      "clean-0-before.json": true,
+      "clean-1-after.json": true,
+      "clean-2-after.json": true,
+      "clean-3-before.json": true,
+      "clean-4-before.json": true,
+      "clean-5-after.json": true,
+      "clean-6-after.json": true,
+      "clean-7-before.json": true,
+      "dirty-0-before.json": true,
+      "dirty-1-after.json": true,
+      "dirty-2-after.json": true,
+      "dirty-3-before.json": true,
+      "dirty-4-before.json": true,
+      "dirty-5-after.json": true,
+      "dirty-6-after.json": true,
+      "dirty-7-before.json": true
+    },
+    "benchmark": {
+      "clean": {
+        "before": {
+          "medianMillisecondsPerDecode": 0.8074354170821607,
+          "minMillisecondsPerDecode": 0.7398437499068677,
+          "maxMillisecondsPerDecode": 0.9919087495654821,
+          "samplesMillisecondsPerDecode": [
+            0.7569987501483411,
+            0.7780820841435343,
+            0.7672337500844151,
+            0.7398437499068677,
+            0.783243749756366,
+            0.8069870842155069,
+            0.8213175006676465,
+            0.7838095829356462,
+            0.8599524991586804,
+            0.7603595836553723,
+            0.7940966659225523,
+            0.7930541667155921,
+            0.8089941658545285,
+            0.7543141662608832,
+            0.748617498902604,
+            0.7466037501581013,
+            0.8495187503285706,
+            0.8947308326605707,
+            0.9826879168394953,
+            0.9919087495654821,
+            0.8078837499488145,
+            0.954493333119899,
+            0.908500833902508,
+            0.9291929157916456,
+            0.8986037503927946,
+            0.8493845839984715,
+            0.8664745837450027,
+            0.7445058331359178
+          ]
+        },
+        "after": {
+          "medianMillisecondsPerDecode": 0.8147695841034874,
+          "minMillisecondsPerDecode": 0.7356041669845581,
+          "maxMillisecondsPerDecode": 1.2724966660607606,
+          "samplesMillisecondsPerDecode": [
+            0.7896670827176422,
+            0.790364999556914,
+            0.7613916660193354,
+            0.7680195837747306,
+            0.8742929168511182,
+            1.2724966660607606,
+            0.8205204166006297,
+            0.8148395840544254,
+            0.8205545833334327,
+            0.7834829168859869,
+            0.8431812503840774,
+            0.8146995841525495,
+            0.844433750025928,
+            0.8255079167429358,
+            0.8588229166343808,
+            0.8128529170062393,
+            0.7356041669845581,
+            0.8393404167145491,
+            0.7649187499191612,
+            0.7620158337522298,
+            0.7462595833931118,
+            0.7529754156712443,
+            0.8639387495350093,
+            0.8064804167952389,
+            0.9788070828653872,
+            1.1279762501362711,
+            0.984006249345839,
+            0.8054166659712791
+          ]
+        }
+      },
+      "dirty": {
+        "before": {
+          "medianMillisecondsPerDecode": 4.65656312473584,
+          "minMillisecondsPerDecode": 4.284592915792018,
+          "maxMillisecondsPerDecode": 5.572856665821746,
+          "samplesMillisecondsPerDecode": [
+            4.830088749295101,
+            5.162730417214334,
+            4.509319165954366,
+            4.424196666805074,
+            5.5154766666237265,
+            4.502601249841973,
+            4.350787083385512,
+            4.7696341667324305,
+            4.648889999371022,
+            4.823285833699629,
+            4.984003333374858,
+            4.590193750336766,
+            4.646256249397993,
+            4.823270833585411,
+            4.93502291617915,
+            5.572856665821746,
+            4.890802500303835,
+            4.6271229174453765,
+            4.594399583293125,
+            4.6108941663987935,
+            4.664236250100657,
+            4.805187917081639,
+            4.997476249700412,
+            4.401765000075102,
+            4.68626125017181,
+            4.287961249938235,
+            4.50356375076808,
+            4.284592915792018
+          ]
+        },
+        "after": {
+          "medianMillisecondsPerDecode": 4.617381250136532,
+          "minMillisecondsPerDecode": 4.253676250809804,
+          "maxMillisecondsPerDecode": 5.222623749868944,
+          "samplesMillisecondsPerDecode": [
+            4.316970416111872,
+            4.7517337498720735,
+            4.394544999813661,
+            4.253676250809804,
+            4.3928204162511975,
+            5.176343333441764,
+            4.949385415529832,
+            5.222623749868944,
+            4.8716474999673665,
+            4.832544582895935,
+            4.487845000112429,
+            4.575751250376925,
+            4.49279333348386,
+            4.9885741667822,
+            4.645180000225082,
+            4.468070833245292,
+            4.769406666746363,
+            4.514661666471511,
+            4.972803749842569,
+            4.8243950004689395,
+            4.37149208271876,
+            4.4360887503717095,
+            4.905850000213832,
+            4.698017500340939,
+            4.476296249777079,
+            4.41427499987185,
+            4.6611333335749805,
+            4.589582500047982
+          ]
+        }
+      }
+    },
+    "order": [
+      "before",
+      "after",
+      "after",
+      "before",
+      "before",
+      "after",
+      "after",
+      "before"
+    ],
+    "iterationsPerSample": 100,
+    "sourceHashes": {
+      "before": "9dc6583fa0bcd360b1bcd82c51761749823b3cc3b70a26673a2149154fbba536",
+      "after": "909a72cac34079c9a540e0bdb14606dbc785513208681132bd4de7a08bcd2eb1"
+    }
+  },
+  "environment": {
+    "macOS": {
+      "architecture": "arm64",
+      "system": "macOS-26.7-arm64-arm-64bit-Mach-O",
+      "runtime": "macOS",
+      "cpu": "Apple M1 Max",
+      "xcode": "Xcode 26.6\nBuild version 17F113",
+      "swift": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+      "validationHashes": {
+        "run.py": "6ece0d56543bce8bc8a2ad3832992c096ea1bf5fde036835bb4df94bf57be8a2",
+        "generate_numeric.py": "8cb179a355ed2a81704ef3c92617e08a1cabbbdf30deb1af187ce95651147462",
+        "NumericE2E.swift": "af8c1bffd8b1d274d8d8d10bc1d5aa3237799fe833de354a8a6c439fe2fcc9f7",
+        "WeatherE2E.swift": "2b0439cdec6fe2e7266dcac7a5807eb6a7d5f0489794866aeec94462e3218c7e",
+        "WeatherE2E.m": "6370461940736324163221608c23ab5467c18280c7ceab1c7179bff48d928579"
+      },
+      "fixtureProvider": {
+        "source": "Open-Meteo Weather Forecast API",
+        "url": "https://api.open-meteo.com/v1/forecast?latitude=31.2304%2C40.7128%2C35.6762&longitude=121.4737%2C-74.006%2C139.6503&current=temperature_2m%2Crelative_humidity_2m%2Cis_day%2Cprecipitation%2Cweather_code%2Cwind_speed_10m&hourly=temperature_2m%2Crelative_humidity_2m%2Cprecipitation_probability%2Cprecipitation%2Cweather_code%2Cwind_speed_10m&daily=temperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Csunrise%2Csunset&forecast_days=4&timezone=UTC",
+        "fetchedAtUTC": "2026-10-03T16:24:49.551679+00:00",
+        "status": 200,
+        "sha256": "92f13b21a4dfb74647d8d55548bb5ecf2730169a7622f95e51ddd81368ceb21c",
+        "license": "CC BY 4.0",
+        "attribution": "Weather data by Open-Meteo, https://open-meteo.com/",
+        "locations": 3,
+        "hoursPerLocation": [
+          96,
+          96,
+          96
+        ]
+      },
+      "parameters": {
+        "iterations": 100,
+        "samples": 7,
+        "warmups": 5,
+        "benchmarkEnabled": true,
+        "networkIncludedInTiming": false,
+        "swiftOptimization": "-O",
+        "objcOptimization": "-O2"
+      }
+    },
+    "iOSSimulator": {
+      "architecture": "arm64",
+      "system": "macOS-26.7-arm64-arm-64bit-Mach-O",
+      "runtime": "iOS Simulator",
+      "cpu": "Apple M1 Max",
+      "xcode": "Xcode 26.6\nBuild version 17F113",
+      "swift": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+      "validationHashes": {
+        "run.py": "6ece0d56543bce8bc8a2ad3832992c096ea1bf5fde036835bb4df94bf57be8a2",
+        "generate_numeric.py": "8cb179a355ed2a81704ef3c92617e08a1cabbbdf30deb1af187ce95651147462",
+        "NumericE2E.swift": "af8c1bffd8b1d274d8d8d10bc1d5aa3237799fe833de354a8a6c439fe2fcc9f7",
+        "WeatherE2E.swift": "2b0439cdec6fe2e7266dcac7a5807eb6a7d5f0489794866aeec94462e3218c7e",
+        "WeatherE2E.m": "6370461940736324163221608c23ab5467c18280c7ceab1c7179bff48d928579"
+      },
+      "fixtureProvider": {
+        "source": "Open-Meteo Weather Forecast API",
+        "url": "https://api.open-meteo.com/v1/forecast?latitude=31.2304%2C40.7128%2C35.6762&longitude=121.4737%2C-74.006%2C139.6503&current=temperature_2m%2Crelative_humidity_2m%2Cis_day%2Cprecipitation%2Cweather_code%2Cwind_speed_10m&hourly=temperature_2m%2Crelative_humidity_2m%2Cprecipitation_probability%2Cprecipitation%2Cweather_code%2Cwind_speed_10m&daily=temperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Csunrise%2Csunset&forecast_days=4&timezone=UTC",
+        "fetchedAtUTC": "2026-10-03T16:24:49.551679+00:00",
+        "status": 200,
+        "sha256": "92f13b21a4dfb74647d8d55548bb5ecf2730169a7622f95e51ddd81368ceb21c",
+        "license": "CC BY 4.0",
+        "attribution": "Weather data by Open-Meteo, https://open-meteo.com/",
+        "locations": 3,
+        "hoursPerLocation": [
+          96,
+          96,
+          96
+        ]
+      },
+      "parameters": {
+        "iterations": 100,
+        "samples": 7,
+        "warmups": 5,
+        "benchmarkEnabled": true,
+        "networkIncludedInTiming": false,
+        "swiftOptimization": "-O",
+        "objcOptimization": "-O2"
+      }
+    }
+  },
+  "limitations": [
+    "iOS 26.5 arm64 simulator, not physical iPhone or iOS 27",
+    "CPU frequency and background load not locked; timing is comparative evidence, not an SLA",
+    "Native JSONDecoder rejection of dirty/sparse weather data is an expected gate",
+    "Foundation Decimal retains its finite decimal precision and range"
+  ]
+}
