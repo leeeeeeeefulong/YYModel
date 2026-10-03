@@ -94,6 +94,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)modelCustomTransformFromDictionary:(NSDictionary *)dictionary;
 
 /**
+ Implement on the root model class to cancel a parse if any nested model dictionary
+ transform fails. Strict nested conversions use the YYModel protocol hooks.
+ The default is NO, preserving the original nested-model behavior. The policy is
+ inherited by all dictionary conversions in this parse, including model containers.
+ Already-instantiated model values are trusted. Updating an existing model can
+ assign some properties before returning NO; this option does not provide rollback.
+ */
++ (BOOL)modelRequiresSuccessfulNestedTransforms;
+
+/**
  Called when the model is converted to a json dictionary.
  You can use this method to do custom transform.
 

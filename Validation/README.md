@@ -39,6 +39,17 @@ python3 Validation/run.py --only weather --iterations 100
 python3 Validation/run.py --only weather --no-benchmark
 ```
 
+G1–G4 的独立公开 API 边界验收（UInt64、非有限值、负毫秒、可选严格嵌套转换）：
+
+```sh
+python3 Validation/run_boundary.py --original-source /tmp/YYModel-original/YYModel --output Validation/artifacts/boundary-mac
+python3 Validation/run_boundary.py --original-source /tmp/YYModel-original/YYModel --simulator SIMULATOR_UUID --output Validation/artifacts/boundary-ios
+```
+
+含原版对照时共 62 项判定。`acceptance.json` 保存逐项结果；`swift.json`、
+`objc-current.json`、`objc-original.json` 保存输入与实际值，`environment.json`
+记录源码及验收程序 SHA。该命令只验正确性，不运行性能基准。
+
 在已经启动的 arm64 iOS 模拟器上运行，无需正式 App 或测试宿主：
 
 ```sh
@@ -71,3 +82,5 @@ python3 Validation/run.py --simulator SIMULATOR_UUID --original-source /tmp/YYMo
 发布组件的回执应引用这里的输入、命令和结果。正式业务 App 的构建状态不作为本组件验收标准。
 
 本次修复的运行回执见 [RESULTS-numeric-fix.md](RESULTS-numeric-fix.md)；[2.1.8 历史回执](RESULTS-2.1.8.md) 保留修复前结论。
+
+G1–G4 后续修复的行为、兼容策略与新鲜回执见 [RESULTS-boundary-fix.md](RESULTS-boundary-fix.md)。

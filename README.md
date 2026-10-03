@@ -11,6 +11,10 @@ High performance JSON model framework for iOS/macOS.
 
 Current release: **2.1.8** (`pod 'YYModel2', '2.1.8'`, SPM `from: "2.1.8"`).
 
+The `master` branch contains unreleased numeric and boundary fixes. The immutable
+2.1.8 tag does not include these fixes; see [CHANGELOG](CHANGELOG.md) and the
+[component validation package](Validation/README.md) for reproducible evidence.
+
 ---
 
 ## Modern iOS Compatibility (2026.09)
@@ -217,6 +221,29 @@ Copy into your project:
 - Swift decoder: `YYModelSwift/YYJSONDecoder.swift`
 
 ## Usage
+
+### Optional strict nested validation (unreleased)
+
+By default, nested model dictionary transforms retain the original YYModel behavior:
+a child returning `NO` does not cancel its parent's parse. To require successful
+nested conversions throughout a parse, implement this hook on the root model:
+
+```objc
+@implementation ResponseModel
++ (BOOL)modelRequiresSuccessfulNestedTransforms { return YES; }
+@end
+```
+
+With this policy enabled, a failed nested dictionary conversion in a model property,
+array, dictionary or set makes `yy_modelWithDictionary:` / `yy_modelWithJSON:` return
+`nil`, and an existing-model setter returns `NO`. Strict conversions use the YYModel
+protocol transform hooks. Already-instantiated model inputs are trusted, and updates
+may assign fields before failing; this option does not provide transactional rollback.
+
+Unreleased Swift decoding rejects NaN, infinity and Float overflow. Automatic date
+conversion uses milliseconds when the timestamp's absolute value exceeds `1e11`,
+including negative timestamps. This magnitude rule remains a heuristic, so ambiguous
+historical dates still require an explicit application date representation.
 
 ### Simple Model
 

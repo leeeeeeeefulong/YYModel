@@ -27,6 +27,7 @@
 #import <objc/message.h>
 #import <objc/runtime.h>
 #import <os/lock.h>
+#include <errno.h>
 
 #define force_inline __inline__ __attribute__((always_inline))
 
@@ -575,6 +576,7 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
     BOOL _hasCustomTransformFromDictionary;
     BOOL _hasCustomTransformToDictionary;
     BOOL _hasCustomClassFromDictionary;
+    BOOL _requiresSuccessfulNestedTransforms;
 }
 @end
 
@@ -734,6 +736,8 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
     _hasCustomTransformFromDictionary = ([cls instancesRespondToSelector:@selector(modelCustomTransformFromDictionary:)]);
     _hasCustomTransformToDictionary = ([cls instancesRespondToSelector:@selector(modelCustomTransformToDictionary:)]);
     _hasCustomClassFromDictionary = ([cls respondsToSelector:@selector(modelCustomClassForDictionary:)]);
+    _requiresSuccessfulNestedTransforms = [cls respondsToSelector:@selector(modelRequiresSuccessfulNestedTransforms)] &&
+        [(id<YYModel>)cls modelRequiresSuccessfulNestedTransforms];
 
     return self;
 }
@@ -771,6 +775,43 @@ static os_unfair_lock _modelMetaLock = OS_UNFAIR_LOCK_INIT;
 #pragma mark - Model Set Core
 // ============================================================
 
+typedef struct {
+    BOOL failed;
+} ModelValidationContext;
+
+static BOOL ModelSetDictionary(id model, NSDictionary *dictionary, ModelValidationContext *validation);
+
+// Only strict parses propagate failures. Legacy parses continue to honor public setter overrides.
+static BOOL ModelSetNestedDictionary(id model, NSDictionary *dictionary, ModelValidationContext *validation) {
+    BOOL success = validation ? ModelSetDictionary(model, dictionary, validation)
+                              : [model yy_modelSetWithDictionary:dictionary];
+    if (validation && !success) validation->failed = YES;
+    return !validation || success;
+}
+
+// Preserve integer precision through the full unsigned range. Invalid positive values
+// leave the property untouched; negative values retain the original unsigned conversion.
+static BOOL ModelUInt64FromDecimal(NSDecimalNumber *number, unsigned long long *result) {
+    NSDecimal decimal = number.decimalValue;
+    if (NSDecimalIsNotANumber(&decimal)) return NO;
+    NSDecimal truncated;
+    NSDecimalRound(&truncated, &decimal, 0,
+                   [number compare:@0] == NSOrderedAscending ? NSRoundUp : NSRoundDown);
+    NSString *text = [NSDecimalNumber decimalNumberWithDecimal:truncated].stringValue;
+    if ([text hasPrefix:@"-"]) {
+        *result = (unsigned long long)text.longLongValue;
+        return YES;
+    }
+    const char *start = text.UTF8String;
+    if (!start) return NO;
+    char *end = NULL;
+    errno = 0;
+    unsigned long long value = strtoull(start, &end, 10);
+    if (errno == ERANGE || end == start || *end != '\0') return NO;
+    *result = value;
+    return YES;
+}
+
 static void ModelSetNumberToProperty(__unsafe_unretained id model,
                                      __unsafe_unretained NSNumber *num,
                                      __unsafe_unretained _YYModelPropertyMeta *meta) {
@@ -805,7 +846,10 @@ static void ModelSetNumberToProperty(__unsafe_unretained id model,
         } break;
         case YYEncodingTypeUInt64: {
             if ([num isKindOfClass:[NSDecimalNumber class]]) {
-                ((YYSendV_ull)(void *)objc_msgSend)(model, meta->_setter, (unsigned long long)num.stringValue.longLongValue);
+                unsigned long long value;
+                if (ModelUInt64FromDecimal((NSDecimalNumber *)num, &value)) {
+                    ((YYSendV_ull)(void *)objc_msgSend)(model, meta->_setter, value);
+                }
             } else {
                 ((YYSendV_ull)(void *)objc_msgSend)(model, meta->_setter, num.unsignedLongLongValue);
             }
@@ -864,7 +908,8 @@ static NSNumber *ModelCreateNumberFromProperty(__unsafe_unretained id model,
 
 static void ModelSetValueForProperty(__unsafe_unretained id model,
                                      __unsafe_unretained id value,
-                                     __unsafe_unretained _YYModelPropertyMeta *meta) {
+                                     __unsafe_unretained _YYModelPropertyMeta *meta,
+                                     ModelValidationContext *validation) {
     if (meta->_isCNumber) {
         NSNumber *num = YYNSNumberCreateFromID(value);
         ModelSetNumberToProperty(model, num, meta);
@@ -996,7 +1041,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                         if (!cls) cls = meta->_genericCls;
                                     }
                                     NSObject *newOne = [cls new];
-                                    [newOne yy_modelSetWithDictionary:one];
+                                    if (!ModelSetNestedDictionary(newOne, one, validation)) return;
                                     if (newOne) [objectArr addObject:newOne];
                                 }
                             }
@@ -1032,10 +1077,14 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                         if (!cls) cls = meta->_genericCls;
                                     }
                                     NSObject *newOne = [cls new];
-                                    [newOne yy_modelSetWithDictionary:(id)oneValue];
+                                    if (!ModelSetNestedDictionary(newOne, oneValue, validation)) {
+                                        *stop = YES;
+                                        return;
+                                    }
                                     if (newOne) dic[oneKey] = newOne;
                                 }
                             }];
+                            if (validation && validation->failed) return;
                             ((YYSendV_id)(void *)objc_msgSend)(model, meta->_setter, dic);
                         } else {
                             if (meta->_nsType == YYEncodingTypeNSDictionary) {
@@ -1065,7 +1114,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                     if (!cls) cls = meta->_genericCls;
                                 }
                                 NSObject *newOne = [cls new];
-                                [newOne yy_modelSetWithDictionary:one];
+                                if (!ModelSetNestedDictionary(newOne, one, validation)) return;
                                 if (newOne) [set addObject:newOne];
                             }
                         }
@@ -1097,13 +1146,13 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                         one = ((YYSendR_id)(void *)objc_msgSend)(model, meta->_getter);
                     }
                     if (one) {
-                        [one yy_modelSetWithDictionary:value];
+                        if (!ModelSetNestedDictionary(one, value, validation)) return;
                     } else {
                         if (meta->_hasCustomClassFromDictionary) {
                             cls = [cls modelCustomClassForDictionary:value] ?: cls;
                         }
                         one = [cls new];
-                        [one yy_modelSetWithDictionary:value];
+                        if (!ModelSetNestedDictionary(one, value, validation)) return;
                         ((YYSendV_id)(void *)objc_msgSend)(model, meta->_setter, (id)one);
                     }
                 }
@@ -1180,16 +1229,19 @@ typedef struct {
     void *modelMeta;
     void *model;
     void *dictionary;
+    ModelValidationContext *validation;
 } ModelSetContext;
 
 static void ModelSetWithDictionaryFunction(const void *_key, const void *_value, void *_context) {
     ModelSetContext *context = _context;
+    if (context->validation && context->validation->failed) return;
     __unsafe_unretained _YYModelMeta *meta = (__bridge _YYModelMeta *)(context->modelMeta);
     __unsafe_unretained _YYModelPropertyMeta *propertyMeta = [meta->_mapper objectForKey:(__bridge id)(_key)];
     __unsafe_unretained id model = (__bridge id)(context->model);
     while (propertyMeta) {
         if (propertyMeta->_setter) {
-            ModelSetValueForProperty(model, (__bridge __unsafe_unretained id)_value, propertyMeta);
+            ModelSetValueForProperty(model, (__bridge __unsafe_unretained id)_value, propertyMeta, context->validation);
+            if (context->validation && context->validation->failed) return;
         }
         propertyMeta = propertyMeta->_next;
     }
@@ -1197,6 +1249,7 @@ static void ModelSetWithDictionaryFunction(const void *_key, const void *_value,
 
 static void ModelSetWithPropertyMetaArrayFunction(const void *_propertyMeta, void *_context) {
     ModelSetContext *context = _context;
+    if (context->validation && context->validation->failed) return;
     __unsafe_unretained NSDictionary *dictionary = (__bridge NSDictionary *)(context->dictionary);
     __unsafe_unretained _YYModelPropertyMeta *propertyMeta = (__bridge _YYModelPropertyMeta *)(_propertyMeta);
     if (!propertyMeta->_setter) return;
@@ -1212,8 +1265,57 @@ static void ModelSetWithPropertyMetaArrayFunction(const void *_propertyMeta, voi
 
     if (value) {
         __unsafe_unretained id model = (__bridge id)(context->model);
-        ModelSetValueForProperty(model, value, propertyMeta);
+        ModelSetValueForProperty(model, value, propertyMeta, context->validation);
     }
+}
+
+// One dictionary engine serves both legacy and strict parses; policy state is stack-local.
+static BOOL ModelSetDictionary(id model, NSDictionary *dic, ModelValidationContext *validation) {
+    if (!model || !dic || dic == (id)kCFNull) return NO;
+    if (![dic isKindOfClass:[NSDictionary class]]) return NO;
+
+    _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:object_getClass(model)];
+    if (!modelMeta || modelMeta->_keyMappedCount == 0) return NO;
+    ModelValidationContext localValidation = {0};
+    if (!validation && modelMeta->_requiresSuccessfulNestedTransforms) validation = &localValidation;
+
+    if (modelMeta->_hasCustomWillTransformFromDictionary) {
+        dic = [((id<YYModel>)model) modelCustomWillTransformFromDictionary:dic];
+        if (![dic isKindOfClass:[NSDictionary class]]) return NO;
+    }
+
+    ModelSetContext context = {0};
+    context.modelMeta = (__bridge void *)(modelMeta);
+    context.model = (__bridge void *)(model);
+    context.dictionary = (__bridge void *)(dic);
+    context.validation = validation;
+
+    if (modelMeta->_keyMappedCount >= CFDictionaryGetCount((CFDictionaryRef)dic)) {
+        CFDictionaryApplyFunction((CFDictionaryRef)dic, ModelSetWithDictionaryFunction, &context);
+        if (modelMeta->_keyPathPropertyMetas) {
+            CFArrayApplyFunction((CFArrayRef)modelMeta->_keyPathPropertyMetas,
+                                 CFRangeMake(0, CFArrayGetCount((CFArrayRef)modelMeta->_keyPathPropertyMetas)),
+                                 ModelSetWithPropertyMetaArrayFunction,
+                                 &context);
+        }
+        if (modelMeta->_multiKeysPropertyMetas) {
+            CFArrayApplyFunction((CFArrayRef)modelMeta->_multiKeysPropertyMetas,
+                                 CFRangeMake(0, CFArrayGetCount((CFArrayRef)modelMeta->_multiKeysPropertyMetas)),
+                                 ModelSetWithPropertyMetaArrayFunction,
+                                 &context);
+        }
+    } else {
+        CFArrayApplyFunction((CFArrayRef)modelMeta->_allPropertyMetas,
+                             CFRangeMake(0, modelMeta->_keyMappedCount),
+                             ModelSetWithPropertyMetaArrayFunction,
+                             &context);
+    }
+
+    if (validation && validation->failed) return NO;
+    if (modelMeta->_hasCustomTransformFromDictionary) {
+        return [((id<YYModel>)model) modelCustomTransformFromDictionary:dic];
+    }
+    return YES;
 }
 
 // ============================================================
@@ -1528,47 +1630,7 @@ static NSString *ModelDescription(NSObject *model) {
 }
 
 - (BOOL)yy_modelSetWithDictionary:(NSDictionary *)dic {
-    if (!dic || dic == (id)kCFNull) return NO;
-    if (![dic isKindOfClass:[NSDictionary class]]) return NO;
-
-    _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:object_getClass(self)];
-    if (modelMeta->_keyMappedCount == 0) return NO;
-
-    if (modelMeta->_hasCustomWillTransformFromDictionary) {
-        dic = [((id<YYModel>)self) modelCustomWillTransformFromDictionary:dic];
-        if (![dic isKindOfClass:[NSDictionary class]]) return NO;
-    }
-
-    ModelSetContext context = {0};
-    context.modelMeta = (__bridge void *)(modelMeta);
-    context.model = (__bridge void *)(self);
-    context.dictionary = (__bridge void *)(dic);
-
-    if (modelMeta->_keyMappedCount >= CFDictionaryGetCount((CFDictionaryRef)dic)) {
-        CFDictionaryApplyFunction((CFDictionaryRef)dic, ModelSetWithDictionaryFunction, &context);
-        if (modelMeta->_keyPathPropertyMetas) {
-            CFArrayApplyFunction((CFArrayRef)modelMeta->_keyPathPropertyMetas,
-                                 CFRangeMake(0, CFArrayGetCount((CFArrayRef)modelMeta->_keyPathPropertyMetas)),
-                                 ModelSetWithPropertyMetaArrayFunction,
-                                 &context);
-        }
-        if (modelMeta->_multiKeysPropertyMetas) {
-            CFArrayApplyFunction((CFArrayRef)modelMeta->_multiKeysPropertyMetas,
-                                 CFRangeMake(0, CFArrayGetCount((CFArrayRef)modelMeta->_multiKeysPropertyMetas)),
-                                 ModelSetWithPropertyMetaArrayFunction,
-                                 &context);
-        }
-    } else {
-        CFArrayApplyFunction((CFArrayRef)modelMeta->_allPropertyMetas,
-                             CFRangeMake(0, modelMeta->_keyMappedCount),
-                             ModelSetWithPropertyMetaArrayFunction,
-                             &context);
-    }
-
-    if (modelMeta->_hasCustomTransformFromDictionary) {
-        return [((id<YYModel>)self) modelCustomTransformFromDictionary:dic];
-    }
-    return YES;
+    return ModelSetDictionary(self, dic, NULL);
 }
 
 - (id)yy_modelToJSONObject {

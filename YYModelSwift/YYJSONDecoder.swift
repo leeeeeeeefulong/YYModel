@@ -41,18 +41,10 @@ public struct YYJSONDecoder: Sendable {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .custom { decoder in
             let container = try decoder.singleValueContainer()
-            if let seconds = try? container.decode(Double.self) {
-                return Date(timeIntervalSince1970: seconds > 1e11 ? seconds / 1000.0 : seconds)
-            }
-            if let text = try? container.decode(String.self) {
-                let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-                if let seconds = TimeInterval(trimmed) {
-                    return Date(timeIntervalSince1970: seconds > 1e11 ? seconds / 1000.0 : seconds)
-                }
-                if let d = YYJSONValueDecoder.isoFormatterWithFractionalSeconds.date(from: trimmed) { return d }
-                if let d = YYJSONValueDecoder.isoFormatterStandard.date(from: trimmed) { return d }
-                if let d = YYJSONValueDecoder.commonDateFormatter.date(from: trimmed) { return d }
-            }
+            if let seconds = try? container.decode(Double.self),
+               let date = YYJSONValueDecoder.date(from: seconds) { return date }
+            if let text = try? container.decode(String.self),
+               let date = YYJSONValueDecoder.date(from: text) { return date }
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Invalid date format"))
         }
         return decoder
@@ -132,8 +124,8 @@ enum YYJSONValueDecoder {
         if T.self == String.self { return string(from: value) as? T }
         if T.self == Bool.self { return bool(from: value) as? T }
         if T.self == Double.self { return double(from: value) as? T }
-        if T.self == Float.self { return double(from: value).map { Float($0) } as? T }
-        if T.self == CGFloat.self { return double(from: value).map { CGFloat($0) } as? T }
+        if T.self == Float.self { return floating(from: value, Float.self) as? T }
+        if T.self == CGFloat.self { return floating(from: value, CGFloat.self) as? T }
         if T.self == Decimal.self { return decimal(from: value) as? T }
         if T.self == Int.self { return integer(value, Int.self) as? T }
         if T.self == Int8.self { return integer(value, Int8.self) as? T }
@@ -185,14 +177,22 @@ enum YYJSONValueDecoder {
     }
 
     private static func double(from value: Any) -> Double? {
+        let result: Double?
         if let number = value as? NSNumber {
-            if isBoolean(number) { return number.boolValue ? 1 : 0 }
-            return number.doubleValue
+            result = isBoolean(number) ? (number.boolValue ? 1 : 0) : number.doubleValue
+        } else if let text = value as? String {
+            result = Double(text.trimmingCharacters(in: .whitespacesAndNewlines))
+        } else {
+            result = nil
         }
-        if let text = value as? String {
-            return Double(text.trimmingCharacters(in: .whitespacesAndNewlines))
-        }
-        return nil
+        guard let result, result.isFinite else { return nil }
+        return result
+    }
+
+    private static func floating<F: BinaryFloatingPoint>(from value: Any, _ type: F.Type) -> F? {
+        guard let number = double(from: value) else { return nil }
+        let result = F(number)
+        return result.isFinite ? result : nil
     }
 
     /// A validated ASCII coefficient and scale: base 10, or base 16 with a binary scale.
@@ -357,7 +357,8 @@ enum YYJSONValueDecoder {
 
     private static func decimal(from value: Any) -> Decimal? {
         if let number = value as? NSNumber, !isBoolean(number) {
-            return number.decimalValue
+            let decimal = number.decimalValue
+            return decimal.isNaN ? nil : decimal
         }
         if let text = value as? String,
            let parsed = numericText(text.trimmingCharacters(in: .whitespacesAndNewlines)) {
@@ -445,17 +446,22 @@ enum YYJSONValueDecoder {
     }()
     #endif
 
-    private static func date(from value: Any) -> Date? {
-        if let date = value as? Date { return date }
+    private static func date(fromTimestamp seconds: Double) -> Date? {
+        guard seconds.isFinite else { return nil }
+        let epoch = abs(seconds) > 1e11 ? seconds / 1000.0 : seconds
+        return Date(timeIntervalSince1970: epoch)
+    }
+
+    fileprivate static func date(from value: Any) -> Date? {
+        if let date = value as? Date {
+            return date.timeIntervalSince1970.isFinite ? date : nil
+        }
         if let number = value as? NSNumber, !isBoolean(number) {
-            let seconds = number.doubleValue
-            return Date(timeIntervalSince1970: seconds > 1e11 ? seconds / 1000.0 : seconds)
+            return date(fromTimestamp: number.doubleValue)
         }
         if let text = value as? String {
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-            if let seconds = TimeInterval(trimmed) {
-                return Date(timeIntervalSince1970: seconds > 1e11 ? seconds / 1000.0 : seconds)
-            }
+            if let seconds = TimeInterval(trimmed) { return date(fromTimestamp: seconds) }
             if let d = isoFormatterWithFractionalSeconds.date(from: trimmed) { return d }
             if let d = isoFormatterStandard.date(from: trimmed) { return d }
             return commonDateFormatter.date(from: trimmed)

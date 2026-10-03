@@ -5,6 +5,14 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+### Boundary correctness and optional nested validation (G1–G4)
+
+- Preserve the full UInt64 range when assigning NSDecimalNumber and JSON decimal numbers to OC unsigned 64-bit properties. Truncate fractions toward zero; NaN and positive overflow leave the existing property untouched. Negative conversion retains legacy behavior.
+- Reject non-finite Swift floating-point, Decimal and Date values, including overflow introduced while narrowing Double to Float.
+- Apply the existing automatic seconds/milliseconds threshold symmetrically to positive and negative timestamps, through one shared date conversion for fast and tolerant decoding.
+- Add the optional root-model hook `+modelRequiresSuccessfulNestedTransforms`. When enabled, nested dictionary conversions propagate failure through objects and model containers to the root parse. Default behavior remains compatible with ibireme; existing-object updates do not roll back prior assignments.
+- Add repeatable public API boundary E2E checks, alongside the independent numeric and Open-Meteo weather validation package.
+
 ### Numeric correctness (F1–F4)
 
 - Parse decimal and C99 hexadecimal numeric strings using one ASCII-byte grammar. Reject Unicode combining marks and malformed suffixes before Foundation conversion.
