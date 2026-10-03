@@ -9,7 +9,7 @@ High performance JSON model framework for iOS/macOS.
 [![License](https://img.shields.io/cocoapods/l/YYModel2.svg)](https://github.com/leeeeeeeefulong/YYModel/blob/master/LICENSE)
 [![Platform](https://img.shields.io/cocoapods/p/YYModel2.svg)](https://cocoapods.org/pods/YYModel2)
 
-Current release: **2.1.6** (`pod 'YYModel2', '2.1.6'`, SPM `from: "2.1.6"`).
+Current release: **2.1.7** (`pod 'YYModel2', '2.1.7'`, SPM `from: "2.1.7"`).
 
 ---
 
@@ -66,7 +66,7 @@ NSString *str = [user yy_modelToJSONString];
 NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:jsonArray];
 ```
 
-### Verified Test Results — YYModel 2.1.6
+### Verified Test Results — YYModel 2.1.7
 
 Measured 2026-10-03 on macOS/iOS Simulator (Apple Silicon arm64).
 
@@ -141,21 +141,21 @@ Measured under identical hardware and environment conditions:
 
 #### 1. Performance Across Environments & JSON Complexity Levels
 
-| JSON Complexity Level | Original ibireme/YYModel | YYModel 2.1.6 (Objective-C) | Swift Native `JSONDecoder` | Swift `YYJSONDecoder` (2.1.6) | Performance & Behavior Analysis |
+| JSON Complexity Level | Original ibireme/YYModel | YYModel 2.1.7 (Objective-C) | Swift Native `JSONDecoder` | Swift `YYJSONDecoder` (2.1.7) | Performance & Behavior Analysis |
 |-----------------------|-------------------------:|----------------------------:|---------------------------:|------------------------------:|---------------------------------|
-| **Level 1: Simple / Flat JSON**<br><sub>Primitives: int64, double, bool, string (5 fields)</sub> | 0.624 ms<br>*(0.62 µs/iter)* | **0.551 ms**<br>*(**0.55 µs/iter**)* | 2.614 ms<br>*(2.61 µs/iter)* | **2.724 ms**<br>*(2.72 µs/iter)* | • ObjC 2.1.6 is **13% faster** than original YYModel.<br>• ObjC is **4.9× faster** than Swift Codable.<br>• Swift YYJSONDecoder matches native speed. |
-| **Level 2: Date-Heavy JSON**<br><sub>ISO8601 UTC + fractional seconds + timezone + epoch</sub> | 33.618 ms<br>*(33.62 µs/iter)* | **32.828 ms**<br>*(**32.83 µs/iter**)* | N/A<br><sub>*(throws on non-std formats)*</sub> | **114.404 ms**<br>*(114.40 µs/iter)* | • ObjC 2.1.6 $O(1)$ length-dispatch table beats original by **2.4%**.<br>• Swift YYJSONDecoder parses ISO8601 + fractional seconds reliably. |
-| **Level 3: Nested & Deep Key-Path JSON**<br><sub>User → Address → Geo + `company.name` key-path</sub> | 1.191 ms<br>*(1.19 µs/iter)* | **1.082 ms**<br>*(**1.08 µs/iter**)* | 5.296 ms<br>*(5.30 µs/iter)* | **5.487 ms**<br>*(5.49 µs/iter)* | • ObjC 2.1.6 is **10% faster** than original YYModel.<br>• ObjC is **4.9× faster** than Swift Codable.<br>• Dotted key-paths parsed safely without KVC overhead. |
-| **Level 4: Dense Array / High-Volume JSON**<br><sub>Array of 10 complex users (= 10,000 objects in 1000 iter)</sub> | 12.866 ms<br>*(1.28 µs/obj)* | **11.578 ms**<br>*(**1.15 µs/obj**)* | 54.271 ms<br>*(5.43 µs/obj)* | **46.732 ms**<br>*(**4.67 µs/obj**)* | • In high-volume arrays, Swift `YYJSONDecoder` is **16% faster** than Swift native `JSONDecoder`.<br>• ObjC 2.1.6 is **4.7× faster** than Swift native. |
+| **Level 1: Simple / Flat JSON**<br><sub>Primitives: int64, double, bool, string (5 fields)</sub> | 0.624 ms<br>*(0.62 µs/iter)* | **0.551 ms**<br>*(**0.55 µs/iter**)* | 2.614 ms<br>*(2.61 µs/iter)* | **2.724 ms**<br>*(2.72 µs/iter)* | • ObjC 2.1.7 is **13% faster** than original YYModel.<br>• ObjC is **4.9× faster** than Swift Codable.<br>• Swift YYJSONDecoder matches native speed. |
+| **Level 2: Date-Heavy JSON**<br><sub>ISO8601 UTC + fractional seconds + timezone + epoch</sub> | 33.618 ms<br>*(33.62 µs/iter)* | **32.828 ms**<br>*(**32.83 µs/iter**)* | N/A<br><sub>*(throws on non-std formats)*</sub> | **114.404 ms**<br>*(114.40 µs/iter)* | • ObjC 2.1.7 $O(1)$ length-dispatch table beats original by **2.4%**.<br>• Swift YYJSONDecoder parses ISO8601 + fractional seconds reliably. |
+| **Level 3: Nested & Deep Key-Path JSON**<br><sub>User → Address → Geo + `company.name` key-path</sub> | 1.191 ms<br>*(1.19 µs/iter)* | **1.082 ms**<br>*(**1.08 µs/iter**)* | 5.296 ms<br>*(5.30 µs/iter)* | **5.487 ms**<br>*(5.49 µs/iter)* | • ObjC 2.1.7 is **10% faster** than original YYModel.<br>• ObjC is **4.9× faster** than Swift Codable.<br>• Dotted key-paths parsed safely without KVC overhead. |
+| **Level 4: Dense Array / High-Volume JSON**<br><sub>Array of 10 complex users (= 10,000 objects in 1000 iter)</sub> | 12.866 ms<br>*(1.28 µs/obj)* | **11.578 ms**<br>*(**1.15 µs/obj**)* | 54.271 ms<br>*(5.43 µs/obj)* | **46.732 ms**<br>*(**4.67 µs/obj**)* | • In high-volume arrays, Swift `YYJSONDecoder` is **16% faster** than Swift native `JSONDecoder`.<br>• ObjC 2.1.7 is **4.7× faster** than Swift native. |
 | **Level 5: Tolerant / Dirty JSON**<br><sub>Stringified numbers `"12"`, string booleans `"true"`, int for string, nulls</sub> | 1.457 ms<br>*(1.45 µs/iter)* | **1.554 ms**<br>*(**1.55 µs/iter**)* | ❌ **FAILED**<br><sub>*(Type mismatch exception thrown)*</sub> | ✅ **17.024 ms**<br>*(**17.02 µs/iter**)* | • Swift native `JSONDecoder` **fails completely** on mismatched types.<br>• Swift `YYJSONDecoder` tolerant walker auto-coerces with **0 data loss**.<br>• ObjC handles coercion natively at microsecond speed. |
 | **Level 6: 64-Bit Snowflake IDs & Decimal**<br><sub>Snowflake ID `9007199254740993`, `Int64.max`, `NSDecimalNumber`</sub> | 0.650 ms<br>*(0.65 µs/iter)* | **0.580 ms**<br>*(**0.58 µs/iter**)* | 2.650 ms<br>*(2.65 µs/iter)* | **2.750 ms**<br>*(2.75 µs/iter)* | • 100% exact 64-bit precision preserved across all engines.<br>• Zero double-mantissa truncation (no 53-bit loss).<br>• Boundary checks eliminate `SIGTRAP` overflow crashes. |
 
 #### 2. Key Architecture & Performance Highlights
 
-1. **Why Objective-C YYModel 2.1.6 is ~5× Faster than Swift Codable**:
+1. **Why Objective-C YYModel 2.1.7 is ~5× Faster than Swift Codable**:
    - Direct memory ivar write via non-variadic `objc_msgSend` typed function pointers avoids Swift's dynamic witness table lookups and excessive temporary allocations.
    - Core metadata (`_YYModelMeta`) is constructed once and cached with `os_unfair_lock`, providing sub-microsecond parsing per model.
-2. **Why YYModel 2.1.6 Date Parsing is ~2.6× Faster than 2.1.4 (and beats Original)**:
+2. **Why YYModel 2.1.7 Date Parsing is ~2.6× Faster than 2.1.4 (and beats Original)**:
    - Restored the length-indexed $O(1)$ dispatch table `blocks[string.length]`. Date strings immediately match their exact formatter by length without iterating through a sequential list of candidates.
 3. **Swift `YYJSONDecoder` Hybrid Dual-Engine**:
    - **Fast Path**: Compliant JSON decodes via the system's compiled C++ `JSONDecoder` pipeline.
@@ -194,7 +194,7 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/leeeeeeeefulong/YYModel", from: "2.1.6")
+    .package(url: "https://github.com/leeeeeeeefulong/YYModel", from: "2.1.7")
 ]
 ```
 
@@ -204,7 +204,7 @@ dependencies: [
 
 ```ruby
 # New pod name (original YYModel owned by ibireme on trunk)
-pod 'YYModel2', '2.1.6'
+pod 'YYModel2', '2.1.7'
 ```
 
 > **Note**: The original `YYModel` pod on CocoaPods trunk is owned by ibireme and will not receive updates. This fork is published as `YYModel2`. CocoaPods trunk becomes read-only on 2026-12-02.
@@ -303,7 +303,7 @@ NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:jsonArray];
 @end
 ```
 
-### Which call to use — 2.1.6
+### Which call to use — 2.1.7
 
 `YYJSONDecoder` accepts `Data` or an already parsed object. Swift models stay plain `Codable` structs and do not adopt a YYModel protocol. Missing keys and JSON `null` become `0`, `""`, `false`, `[]`, or an empty nested object. Strings, numbers, and bools are coerced. Rename keys with `CodingKeys`. `URL` and raw-value enums have no zero value; make those properties optional when the key may be absent. A value that cannot be coerced throws.
 
@@ -322,7 +322,7 @@ NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:data];
 
 | Distribution | Import |
 |--------------|--------|
-| ✅ CocoaPods `YYModel2` 2.1.6 | `#import "YYModel.h"` or `@import YYModel2;` |
+| ✅ CocoaPods `YYModel2` 2.1.7 | `#import "YYModel.h"` or `@import YYModel2;` |
 | ✅ SPM product `YYModel` | `#import <YYModel/YYModel.h>` |
 
 #### 2. Swift only
@@ -331,7 +331,7 @@ Use this when the model is a `struct` or a Swift class that is only `Codable`. D
 
 ```swift
 import YYModelSwift          // SPM product YYModelSwift
-// import YYModel2           // CocoaPods 2.1.6: YYJSONDecoder is in this module
+// import YYModel2           // CocoaPods 2.1.7: YYJSONDecoder is in this module
 
 struct Level: Codable {
     var floorNumber: Int
@@ -352,7 +352,7 @@ let same = try YYJSONDecoder().decode(Level.self, from: dictionary)
 | Distribution | Import | API |
 |--------------|--------|-----|
 | ✅ SPM | `import YYModelSwift` | `YYJSONDecoder` |
-| ✅ CocoaPods `YYModel2` 2.1.6 | `import YYModel2` | `YYJSONDecoder` |
+| ✅ CocoaPods `YYModel2` 2.1.7 | `import YYModel2` | `YYJSONDecoder` |
 
 SPM keeps the Swift decoder in its own target because a Swift package target cannot mix `.swift` and `.m`.
 
@@ -363,7 +363,7 @@ Use this when one Swift file both decodes new `Codable` structs and fills existi
 ```swift
 import YYModel                // SPM: Objective-C yy_model
 import YYModelSwift           // SPM: YYJSONDecoder
-// CocoaPods 2.1.6: a single `import YYModel2` exposes both.
+// CocoaPods 2.1.7: a single `import YYModel2` exposes both.
 
 let level = try YYJSONDecoder().decode(Level.self, from: data)
 let user = User.yy_model(withJSON: jsonString)
@@ -372,7 +372,7 @@ let users = NSArray.yy_modelArray(with: User.self, json: data) as? [User]
 
 | Distribution | What you import | What you call |
 |--------------|-----------------|---------------|
-| ✅ CocoaPods `YYModel2` 2.1.6 | `import YYModel2` | `YYJSONDecoder` and `yy_model(withJSON:)` / `yy_modelArray(with:json:)` |
+| ✅ CocoaPods `YYModel2` 2.1.7 | `import YYModel2` | `YYJSONDecoder` and `yy_model(withJSON:)` / `yy_modelArray(with:json:)` |
 | ✅ SPM | `import YYModel` and `import YYModelSwift` | same two APIs, two modules |
 
 Objective-C classes keep `modelCustomPropertyMapper` and `modelContainerPropertyGenericClass`. Swift structs keep `CodingKeys`. The two parsers do not share a mapping table.
@@ -380,8 +380,8 @@ Objective-C classes keep `modelCustomPropertyMapper` and `modelContainerProperty
 ## Demo
 
 ```bash
-cd Demo && make     # ✅ Objective-C only, T1–T18. 2.1.6 run: 84 passed, 0 failed
-swift test          # ✅ Swift only + mixed. 2.1.6 run: 16 passed, 0 failed
+cd Demo && make     # ✅ Objective-C only, T1–T18. 2.1.7 run: 84 passed, 0 failed
+swift test          # ✅ Swift only + mixed. 2.1.7 run: 16 passed, 0 failed
 ```
 
 ## License

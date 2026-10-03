@@ -222,29 +222,29 @@ enum YYJSONValueDecoder {
         }
         if let text = value as? String {
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else { return nil }
             if let exact = I(trimmed) { return exact }
 
-            let isIntegerString: Bool = {
+            let isPureInteger: Bool = {
                 var s = trimmed[...]
                 if s.hasPrefix("+") || s.hasPrefix("-") { s = s.dropFirst() }
                 return !s.isEmpty && s.allSatisfy { $0 >= "0" && $0 <= "9" }
             }()
-            if isIntegerString {
+            if isPureInteger {
                 return nil
             }
 
+            guard let d = Double(trimmed), d.isFinite else { return nil }
+
             if let dec = Decimal(string: trimmed) {
-                var rounded = Decimal()
+                var truncated = Decimal()
                 var copy = dec
-                NSDecimalRound(&rounded, &copy, 0, .plain)
-                let str = "\(rounded)"
+                let mode: NSDecimalNumber.RoundingMode = dec.isSignMinus ? .up : .down
+                NSDecimalRound(&truncated, &copy, 0, mode)
+                let str = "\(truncated)"
                 if let exact = I(str) {
                     return exact
                 }
-            }
-
-            if let d = Double(trimmed), d.isFinite {
-                return I(exactly: d.rounded(.towardZero))
             }
         }
         return nil
@@ -433,16 +433,24 @@ private struct YYUnkeyedContainer: UnkeyedDecodingContainer {
     }
 
     mutating func nestedContainer<NestedKey: CodingKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> {
-        try nextDecoder().container(keyedBy: type)
+        guard !isAtEnd else { throw end() }
+        let index = currentIndex
+        let subDecoder = _YYDecoder(value: array[index], codingPath: codingPath + [YYIndexKey(intValue: index)])
+        let container = try subDecoder.container(keyedBy: type)
+        currentIndex += 1
+        return container
     }
 
     mutating func nestedUnkeyedContainer() throws -> UnkeyedDecodingContainer {
-        try nextDecoder().unkeyedContainer()
+        guard !isAtEnd else { throw end() }
+        let index = currentIndex
+        let subDecoder = _YYDecoder(value: array[index], codingPath: codingPath + [YYIndexKey(intValue: index)])
+        let container = try subDecoder.unkeyedContainer()
+        currentIndex += 1
+        return container
     }
 
-    mutating func superDecoder() throws -> Decoder { try nextDecoder() }
-
-    private mutating func nextDecoder() throws -> _YYDecoder {
+    mutating func superDecoder() throws -> Decoder {
         guard !isAtEnd else { throw end() }
         let index = currentIndex
         currentIndex += 1

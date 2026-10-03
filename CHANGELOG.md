@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## 2.1.7 — Extended Review Parity & Robustness (2026-10-03)
+
+### Bug Fixes & Boundary Robustness (D1–D7)
+
+- **(D2) Objective-C Whitespace-Prefixed Negative Numbers**:
+  - In `YYNSNumberCreateFromID`, skips leading whitespace (`" -1"`, `"\t-123"`, `"\n-42"`) before inspecting negative sign, ensuring signed parsing via `strtoll` and preventing unintentional unsigned underflow to `18446744073709551615`.
+- **(D3 & D5) Swift Decimal String Toward-Zero Truncation & Overflow Rejection**:
+  - Re-architected decimal string parsing in `YYJSONDecoder.swift` to strictly truncate toward zero (matching numeric `1.8` -> `1` and `-1.8` -> `-1`) via `NSDecimalRound` mode.
+  - Rejects out-of-range decimal strings (`"-9223372036854775809.0"`, `"-9.223372036854775809e18"`) by verifying integer bounds on the exact truncated representation rather than falling back to Double.
+- **(D4) Swift Malformed Numeric Suffix Rejection**:
+  - Strings with illegal suffixes (`"123abc"`, `"1.8xyz"`, `"1e2garbage"`) are rejected immediately, preventing partial prefix absorption.
+- **(D6) Swift Non-Destructive Container Creation**:
+  - `UnkeyedDecodingContainer.nestedContainer` and `nestedUnkeyedContainer` advance `currentIndex` only after successfully verifying and creating the sub-container. Failed attempts no longer prematurely consume elements, enabling clean heterogeneous array decoding.
+- **(D7) Extended Date Formats Support**:
+  - Added fast-fallback parsing for RFC 822/1123 (`"Sat, 03 Oct 2026 08:00:00 +0000"`) and asctime (`"Sat Oct 03 08:00:00 2026"`), preserving full compatibility with fork enhancements while retaining $O(1)$ dispatch speed for standard ISO8601 dates.
+- **(D1) CocoaPods Clean Version Bump**:
+  - Released as official version `2.1.7` across Podspecs and Package.swift to eliminate CocoaPods git tag cache reuse and guarantee fresh dependency installation.
+
+### Verification Status
+
+- ✅ Framework XCTest: 27 passed, 0 failed.
+- ✅ Demo Suite: 84 passed, 0 failed (0 warnings).
+- ✅ Swift Test: 16 passed, 0 failed.
+- ✅ Original Acceptance (R1–R8): 9/9 checks passed (`acceptance.json`).
+- ✅ Extended Acceptance (N1–N8): 11/11 checks passed (`extended-acceptance.json`).
+- ✅ Boundary Acceptance (D2–D7): 5/5 checks passed (`boundary-acceptance.json`).
+- ✅ Main App (BlackListTests): 21 passed, 0 failed.
+
+---
+
 ## 2.1.6 — Code Review Enhancements & Contract Precision (2026-10-03)
 
 ### Bug Fixes & Contract Enhancements (R1–R8 & N1–N8)

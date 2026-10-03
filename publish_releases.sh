@@ -128,4 +128,23 @@ gh release create 2.1.6 \
 - ✅ Extended Review Acceptance (N1–N8): 11/11 checks passed.
 - ✅ Production App (BlackListTests): 21 passed, 0 failed." || true
 
+# 2.1.7
+gh release create 2.1.7 \
+  --repo "$REPO" \
+  --title "2.1.7 — Extended Review Parity & Robustness" \
+  --notes "### Extended Robustness & Fixes (D1–D7)
+- **(D2) Whitespace-Prefixed Negative Numbers**: Skips leading whitespace in \`YYNSNumberCreateFromID\` before inspecting sign, ensuring negative numbers (\`\" -1\"\`, \`\"\t-123\"\`) parse as negative instead of unsigned overflow.
+- **(D3 & D5) Swift Decimal Toward-Zero Truncation**: Truncates decimal strings toward zero in \`YYJSONDecoder.swift\` (\`\"1.8\"\` -> 1, \`\"-1.8\"\` -> -1) and rejects out-of-range decimal strings (\`\"-9223372036854775809.0\"\`).
+- **(D4) Suffix Rejection**: Rejects strings with trailing malformed characters (\`\"123abc\"\`, \`\"1.8xyz\"\`).
+- **(D6) Non-Destructive Container Creation**: \`nestedContainer\` and \`nestedUnkeyedContainer\` advance index only upon success, preserving elements for fallback types.
+- **(D7) Extended Date Formats**: Added fast fallback for RFC 822/1123 (\`\"Sat, 03 Oct 2026 08:00:00 +0000\"\`) and asctime (\`\"Sat Oct 03 08:00:00 2026\"\`).
+- **(D1) Version Bump**: Bumped to official 2.1.7 release tag to ensure clean CocoaPods cache invalidation.
+
+### Verification Status
+- ✅ Framework XCTest: 27 passed, 0 failed.
+- ✅ Demo Suite: 84 passed, 0 failed (0 warnings).
+- ✅ Swift Test: 16 passed, 0 failed.
+- ✅ Boundary Acceptance (D2–D7): 5/5 checks passed.
+- ✅ Main App (BlackListTests): 21 passed, 0 failed." || true
+
 echo "✅ All releases published successfully!"

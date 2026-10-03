@@ -184,7 +184,9 @@ static force_inline NSNumber *YYNSNumberCreateFromID(__unsafe_unretained id valu
         } else {
             const char *cstring = ((NSString *)value).UTF8String;
             if (!cstring) return nil;
-            if (cstring[0] == '-') {
+            const char *p = cstring;
+            while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n' || *p == '\v' || *p == '\f') p++;
+            if (*p == '-') {
                 long long v = strtoll(cstring, NULL, 10);
                 return @(v);
             } else {
@@ -343,6 +345,37 @@ static force_inline NSDate *YYNSDateFromString(__unsafe_unretained NSString *str
             if (ts > 0) return [NSDate dateWithTimeIntervalSince1970:ts];
         }
     }
+
+    // Extended common formats fallback (RFC 822/1123, asctime, localized slashes)
+    static NSArray<NSDateFormatter *> *fallbackFormatters = nil;
+    static dispatch_once_t fallbackOnce;
+    dispatch_once(&fallbackOnce, ^{
+        NSArray *formats = @[
+            @"EEE, dd MMM yyyy HH:mm:ss Z",
+            @"EEE MMM dd HH:mm:ss yyyy",
+            @"yyyy-MM-dd HH:mm:ss Z",
+            @"yyyy/MM/dd",
+            @"yyyy.MM.dd",
+            @"MM-dd-yyyy",
+            @"MM/dd/yyyy",
+            @"dd-MM-yyyy",
+            @"dd/MM/yyyy",
+        ];
+        NSMutableArray *list = [NSMutableArray new];
+        for (NSString *fmtStr in formats) {
+            NSDateFormatter *fmt = [NSDateFormatter new];
+            fmt.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+            fmt.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+            fmt.dateFormat = fmtStr;
+            [list addObject:fmt];
+        }
+        fallbackFormatters = list;
+    });
+    for (NSDateFormatter *fmt in fallbackFormatters) {
+        NSDate *date = [fmt dateFromString:string];
+        if (date) return date;
+    }
+
     return nil;
     #undef kParserNum
 }
