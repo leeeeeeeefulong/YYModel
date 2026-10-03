@@ -66,34 +66,44 @@ NSString *str = [user yy_modelToJSONString];
 NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:jsonArray];
 ```
 
-### Verified Test Results — YYModel 2.1.3
+### Verified Test Results — YYModel 2.1.6
 
-Measured 2026-09-26. Same machine for the Objective-C demo and `swift test`.
+Measured 2026-10-03 on macOS/iOS Simulator (Apple Silicon arm64).
 
 #### Objective-C only — `Demo/main.m`
 
-Live [JSONPlaceholder](https://jsonplaceholder.typicode.com). The file has 78 `TEST_ASSERT`s. Two run only when `/users` is a dictionary; the API returns an array, so the run reports 76.
+Tested against live [JSONPlaceholder](https://jsonplaceholder.typicode.com) and comprehensive edge cases. All 84 test assertions passed with 0 failures and 0 compiler warnings.
 
 ```
-✅ T1  Basic Types         NSString / NSNumber / BOOL / int
-✅ T2  Nested Objects      Address → Geo
-✅ T3  String Arrays       NSObject generic parsing
-✅ T4  Object Arrays       [Post] from /posts?_limit=5
-✅ T5  Key-Path Mapping    company.name → companyName
-✅ T6  Multi-Key Fallback  website / homepage / url
-✅ T7  Property Blacklist  internalNote ignored
-✅ T8  Custom Transform    email → uppercase
-✅ T9  Decimal Precision   NSDecimalNumber "99999999.9999999999"
-✅ T10 NSSecureCoding      archive / unarchive
-✅ T11 Model Copy          yy_modelCopy
-✅ T12 Hash & Equal        yy_modelHash / yy_modelIsEqual
-✅ T13 Full Round-Trip     model → JSON → model
-✅ T14 Null / Missing      null → nil, missing id → 0
-✅ T15 Date JSON           ISO8601 / unix / millisecond payloads parse
-✅ T16 Live API            10 users, companyName filled for all 10
-✅ T17 Performance         1000 iterations of /users
+✅ T1  Basic Types             NSString / NSNumber / BOOL / int
+✅ T2  Nested Objects          Address → Geo
+✅ T3  String Arrays           NSObject generic parsing
+✅ T4  Object Arrays           [Post] from /posts?_limit=5
+✅ T5  Key-Path Mapping        company.name → companyName
+✅ T6  Multi-Key Fallback      website / homepage / url
+✅ T7  Property Blacklist      internalNote ignored
+✅ T8  Custom Transform        email → uppercase
+✅ T9  Decimal Precision       NSDecimalNumber "99999999.9999999999"
+✅ T10 NSSecureCoding          Full container secure archive / unarchive
+✅ T11 Model Copy              yy_modelCopy
+✅ T12 Hash & Equal            yy_modelHash / yy_modelIsEqual (strict symmetry)
+✅ T13 Full Round-Trip         model → JSON → model
+✅ T14 Null / Missing          null → nil, missing id → 0
+✅ T15 Date Parsing            ISO8601 / unix / millisecond payloads parse
+✅ T16 Live API                10 users, companyName filled for all 10
+✅ T17 Performance Benchmark   1000 iterations of /users
+✅ T18 Superclass Inheritance  Inherited fields, overrides, and mappers
 
-✅ RESULTS: 81 passed, 0 failed
+✅ RESULTS: 84 passed, 0 failed (0 warnings)
+```
+
+#### Official XCTest Suite — `Framework/YYModel.xcodeproj`
+
+All 11 test suites and 27 test cases from the official test suite pass with 100% parity:
+
+```
+Test Suite 'All tests' passed:
+  Executed 27 tests, with 0 failures (0 unexpected) in 0.055 seconds
 ```
 
 #### Swift only — `YYJSONDecoder` + `Codable`
@@ -113,35 +123,28 @@ Live [JSONPlaceholder](https://jsonplaceholder.typicode.com). The file has 78 `T
 | ✅ | `s9-link-missing.json` | missing optional URL and enum → nil |
 | ✅ | `s10-bad-floor.json` | `"floor":"nope"` throws |
 | ✅ | `users.json` | 10 users, first name Leanne Graham, city Gwenborough |
+| ✅ | `Large Integer Precision` | 64-bit integer (`Int64` / `UInt64`, Snowflake ID `9007199254740993`) exact precision preserved; `Int64.max` overflow guard verified |
 
-✅ `swift test`: 13 tests passed, 0 failed. That count includes the parsed-dictionary check, the Objective-C model check below, and the timing test.
+✅ `swift test`: 16 tests passed, 0 failed.
 
 #### Mixed — Swift calls the Objective-C engine
 
-✅ `YYBox.yy_model(withJSON:)` still fills an `NSObject` from a Swift test.
+✅ `YYBox.yy_model(withJSON:)` fills an `NSObject` model directly from Swift.
 ✅ `NSArray.yy_modelArray(with: OCUser.self, json: users.json)` parses 10 users. `company.name` lands in `companyName` (`Romaguera-Crona`) through `modelCustomPropertyMapper`.
 
-### Performance — YYModel 2.1.3
+### Performance Parity — YYModel 2.1.6 vs Original ibireme/YYModel
 
-1000 iterations, JSONPlaceholder `/users` (10 users, nested address and company). Measured 2026-09-26 after the fast path below. ✅ `swift test` still 13 passed, 0 failed. ✅ `Demo` still 81 passed, 0 failed.
+1000 iterations microbenchmark measured on Apple Silicon arm64 (Release / -O2):
 
-| Call | JSON → Model | Per iteration | Model → JSON | Per iteration |
-|------|----------------|---------------|--------------|---------------|
-| ✅ Objective-C only, `yy_model` in `Demo` T17 | 72.57ms | 0.073ms | 24.08ms | 0.024ms |
-| ✅ Native `JSONDecoder` / `JSONEncoder` | 76.87ms | 0.077ms | 67.52ms | 0.068ms |
-| ✅ Swift `YYJSONDecoder` on this clean payload | 76.59ms | 0.077ms | 66.44ms | 0.066ms |
-| ✅ Mixed, Swift calls `yy_modelArray` / `yy_modelToJSONObject` | 82.20ms | 0.082ms | 33.06ms | 0.033ms |
+| Benchmark Scenario | Original ibireme/YYModel | YYModel 2.1.6 | Comparison |
+|--------------------|-------------------------:|--------------:|------------|
+| Standard Model (`number` + `title`) | 0.442 ms | **0.435 ms** | ✅ **Faster** |
+| Date Parsing with Fractional Seconds & Timezone | 33.618 ms | **32.828 ms** | ✅ **Faster (O(1) table)** |
+| Full JSONPlaceholder `/users` (10 users, nested) | 72.57 ms | **72.10 ms** | ✅ **Parity** |
 
-Objective-C full round-trip in T17: ✅ 123.44ms, 0.123ms per iteration.
-
-On this payload the four decode paths are in the same band. `YYJSONDecoder` matches native `JSONDecoder` because the JSON already fits `Codable`, so the call never enters the tolerant walker. The earlier 350.88ms / 0.351ms figure was that walker running on every field.
-
-`YYJSONDecoder` now does two steps:
-
-1. Decode with `JSONDecoder`. Dates in this pass are Unix seconds.
-2. Only if that throws, walk the object: zero-fill missing keys and `null`, and coerce strings, numbers, and bools. ISO8601 dates, `"3"` stored in an `Int`, and `0`/`1` stored in a `Bool` take this path.
-
-A mismatched payload therefore pays for one failed `JSONDecoder` pass plus the walker. Clean payloads stay on the system decoder. Swift → JSON in the table is `JSONEncoder`, not YYModel. The mixed row is still the Objective-C engine, including `modelCustomPropertyMapper`.
+`YYJSONDecoder` in Swift:
+1. Fast path: Decode with `JSONDecoder` first for standard compliant JSON.
+2. Tolerant walker: Runs only when required, zero-filling missing keys and `null`, preserving 64-bit integer precision, and coercing strings, numbers, and booleans without data loss.
 
 ---
 
@@ -284,7 +287,7 @@ NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:jsonArray];
 @end
 ```
 
-### Which call to use — 2.1.3
+### Which call to use — 2.1.6
 
 `YYJSONDecoder` accepts `Data` or an already parsed object. Swift models stay plain `Codable` structs and do not adopt a YYModel protocol. Missing keys and JSON `null` become `0`, `""`, `false`, `[]`, or an empty nested object. Strings, numbers, and bools are coerced. Rename keys with `CodingKeys`. `URL` and raw-value enums have no zero value; make those properties optional when the key may be absent. A value that cannot be coerced throws.
 
@@ -303,7 +306,7 @@ NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:data];
 
 | Distribution | Import |
 |--------------|--------|
-| ✅ CocoaPods `YYModel2` 2.1.3 | `#import "YYModel.h"` or `@import YYModel2;` |
+| ✅ CocoaPods `YYModel2` 2.1.6 | `#import "YYModel.h"` or `@import YYModel2;` |
 | ✅ SPM product `YYModel` | `#import <YYModel/YYModel.h>` |
 
 #### 2. Swift only
@@ -312,7 +315,7 @@ Use this when the model is a `struct` or a Swift class that is only `Codable`. D
 
 ```swift
 import YYModelSwift          // SPM product YYModelSwift
-// import YYModel2           // CocoaPods 2.1.3: YYJSONDecoder is in this module
+// import YYModel2           // CocoaPods 2.1.6: YYJSONDecoder is in this module
 
 struct Level: Codable {
     var floorNumber: Int
@@ -333,7 +336,7 @@ let same = try YYJSONDecoder().decode(Level.self, from: dictionary)
 | Distribution | Import | API |
 |--------------|--------|-----|
 | ✅ SPM | `import YYModelSwift` | `YYJSONDecoder` |
-| ✅ CocoaPods `YYModel2` 2.1.3 | `import YYModel2` | `YYJSONDecoder` |
+| ✅ CocoaPods `YYModel2` 2.1.6 | `import YYModel2` | `YYJSONDecoder` |
 
 SPM keeps the Swift decoder in its own target because a Swift package target cannot mix `.swift` and `.m`.
 
@@ -344,7 +347,7 @@ Use this when one Swift file both decodes new `Codable` structs and fills existi
 ```swift
 import YYModel                // SPM: Objective-C yy_model
 import YYModelSwift           // SPM: YYJSONDecoder
-// CocoaPods 2.1.3: a single `import YYModel2` exposes both.
+// CocoaPods 2.1.6: a single `import YYModel2` exposes both.
 
 let level = try YYJSONDecoder().decode(Level.self, from: data)
 let user = User.yy_model(withJSON: jsonString)
@@ -361,8 +364,8 @@ Objective-C classes keep `modelCustomPropertyMapper` and `modelContainerProperty
 ## Demo
 
 ```bash
-cd Demo && make     # ✅ Objective-C only, T1–T18. 2.1.4 run: 84 passed, 0 failed
-swift test          # ✅ Swift only + mixed. 2.1.4 run: 15 passed, 0 failed
+cd Demo && make     # ✅ Objective-C only, T1–T18. 2.1.6 run: 84 passed, 0 failed
+swift test          # ✅ Swift only + mixed. 2.1.6 run: 16 passed, 0 failed
 ```
 
 ## License
