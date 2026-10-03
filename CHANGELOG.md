@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## 2.1.8 — Strict Numeric Architecture & High-Precision Preservation (2026-10-03)
+
+### Bug Fixes & Architectural Enhancements (E1–E4)
+
+- **(E1) High-Precision `NSDecimalNumber` Integer Coercion & Overflow Guard**:
+  - Re-architected integer coercion for `NSNumber` instances: explicitly isolates `NSDecimalNumber` before standard binary floating-point checks.
+  - Directly extracts `decimalValue` and applies mathematical toward-zero truncation (`NSDecimalRound`), verifying destination boundaries using exact integer strings (`I(str)`).
+  - Completely eliminates 53-bit Double mantissa truncation for 64-bit snowflake IDs (e.g. `9007199254740993`) and boundaries (`9223372036854775807`, `18446744073709551615`).
+- **(E2) Hexadecimal Float Syntax & Value Consistency**:
+  - Added dedicated `isStrictHexFloatSyntax` parser supporting C99 hexadecimal floats (e.g. `"0x1p4"`, `"0x1.8p+2"`, `"-0x1p4"`).
+  - Eliminates silent value corruption where `Decimal(string:)` erroneously parsed only leading zero, guaranteeing consistent evaluation to `16`, `6`, `-16` across both integers and `Decimal` fields.
+- **(E3) Unified Grammar Validation for `Decimal` Fields**:
+  - `Decimal` field coercion now enforces strict numeric grammar (`isStrictDecimalSyntax`), rejecting malformed alphanumeric suffixes (`"123abc"`, `"1.8xyz"`, `"1e2garbage"`).
+- **(E4) Tiny Scientific Notation Toward-Zero Truncation**:
+  - Values in scientific notation with small magnitudes below 1 (e.g. `"1e-129"`, `"-1e-129"`, `"1e-400"`) are mathematically recognized as lying within $(-1, 1)$, correctly truncating toward zero (`0`) without throwing false-positive `DecodingError`.
+
+### Verification Status
+
+- ✅ Framework XCTest: 27 passed, 0 failed.
+- ✅ Demo Suite: 84 passed, 0 failed (0 warnings).
+- ✅ Swift Test: 16 passed, 0 failed.
+- ✅ Numeric Extension Suite (E1–E4): 5/5 checks passed (`numeric-acceptance.json`).
+- ✅ Boundary Acceptance (D2–D7): 5/5 checks passed (`boundary-acceptance.json`).
+- ✅ Original Acceptance (R1–R8): 9/9 checks passed (`acceptance.json`).
+- ✅ Extended Acceptance (N1–N8): 11/11 checks passed (`extended-acceptance.json`).
+- ✅ Sign & Extended Date Suite: 8/8 checks passed.
+- ✅ iOS Simulator 26.5 Execution: exit 0.
+
+---
+
 ## 2.1.7 — Extended Review Parity & Robustness (2026-10-03)
 
 ### Bug Fixes & Boundary Robustness (D1–D7)

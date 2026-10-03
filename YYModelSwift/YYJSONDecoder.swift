@@ -195,10 +195,108 @@ enum YYJSONValueDecoder {
         return nil
     }
 
+    private static func isStrictDecimalSyntax(_ s: Substring) -> Bool {
+        var str = s
+        if str.hasPrefix("+") || str.hasPrefix("-") {
+            str = str.dropFirst()
+        }
+        guard !str.isEmpty else { return false }
+
+        var hasDot = false
+        var hasExp = false
+        var intDigitCount = 0
+        var fracDigitCount = 0
+        var expDigitCount = 0
+        var expHasSign = false
+
+        for c in str {
+            if c >= "0" && c <= "9" {
+                if hasExp {
+                    expDigitCount += 1
+                } else if hasDot {
+                    fracDigitCount += 1
+                } else {
+                    intDigitCount += 1
+                }
+            } else if c == "." {
+                if hasDot || hasExp { return false }
+                hasDot = true
+            } else if c == "e" || c == "E" {
+                if hasExp { return false }
+                if intDigitCount == 0 && fracDigitCount == 0 { return false }
+                hasExp = true
+            } else if c == "+" || c == "-" {
+                if !hasExp || expDigitCount > 0 || expHasSign { return false }
+                expHasSign = true
+            } else {
+                return false
+            }
+        }
+
+        if intDigitCount == 0 && fracDigitCount == 0 { return false }
+        if hasExp && expDigitCount == 0 { return false }
+        return true
+    }
+
+    private static func isStrictHexFloatSyntax(_ s: Substring) -> Bool {
+        var str = s
+        if str.hasPrefix("+") || str.hasPrefix("-") {
+            str = str.dropFirst()
+        }
+        guard str.hasPrefix("0x") || str.hasPrefix("0X") else { return false }
+        str = str.dropFirst(2)
+        guard !str.isEmpty else { return false }
+
+        var hasDot = false
+        var hasP = false
+        var hexDigitCount = 0
+        var expDigitCount = 0
+        var expHasSign = false
+
+        for c in str {
+            let isHex = (c >= "0" && c <= "9") || (c >= "a" && c <= "f") || (c >= "A" && c <= "F")
+            if isHex {
+                if hasP {
+                    if c >= "0" && c <= "9" {
+                        expDigitCount += 1
+                    } else {
+                        return false
+                    }
+                } else {
+                    hexDigitCount += 1
+                }
+            } else if c == "." {
+                if hasDot || hasP { return false }
+                hasDot = true
+            } else if c == "p" || c == "P" {
+                if hasP || hexDigitCount == 0 { return false }
+                hasP = true
+            } else if c == "+" || c == "-" {
+                if !hasP || expDigitCount > 0 || expHasSign { return false }
+                expHasSign = true
+            } else {
+                return false
+            }
+        }
+        return hasP && expDigitCount > 0 && hexDigitCount > 0
+    }
+
     private static func decimal(from value: Any) -> Decimal? {
-        if let text = value as? String { return Decimal(string: text) }
         if let number = value as? NSNumber, !isBoolean(number) {
             return number.decimalValue
+        }
+        if let text = value as? String {
+            let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else { return nil }
+            if isStrictDecimalSyntax(trimmed[...]) {
+                return Decimal(string: trimmed)
+            }
+            if isStrictHexFloatSyntax(trimmed[...]) {
+                if let d = Double(trimmed), d.isFinite {
+                    return Decimal(d)
+                }
+            }
+            return nil
         }
         return nil
     }
@@ -207,6 +305,14 @@ enum YYJSONValueDecoder {
         if let number = value as? NSNumber {
             if isBoolean(number) {
                 return I(number.boolValue ? 1 : 0)
+            }
+            if let decimalNum = number as? NSDecimalNumber {
+                var truncated = Decimal()
+                var copy = decimalNum.decimalValue
+                let mode: NSDecimalNumber.RoundingMode = copy.isSignMinus ? .up : .down
+                NSDecimalRound(&truncated, &copy, 0, mode)
+                let str = "\(truncated)"
+                return I(str)
             }
             if CFNumberIsFloatType(number as CFNumber) {
                 let d = number.doubleValue
@@ -223,6 +329,7 @@ enum YYJSONValueDecoder {
         if let text = value as? String {
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !trimmed.isEmpty else { return nil }
+
             if let exact = I(trimmed) { return exact }
 
             let isPureInteger: Bool = {
@@ -234,17 +341,63 @@ enum YYJSONValueDecoder {
                 return nil
             }
 
-            guard let d = Double(trimmed), d.isFinite else { return nil }
+            if isStrictHexFloatSyntax(trimmed[...]) {
+                guard let d = Double(trimmed), d.isFinite else { return nil }
+                return I(exactly: d.rounded(.towardZero))
+            }
 
-            if let dec = Decimal(string: trimmed) {
-                var truncated = Decimal()
-                var copy = dec
-                let mode: NSDecimalNumber.RoundingMode = dec.isSignMinus ? .up : .down
-                NSDecimalRound(&truncated, &copy, 0, mode)
-                let str = "\(truncated)"
-                if let exact = I(str) {
-                    return exact
+            guard isStrictDecimalSyntax(trimmed[...]) else { return nil }
+
+            if let eIndex = trimmed.firstIndex(where: { $0 == "e" || $0 == "E" }) {
+                let significandStr = String(trimmed[..<eIndex])
+                let expStr = String(trimmed[trimmed.index(after: eIndex)...])
+
+                var isNegativeExp = false
+                var expDigits = expStr[...]
+                if expDigits.hasPrefix("-") {
+                    isNegativeExp = true
+                    expDigits = expDigits.dropFirst()
+                } else if expDigits.hasPrefix("+") {
+                    expDigits = expDigits.dropFirst()
                 }
+
+                if isNegativeExp {
+                    var sig = significandStr[...]
+                    if sig.hasPrefix("+") || sig.hasPrefix("-") { sig = sig.dropFirst() }
+                    let dotParts = sig.split(separator: ".", omittingEmptySubsequences: false)
+                    let intPartDigits = dotParts[0].count
+
+                    if expDigits.count > 5 {
+                        return I(0)
+                    }
+                    if let expVal = Int(expDigits), expVal >= intPartDigits {
+                        return I(0)
+                    }
+                }
+
+                if let dec = Decimal(string: trimmed) {
+                    var truncated = Decimal()
+                    var copy = dec
+                    let mode: NSDecimalNumber.RoundingMode = dec.isSignMinus ? .up : .down
+                    NSDecimalRound(&truncated, &copy, 0, mode)
+                    let str = "\(truncated)"
+                    return I(str)
+                }
+                return nil
+            } else if trimmed.contains(".") {
+                let dotIndex = trimmed.firstIndex(of: ".")!
+                let intPartStr = String(trimmed[..<dotIndex])
+                var normalizedIntPart = intPartStr
+                if normalizedIntPart.isEmpty || normalizedIntPart == "+" {
+                    normalizedIntPart = "0"
+                } else if normalizedIntPart == "-" {
+                    normalizedIntPart = "-0"
+                }
+
+                if normalizedIntPart == "-0" || normalizedIntPart == "+0" || normalizedIntPart == "0" {
+                    return I(0)
+                }
+                return I(normalizedIntPart)
             }
         }
         return nil

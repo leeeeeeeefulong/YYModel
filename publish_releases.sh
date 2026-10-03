@@ -147,4 +147,21 @@ gh release create 2.1.7 \
 - ✅ Boundary Acceptance (D2–D7): 5/5 checks passed.
 - ✅ Main App (BlackListTests): 21 passed, 0 failed." || true
 
+# 2.1.8
+gh release create 2.1.8 \
+  --repo "$REPO" \
+  --title "2.1.8 — Strict Numeric Architecture & High-Precision Preservation" \
+  --notes "### Architectural Enhancements & Boundary Robustness (E1–E4)
+- **(E1) High-Precision NSDecimalNumber Integer Coercion**: Isolates \`NSDecimalNumber\` before binary float dispatch, preserving exact 64-bit integer values (\`9007199254740993\`, \`9223372036854775807\`, \`18446744073709551615\`) without Double mantissa truncation.
+- **(E2) Hexadecimal Float Syntax & Value Consistency**: Added dedicated C99 hex float parser (\`\"0x1p4\"\`, \`\"0x1.8p+2\"\`, \`\"-0x1p4\"\`) evaluating to exact values (\`16\`, \`6\`, \`-16\`) across integers and Decimal fields.
+- **(E3) Unified Grammar Validation**: Enforced strict numeric syntax for Decimal fields, rejecting malformed suffixes (\`\"123abc\"\`, \`\"1.8xyz\"\`, \`\"1e2garbage\"\`).
+- **(E4) Tiny Scientific Notation Truncation**: Numbers with small magnitudes below 1 (\`\"1e-129\"\`, \`\"-1e-129\"\`, \`\"1e-400\"\`) mathematically truncate to zero (\`0\`) without false-positive DecodingError.
+
+### Verification Status
+- ✅ Framework XCTest: 27 passed, 0 failed.
+- ✅ Demo Suite: 84 passed, 0 failed (0 warnings).
+- ✅ Swift Test: 16 passed, 0 failed.
+- ✅ Numeric Extension Suite (E1–E4): 5/5 checks passed.
+- ✅ Main App (BlackListTests): 21 passed, 0 failed." || true
+
 echo "✅ All releases published successfully!"
