@@ -164,4 +164,27 @@ gh release create 2.1.8 \
 - ✅ Numeric Extension Suite (E1–E4): 5/5 checks passed.
 - ✅ Main App (BlackListTests): 21 passed, 0 failed." || true
 
+# 2.1.9
+gh release create 2.1.9 \
+  --repo "$REPO" \
+  --title "2.1.9 — Boundary Robustness & Unified Numeric Lexer" \
+  --notes "### Boundary Correctness & Optional Nested Validation (G1–G4)
+- **(G1) Objective-C UInt64 Decimal Preservation**: Preserves the full UInt64 range (\`0..18446744073709551615\`) when assigning \`NSDecimalNumber\` and JSON decimal numbers to Objective-C unsigned 64-bit properties. Truncates fractions toward zero via \`NSDecimalRound\`; NaN and positive overflow leave existing properties untouched, and negative numbers retain legacy unsigned conversion.
+- **(G2) Swift Non-Finite Floating-Point Guard**: Rejects non-finite floating-point (\`Double\`/\`Float\`/\`CGFloat\`), \`Decimal\`, and \`Date\` values, including overflow introduced when narrowing \`Double\` to \`Float\`.
+- **(G3) Symmetric Millisecond Timestamp Handling**: Applies the existing automatic seconds/milliseconds threshold symmetrically to positive and negative timestamps (\`abs(seconds) > 1e11\`), using one shared date conversion for fast and tolerant decoding.
+- **(G4) Optional Nested Transform Failure Propagation**: Adds the root-model protocol hook \`+modelRequiresSuccessfulNestedTransforms\`. When enabled, nested dictionary conversions propagate failure through objects and model containers to the root parse (returning nil). Default behavior remains 100% compatible with original ibireme/YYModel.
+- **Public API Boundary Validation Package**: Added repeatable public API boundary E2E checks (\`Validation/\`) covering 62 boundary scenarios and Open-Meteo weather datasets.
+
+### Numeric Correctness & Unified Lexer (F1–F4)
+- **Unified ASCII Byte Lexer**: Parses decimal and C99 hexadecimal numeric strings using an exact ASCII-byte grammar (\`NumericText\`), rejecting malformed suffixes and illegal characters before conversion.
+- **Normalized Exponent and Coefficient Handling**: Accurately normalizes coefficients and exponents, handling leading zeros and extreme exponents.
+- **High-Precision Integer Truncation**: Truncates decimal and hexadecimal strings to integers using exact digits/bits and destination range checks; preserves values above 2^53 and rejects overflow without lossy Double intermediates.
+- **Hexadecimal Decimal Preservation**: Converts hexadecimal \`Decimal\` fields using high-precision decimal arithmetic (\`NSDecimalMultiply\`/\`NSDecimalDivide\`), preserving precision beyond \`binary64\`.
+
+### Verification Status
+- ✅ Framework XCTest: 27 passed, 0 failed.
+- ✅ Demo Suite: 84 passed, 0 failed (0 warnings).
+- ✅ Swift Test: 16 passed, 0 failed.
+- ✅ Validation Suite (Boundary & Weather): 82/82 checks passed." || true
+
 echo "✅ All releases published successfully!"

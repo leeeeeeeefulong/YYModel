@@ -9,11 +9,7 @@ High performance JSON model framework for iOS/macOS.
 [![License](https://img.shields.io/cocoapods/l/YYModel2.svg)](https://github.com/leeeeeeeefulong/YYModel/blob/master/LICENSE)
 [![Platform](https://img.shields.io/cocoapods/p/YYModel2.svg)](https://cocoapods.org/pods/YYModel2)
 
-Current release: **2.1.8** (`pod 'YYModel2', '2.1.8'`, SPM `from: "2.1.8"`).
-
-The `master` branch contains unreleased numeric and boundary fixes. The immutable
-2.1.8 tag does not include these fixes; see [CHANGELOG](CHANGELOG.md) and the
-[component validation package](Validation/README.md) for reproducible evidence.
+Current release: **2.1.9** (`pod 'YYModel2', '2.1.9'`, SPM `from: "2.1.9"`).
 
 ---
 

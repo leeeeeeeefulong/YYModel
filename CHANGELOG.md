@@ -3,23 +3,22 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 2.1.9 — Boundary Robustness & Unified Numeric Lexer (2026-10-04)
 
-### Boundary correctness and optional nested validation (G1–G4)
+### Boundary Correctness & Optional Nested Validation (G1–G4)
 
-- Preserve the full UInt64 range when assigning NSDecimalNumber and JSON decimal numbers to OC unsigned 64-bit properties. Truncate fractions toward zero; NaN and positive overflow leave the existing property untouched. Negative conversion retains legacy behavior.
-- Reject non-finite Swift floating-point, Decimal and Date values, including overflow introduced while narrowing Double to Float.
-- Apply the existing automatic seconds/milliseconds threshold symmetrically to positive and negative timestamps, through one shared date conversion for fast and tolerant decoding.
-- Add the optional root-model hook `+modelRequiresSuccessfulNestedTransforms`. When enabled, nested dictionary conversions propagate failure through objects and model containers to the root parse. Default behavior remains compatible with ibireme; existing-object updates do not roll back prior assignments.
-- Add repeatable public API boundary E2E checks, alongside the independent numeric and Open-Meteo weather validation package.
+- **(G1) Objective-C UInt64 Decimal Preservation**: Preserves the full `UInt64` range (`0..18446744073709551615`) when assigning `NSDecimalNumber` and JSON decimal numbers to Objective-C unsigned 64-bit properties. Truncates fractions toward zero via `NSDecimalRound`; `NaN` and positive overflow leave existing properties untouched, and negative numbers retain legacy unsigned conversion.
+- **(G2) Swift Non-Finite Floating-Point Guard**: Rejects non-finite floating-point (`Double`/`Float`/`CGFloat`), `Decimal`, and `Date` values, including overflow introduced when narrowing `Double` to `Float`.
+- **(G3) Symmetric Millisecond Timestamp Handling**: Applies the existing automatic seconds/milliseconds threshold symmetrically to positive and negative timestamps (`abs(seconds) > 1e11`), using one shared date conversion for fast and tolerant decoding.
+- **(G4) Optional Nested Transform Failure Propagation**: Adds the root-model protocol hook `+modelRequiresSuccessfulNestedTransforms`. When enabled, nested dictionary conversions propagate failure through objects and model containers to the root parse (returning `nil`). Default behavior remains 100% compatible with original `ibireme/YYModel`.
+- **Public API Boundary Validation Package**: Added repeatable public API boundary E2E checks (`Validation/`) covering 62 boundary scenarios and Open-Meteo weather datasets.
 
-### Numeric correctness (F1–F4)
+### Numeric Correctness & Unified Lexer (F1–F4)
 
-- Parse decimal and C99 hexadecimal numeric strings using one ASCII-byte grammar. Reject Unicode combining marks and malformed suffixes before Foundation conversion.
-- Normalize coefficients and exponent values, including leading zeros and zero coefficients with arbitrarily large exponents.
-- Truncate decimal and hexadecimal strings to integers using exact digits/bits and destination range checks; preserve values above 2^53 and reject overflow without a Double intermediate.
-- Convert hexadecimal Decimal fields using decimal arithmetic, preserving their precision beyond binary64 while respecting Foundation Decimal's finite range and precision.
-- Add a standalone public API validation package with generated numeric boundaries and attributed, offline Open-Meteo weather fixtures. No business application is required for component acceptance.
+- **Unified ASCII Byte Lexer**: Parses decimal and C99 hexadecimal numeric strings using an exact ASCII-byte grammar (`NumericText`), rejecting malformed suffixes and illegal characters before conversion.
+- **Normalized Exponent and Coefficient Handling**: Accurately normalizes coefficients and exponents, handling leading zeros and extreme exponents.
+- **High-Precision Integer Truncation**: Truncates decimal and hexadecimal strings to integers using exact digits/bits and destination range checks; preserves values above $2^{53}$ and rejects overflow without lossy Double intermediates.
+- **Hexadecimal Decimal Preservation**: Converts hexadecimal `Decimal` fields using high-precision decimal arithmetic (`NSDecimalMultiply`/`NSDecimalDivide`), preserving precision beyond `binary64`.
 
 ## 2.1.8 — Strict Numeric Architecture & High-Precision Preservation (2026-10-03)
 
