@@ -29,17 +29,27 @@ public struct YYJSONDecoder: Sendable {
     }
 
     public func decode<T: Decodable>(_ type: T.Type, from object: Any) throws -> T {
-        if JSONSerialization.isValidJSONObject(object),
-           let data = try? JSONSerialization.data(withJSONObject: object),
-           let value = try? Self.fastDecoder().decode(type, from: data) {
-            return value
-        }
         return try YYJSONValueDecoder.decode(type, from: object, codingPath: [])
     }
 
     private static func fastDecoder() -> JSONDecoder {
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .secondsSince1970
+        decoder.dateDecodingStrategy = .custom { decoder in
+            let container = try decoder.singleValueContainer()
+            if let seconds = try? container.decode(Double.self) {
+                return Date(timeIntervalSince1970: seconds > 1e11 ? seconds / 1000.0 : seconds)
+            }
+            if let text = try? container.decode(String.self) {
+                let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+                if let seconds = TimeInterval(trimmed) {
+                    return Date(timeIntervalSince1970: seconds > 1e11 ? seconds / 1000.0 : seconds)
+                }
+                if let d = YYJSONValueDecoder.isoFormatterWithFractionalSeconds.date(from: trimmed) { return d }
+                if let d = YYJSONValueDecoder.isoFormatterStandard.date(from: trimmed) { return d }
+                if let d = YYJSONValueDecoder.commonDateFormatter.date(from: trimmed) { return d }
+            }
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Invalid date format"))
+        }
         return decoder
     }
 }
@@ -206,15 +216,40 @@ enum YYJSONValueDecoder {
         return nil
     }
 
+    fileprivate static let isoFormatterWithFractionalSeconds: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }()
+
+    fileprivate static let isoFormatterStandard: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter
+    }()
+
+    fileprivate static let commonDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return formatter
+    }()
+
     private static func date(from value: Any) -> Date? {
         if let date = value as? Date { return date }
         if let number = value as? NSNumber, !isBoolean(number) {
-            return Date(timeIntervalSince1970: number.doubleValue)
+            let seconds = number.doubleValue
+            return Date(timeIntervalSince1970: seconds > 1e11 ? seconds / 1000.0 : seconds)
         }
         if let text = value as? String {
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-            if let seconds = TimeInterval(trimmed) { return Date(timeIntervalSince1970: seconds) }
-            return ISO8601DateFormatter().date(from: trimmed)
+            if let seconds = TimeInterval(trimmed) {
+                return Date(timeIntervalSince1970: seconds > 1e11 ? seconds / 1000.0 : seconds)
+            }
+            if let d = isoFormatterWithFractionalSeconds.date(from: trimmed) { return d }
+            if let d = isoFormatterStandard.date(from: trimmed) { return d }
+            return commonDateFormatter.date(from: trimmed)
         }
         return nil
     }

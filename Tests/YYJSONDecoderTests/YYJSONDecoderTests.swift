@@ -107,6 +107,18 @@ final class YYJSONDecoderTests: XCTestCase {
         XCTAssertThrowsError(try YYJSONDecoder().decode(Level.self, from: try fixture("s10-bad-floor")))
     }
 
+    func testMillisecondDate() throws {
+        let json = "{\"created\": 1700000000000}".data(using: .utf8)!
+        let stamp = try YYJSONDecoder().decode(Stamp.self, from: json)
+        XCTAssertEqual(stamp.created, Date(timeIntervalSince1970: 1_700_000_000))
+    }
+
+    func testFractionalSecondsISODate() throws {
+        let json = "{\"created\": \"2026-09-05T12:00:00.500Z\"}".data(using: .utf8)!
+        let stamp = try YYJSONDecoder().decode(Stamp.self, from: json)
+        XCTAssertEqual(stamp.created.timeIntervalSince1970, 1788609600.5, accuracy: 0.001)
+    }
+
     func testParsedObjectMatchesFixtureFile() throws {
         let object = try XCTUnwrap(try JSONSerialization.jsonObject(with: try fixture("s5-bool-number")) as? [String: Any])
         let level = try YYJSONDecoder().decode(Level.self, from: object)

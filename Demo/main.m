@@ -99,9 +99,11 @@ static void TestT3_ArrayOfStrings(void) {
         @"tags": @[@"swift", @"objc", @"yymodel"] // hypothetical
     };
 
-    // Use generic NSObject for this test
-    id obj = [NSObject yy_modelWithDictionary:dict];
-    TEST_ASSERT(obj != nil, @"NSObject model created");
+    TagModel *obj = [TagModel yy_modelWithDictionary:dict];
+    TEST_ASSERT(obj != nil, @"TagModel model created");
+    TEST_ASSERT(obj.tagId == 42, @"tagId parsed");
+    TEST_ASSERT(obj.tags.count == 3, @"tags array parsed");
+    TEST_ASSERT([obj.tags[0] isEqualToString:@"swift"], @"first tag matches");
 }
 
 // ============================================================
@@ -363,22 +365,22 @@ static void TestT14_NullMissing(void) {
 // ============================================================
 
 static void TestT15_DateParsing(void) {
-    TEST_SECTION(@"T15 — Date Parsing (inline, using generic NSObject)");
+    TEST_SECTION(@"T15 — Date Parsing (inline, using DateModel)");
 
     // ISO 8601
     NSString *json1 = @"{\"created\":\"2026-09-05T12:00:00Z\"}";
-    id obj1 = [NSObject yy_modelWithJSON:json1];
-    TEST_ASSERT(obj1 != nil, @"Parsed ISO 8601 date JSON");
+    DateModel *obj1 = [DateModel yy_modelWithJSON:json1];
+    TEST_ASSERT(obj1 != nil && obj1.created != nil, @"Parsed ISO 8601 date JSON");
 
     // Unix timestamp (seconds)
     NSString *json2 = @"{\"ts\":1725000000}";
-    id obj2 = [NSObject yy_modelWithJSON:json2];
-    TEST_ASSERT(obj2 != nil, @"Parsed unix timestamp JSON");
+    DateModel *obj2 = [DateModel yy_modelWithJSON:json2];
+    TEST_ASSERT(obj2 != nil && obj2.ts != nil, @"Parsed unix timestamp JSON");
 
     // Unix timestamp (milliseconds)
     NSString *json3 = @"{\"ts\":1725000000000}";
-    id obj3 = [NSObject yy_modelWithJSON:json3];
-    TEST_ASSERT(obj3 != nil, @"Parsed millisecond timestamp JSON");
+    DateModel *obj3 = [DateModel yy_modelWithJSON:json3];
+    TEST_ASSERT(obj3 != nil && obj3.ts != nil, @"Parsed millisecond timestamp JSON");
 }
 
 // ============================================================
@@ -505,7 +507,7 @@ int main(int argc, const char * argv[]) {
     @autoreleasepool {
         NSLog(@"\n");
         NSLog(@"╔═══════════════════════════════════════════════════╗");
-        NSLog(@"║     YYModel 2.1.3 — Objective-C only             ║");
+        NSLog(@"║     YYModel 2.1.4 — Objective-C only             ║");
         NSLog(@"║     API: JSONPlaceholder (typicode.com)           ║");
         NSLog(@"╚═══════════════════════════════════════════════════╝");
 

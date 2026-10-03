@@ -158,3 +158,15 @@
 @property (nonatomic, copy)   NSString *name;
 @property (nonatomic, assign) NSInteger age;
 @end
+
+@interface TagModel : NSObject
+@property (nonatomic, assign) NSInteger tagId;
+@property (nonatomic, copy)   NSString *title;
+@property (nonatomic, strong) NSArray<NSString *> *tags;
+@end
+
+@interface DateModel : NSObject
+@property (nonatomic, strong) NSDate *created;
+@property (nonatomic, strong) NSDate *ts;
+@end
+

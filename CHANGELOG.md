@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.1.4 — 100% Behavioral Parity with ibireme/YYModel & Swift Optimizations (2026-10-03)
+
+- **Polymorphic Resolution**: Restored `modelCustomClassForDictionary:` on root `yy_modelWithDictionary:` and nested container mappings.
+- **Custom Transform Contract**: `modelCustomTransformFromDictionary:` boolean return value is strictly checked; returns `nil` when parsing fails.
+- **Nested Model In-Place Update**: Re-mapped nested dictionaries now update existing instances via `yy_modelSetWithDictionary:` rather than replacing them.
+- **Generic Class Normalization**: String class names in `modelContainerPropertyGenericClass` are resolved via `NSClassFromString` and protocol pseudo-generics are preserved.
+- **Safe KeyPath Traversal**: Restored dictionary subscript traversal, eliminating KVC `valueForUndefinedKey:` exceptions on non-dictionary intermediate nodes.
+- **Model to JSON Fidelity**: Restored nested dictionary output for dotted key paths; dates format as standard ISO8601 strings; `modelCustomTransformToDictionary:` runs post-property extraction.
+- **Memory & Type Safety**: Proper type handling across struct (`NSValue`), pointer, block, selector, CNumber for `yy_modelCopy`, `yy_modelEncodeWithCoder:`, `yy_modelIsEqual:`, and `yy_modelDescription`.
+- **Inheritance Traversal**: Subclass merges custom mappers, generic classes, and blacklists/whitelists from ancestors bottom-up.
+- **Swift YYJSONDecoder Optimizations**: Cached ISO8601 formatters with fractional seconds support; automatic millisecond timestamp conversion; direct memory decoding without intermediate serialization.
+- ✅ `Framework XCTest`: 27 passed, 0 failed (100% pass rate).
+- ✅ `Demo`: 84 passed, 0 failed.
+- ✅ `swift test`: 15 passed, 0 failed.
+
 ## 2.1.3 — Superclass property inheritance (2026-10-03)
 
 - `_YYModelMeta` traverses superclass properties recursively up to `NSObject`.

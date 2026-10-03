@@ -65,6 +65,14 @@
     [self yy_modelEncodeWithCoder:coder];
 }
 
+- (NSUInteger)hash {
+    return [self yy_modelHash];
+}
+
+- (BOOL)isEqual:(id)object {
+    return [self yy_modelIsEqual:object];
+}
+
 @end
 
 // ============================================================
@@ -154,3 +162,13 @@
 
 @implementation Cat
 @end
+
+@implementation TagModel
++ (NSDictionary *)modelCustomPropertyMapper {
+    return @{@"tagId" : @"id"};
+}
+@end
+
+@implementation DateModel
+@end
+
