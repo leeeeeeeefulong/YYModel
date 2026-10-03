@@ -1,7 +1,8 @@
 # Changelog
 
-## 2.1.4 — 100% Behavioral Parity with ibireme/YYModel & Swift Optimizations (2026-10-03)
+## 2.1.5 — Swift 6 Strict Concurrency & Full Parity (2026-10-03)
 
+- **Swift 6 Strict Concurrency**: Added `nonisolated(unsafe)` compiler guards for static `ISO8601DateFormatter` instances.
 - **Polymorphic Resolution**: Restored `modelCustomClassForDictionary:` on root `yy_modelWithDictionary:` and nested container mappings.
 - **Custom Transform Contract**: `modelCustomTransformFromDictionary:` boolean return value is strictly checked; returns `nil` when parsing fails.
 - **Nested Model In-Place Update**: Re-mapped nested dictionaries now update existing instances via `yy_modelSetWithDictionary:` rather than replacing them.
