@@ -140,11 +140,31 @@ static force_inline NSNumber *YYNSNumberCreateFromID(__unsafe_unretained id valu
     static NSDictionary *dic;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        dot = [NSCharacterSet characterSetWithCharactersInString:@"._"];
-        dic = @{@"TRUE"  : @(YES), @"True"  : @(YES), @"true"  : @(YES), @"YES"  : @(YES),
-                @"FALSE" : @(NO),  @"False" : @(NO),  @"false" : @(NO),  @"NO"   : @(NO),
-                @"NIL"   : (id)kCFNull, @"Nil"  : (id)kCFNull, @"nil"  : (id)kCFNull,
-                @"NULL"  : (id)kCFNull, @"null" : (id)kCFNull, @"(null)" : (id)kCFNull};
+        dot = [NSCharacterSet characterSetWithRange:NSMakeRange('.', 1)];
+        dic = @{@"TRUE" :   @(YES),
+                @"True" :   @(YES),
+                @"true" :   @(YES),
+                @"FALSE" :  @(NO),
+                @"False" :  @(NO),
+                @"false" :  @(NO),
+                @"YES" :    @(YES),
+                @"Yes" :    @(YES),
+                @"yes" :    @(YES),
+                @"NO" :     @(NO),
+                @"No" :     @(NO),
+                @"no" :     @(NO),
+                @"NIL" :    (id)kCFNull,
+                @"Nil" :    (id)kCFNull,
+                @"nil" :    (id)kCFNull,
+                @"NULL" :   (id)kCFNull,
+                @"Null" :   (id)kCFNull,
+                @"null" :   (id)kCFNull,
+                @"(NULL)" : (id)kCFNull,
+                @"(Null)" : (id)kCFNull,
+                @"(null)" : (id)kCFNull,
+                @"<NULL>" : (id)kCFNull,
+                @"<Null>" : (id)kCFNull,
+                @"<null>" : (id)kCFNull};
     });
 
     if (!value || value == (id)kCFNull) return nil;
@@ -158,25 +178,13 @@ static force_inline NSNumber *YYNSNumberCreateFromID(__unsafe_unretained id valu
         if ([(NSString *)value rangeOfCharacterFromSet:dot].location != NSNotFound) {
             const char *cstring = ((NSString *)value).UTF8String;
             if (!cstring) return nil;
-            if (strchr(cstring, 'F') || strchr(cstring, 'f')) {
-                float f = strtof(cstring, NULL);
-                if (isnan(f) || isinf(f)) return nil;
-                return @(f);
-            } else {
-                double d = strtod(cstring, NULL);
-                if (isnan(d) || isinf(d)) return nil;
-                return @(d);
-            }
+            double num = atof(cstring);
+            if (isnan(num) || isinf(num)) return nil;
+            return @(num);
         } else {
             const char *cstring = ((NSString *)value).UTF8String;
             if (!cstring) return nil;
-            if (cstring[0] == '-') {
-                long long v = strtoll(cstring, NULL, 10);
-                return @(v);
-            } else {
-                unsigned long long v = strtoull(cstring, NULL, 10);
-                return [NSNumber numberWithUnsignedLongLong:v];
-            }
+            return @(atoll(cstring));
         }
     }
     return nil;
@@ -185,32 +193,6 @@ static force_inline NSNumber *YYNSNumberCreateFromID(__unsafe_unretained id valu
 // ============================================================
 #pragma mark - NSDate Parsing & Formatting (Thread-Safe)
 // ============================================================
-
-static NSDateFormatter *YYNSDateFormatterCreate(NSString *format) {
-    NSDateFormatter *formatter = [NSDateFormatter new];
-    formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-    formatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-    formatter.dateFormat = format;
-    return formatter;
-}
-
-static NSDateFormatter *YYNSDateGMTFormatter(NSString *format) {
-    static os_unfair_lock formatterLock = OS_UNFAIR_LOCK_INIT;
-    static NSMutableDictionary<NSString *, NSDateFormatter *> *cache = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        cache = [NSMutableDictionary new];
-    });
-
-    os_unfair_lock_lock(&formatterLock);
-    NSDateFormatter *fmt = cache[format];
-    if (!fmt) {
-        fmt = YYNSDateFormatterCreate(format);
-        cache[format] = fmt;
-    }
-    os_unfair_lock_unlock(&formatterLock);
-    return fmt;
-}
 
 static NSString *YYISODateString(NSDate *date) {
     if (!date) return nil;
@@ -228,61 +210,114 @@ static NSString *YYISODateString(NSDate *date) {
     return str;
 }
 
-static NSDate *YYNSDateFromString(__unsafe_unretained NSString *string) {
-    if (!string || (id)string == (id)kCFNull) return nil;
-    if (![string isKindOfClass:[NSString class]]) return nil;
+static force_inline NSDate *YYNSDateFromString(__unsafe_unretained NSString *string) {
+    typedef NSDate* (^YYNSDateParseBlock)(NSString *string);
+    #define kParserNum 34
+    static YYNSDateParseBlock blocks[kParserNum + 1] = {0};
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        {
+            /*
+             2014-01-20  // Google
+             */
+            NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+            formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+            formatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+            formatter.dateFormat = @"yyyy-MM-dd";
+            blocks[10] = ^(NSString *string) { return [formatter dateFromString:string]; };
+        }
 
-    // Fast path: numeric timestamp
-    if (string.length == 13) {
-        NSTimeInterval ts = string.doubleValue / 1000.0;
-        if (ts > 0) return [NSDate dateWithTimeIntervalSince1970:ts];
-    }
-    if (string.length == 10) {
-        NSTimeInterval ts = string.doubleValue;
-        if (ts > 0) return [NSDate dateWithTimeIntervalSince1970:ts];
-    }
+        {
+            /*
+             2014-01-20 12:24:48
+             2014-01-20T12:24:48   // Google
+             2014-01-20 12:24:48.000
+             2014-01-20T12:24:48.000
+             */
+            NSDateFormatter *formatter1 = [[NSDateFormatter alloc] init];
+            formatter1.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+            formatter1.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+            formatter1.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss";
 
-    // ISO 8601 / common formats
-    static NSString *formats[] = {
-        @"yyyy-MM-dd'T'HH:mm:ssZ",
-        @"yyyy-MM-dd HH:mm:ss",
-        @"yyyy-MM-dd'T'HH:mm:ss.SSSZ",
-        @"yyyy-MM-dd'T'HH:mm:ssZZZZZ",
-        @"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ",
-        @"yyyy-MM-dd HH:mm:ss Z",
-        @"EEE MMM dd HH:mm:ss Z yyyy",
-        @"EEE MMM dd HH:mm:ss yyyy",
-        @"EEE, dd MMM yyyy HH:mm:ss Z",
-        @"yyyy-MM-dd",
-        @"yyyy/MM/dd",
-        @"yyyy.MM.dd",
-        @"MM-dd-yyyy",
-        @"MM/dd/yyyy",
-        @"dd-MM-yyyy",
-        @"dd/MM/yyyy",
-    };
-    static int formatCount = sizeof(formats) / sizeof(formats[0]);
+            NSDateFormatter *formatter2 = [[NSDateFormatter alloc] init];
+            formatter2.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+            formatter2.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+            formatter2.dateFormat = @"yyyy-MM-dd HH:mm:ss";
 
-    for (int i = 0; i < formatCount; i++) {
-        NSDateFormatter *fmt = YYNSDateGMTFormatter(formats[i]);
-        NSDate *date = [fmt dateFromString:string];
-        if (date) return date;
-    }
+            NSDateFormatter *formatter3 = [[NSDateFormatter alloc] init];
+            formatter3.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+            formatter3.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+            formatter3.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSS";
 
-    // Fallback: Apple's NSDataDetector
-    if (string.length > 0 && string.length < 64) {
-        static NSDataDetector *detector = nil;
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingAllTypes error:NULL];
-        });
-        NSTextCheckingResult *result = [detector firstMatchInString:string
-                                                            options:0
-                                                              range:NSMakeRange(0, string.length)];
-        if (result && result.date) return result.date;
-    }
+            NSDateFormatter *formatter4 = [[NSDateFormatter alloc] init];
+            formatter4.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+            formatter4.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+            formatter4.dateFormat = @"yyyy-MM-dd HH:mm:ss.SSS";
 
-    return nil;
+            blocks[19] = ^(NSString *string) {
+                if ([string characterAtIndex:10] == 'T') {
+                    return [formatter1 dateFromString:string];
+                } else {
+                    return [formatter2 dateFromString:string];
+                }
+            };
+
+            blocks[23] = ^(NSString *string) {
+                if ([string characterAtIndex:10] == 'T') {
+                    return [formatter3 dateFromString:string];
+                } else {
+                    return [formatter4 dateFromString:string];
+                }
+            };
+        }
+
+        {
+            /*
+             2014-01-20T12:24:48Z        // Github, Apple
+             2014-01-20T12:24:48+0800    // Facebook
+             2014-01-20T12:24:48+12:00   // Google
+             2014-01-20T12:24:48.000Z
+             2014-01-20T12:24:48.000+0800
+             2014-01-20T12:24:48.000+12:00
+             */
+            NSDateFormatter *formatter = [NSDateFormatter new];
+            formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+            formatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
+
+            NSDateFormatter *formatter2 = [NSDateFormatter new];
+            formatter2.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+            formatter2.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+
+            blocks[20] = ^(NSString *string) { return [formatter dateFromString:string]; };
+            blocks[24] = ^(NSString *string) { return [formatter dateFromString:string]?: [formatter2 dateFromString:string]; };
+            blocks[25] = ^(NSString *string) { return [formatter dateFromString:string]; };
+            blocks[28] = ^(NSString *string) { return [formatter2 dateFromString:string]; };
+            blocks[29] = ^(NSString *string) { return [formatter2 dateFromString:string]; };
+        }
+
+        {
+            /*
+             Fri Sep 04 00:12:21 +0800 2015 // Weibo, Twitter
+             Fri Sep 04 00:12:21.000 +0800 2015
+             */
+            NSDateFormatter *formatter = [NSDateFormatter new];
+            formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+            formatter.dateFormat = @"EEE MMM dd HH:mm:ss Z yyyy";
+
+            NSDateFormatter *formatter2 = [NSDateFormatter new];
+            formatter2.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+            formatter2.dateFormat = @"EEE MMM dd HH:mm:ss.SSS Z yyyy";
+
+            blocks[30] = ^(NSString *string) { return [formatter dateFromString:string]; };
+            blocks[34] = ^(NSString *string) { return [formatter2 dateFromString:string]; };
+        }
+    });
+    if (!string) return nil;
+    if (string.length > kParserNum) return nil;
+    YYNSDateParseBlock parser = blocks[string.length];
+    if (!parser) return nil;
+    return parser(string);
+    #undef kParserNum
 }
 
 static force_inline Class YYNSBlockClass(void) {
@@ -497,26 +532,25 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
     }
     NSArray *reversedHierarchy = classHierarchy.reverseObjectEnumerator.allObjects;
 
-    NSMutableSet *blacklist = nil;
-    NSMutableSet *whitelist = nil;
+    NSSet *blacklist = nil;
+    if ([cls respondsToSelector:@selector(modelPropertyBlacklist)]) {
+        NSArray *properties = [(id<YYModel>)cls modelPropertyBlacklist];
+        if (properties) {
+            blacklist = [NSSet setWithArray:properties];
+        }
+    }
+    NSSet *whitelist = nil;
+    if ([cls respondsToSelector:@selector(modelPropertyWhitelist)]) {
+        NSArray *properties = [(id<YYModel>)cls modelPropertyWhitelist];
+        if (properties) {
+            whitelist = [NSSet setWithArray:properties];
+        }
+    }
+
     NSMutableDictionary *genericMapper = nil;
     NSMutableDictionary *customMapper = nil;
 
     for (Class currentCls in reversedHierarchy) {
-        if ([currentCls respondsToSelector:@selector(modelPropertyBlacklist)]) {
-            NSArray *list = [(id<YYModel>)currentCls modelPropertyBlacklist];
-            if (list.count) {
-                if (!blacklist) blacklist = [NSMutableSet new];
-                [blacklist addObjectsFromArray:list];
-            }
-        }
-        if ([currentCls respondsToSelector:@selector(modelPropertyWhitelist)]) {
-            NSArray *list = [(id<YYModel>)currentCls modelPropertyWhitelist];
-            if (list.count) {
-                if (!whitelist) whitelist = [NSMutableSet new];
-                [whitelist addObjectsFromArray:list];
-            }
-        }
         if ([currentCls respondsToSelector:@selector(modelContainerPropertyGenericClass)]) {
             NSDictionary *mapper = [(id<YYModel>)currentCls modelContainerPropertyGenericClass];
             if (mapper.count) {
@@ -1665,19 +1699,38 @@ static NSString *ModelDescription(NSObject *model) {
             switch (type) {
                 case YYEncodingTypeObject: {
                     id value = nil;
+                    BOOL isContainer = (propertyMeta->_nsType == YYEncodingTypeNSArray ||
+                                        propertyMeta->_nsType == YYEncodingTypeNSMutableArray ||
+                                        propertyMeta->_nsType == YYEncodingTypeNSDictionary ||
+                                        propertyMeta->_nsType == YYEncodingTypeNSMutableDictionary ||
+                                        propertyMeta->_nsType == YYEncodingTypeNSSet ||
+                                        propertyMeta->_nsType == YYEncodingTypeNSMutableSet ||
+                                        (propertyMeta->_cls && ([propertyMeta->_cls isSubclassOfClass:[NSArray class]] ||
+                                                                [propertyMeta->_cls isSubclassOfClass:[NSDictionary class]] ||
+                                                                [propertyMeta->_cls isSubclassOfClass:[NSSet class]])));
                     @try {
-                        if (propertyMeta->_cls && [aDecoder respondsToSelector:@selector(decodeObjectOfClass:forKey:)]) {
-                            value = [aDecoder decodeObjectOfClass:propertyMeta->_cls forKey:propertyMeta->_name];
-                        } else if ([aDecoder respondsToSelector:@selector(decodeObjectOfClasses:forKey:)] &&
-                                   (propertyMeta->_nsType == YYEncodingTypeNSArray || propertyMeta->_nsType == YYEncodingTypeNSSet || propertyMeta->_nsType == YYEncodingTypeNSDictionary)) {
-                            NSSet *classes = [NSSet setWithObjects:[NSArray class], [NSDictionary class], [NSSet class],
-                                              [NSString class], [NSNumber class], [NSDate class], [NSData class],
-                                              propertyMeta->_genericCls ?: [NSObject class], nil];
+                        if (isContainer && [aDecoder respondsToSelector:@selector(decodeObjectOfClasses:forKey:)]) {
+                            NSMutableSet *classes = [NSMutableSet setWithObjects:
+                                                     [NSArray class], [NSMutableArray class],
+                                                     [NSDictionary class], [NSMutableDictionary class],
+                                                     [NSSet class], [NSMutableSet class],
+                                                     [NSString class], [NSNumber class],
+                                                     [NSDate class], [NSData class], nil];
+                            if (propertyMeta->_cls) [classes addObject:propertyMeta->_cls];
+                            if (propertyMeta->_genericCls) [classes addObject:propertyMeta->_genericCls];
                             value = [aDecoder decodeObjectOfClasses:classes forKey:propertyMeta->_name];
+                        } else if (propertyMeta->_cls && [aDecoder respondsToSelector:@selector(decodeObjectOfClass:forKey:)]) {
+                            value = [aDecoder decodeObjectOfClass:propertyMeta->_cls forKey:propertyMeta->_name];
                         } else {
                             value = [aDecoder decodeObjectForKey:propertyMeta->_name];
                         }
-                    } @catch (NSException *exception) {}
+                    } @catch (NSException *exception) {
+                        if (!aDecoder.requiresSecureCoding) {
+                            @try {
+                                value = [aDecoder decodeObjectForKey:propertyMeta->_name];
+                            } @catch (NSException *e) {}
+                        }
+                    }
                     if (value) ((YYSendV_id)(void *)objc_msgSend)(self, propertyMeta->_setter, value);
                 } break;
                 case YYEncodingTypeClass: {
@@ -1746,12 +1799,10 @@ static NSString *ModelDescription(NSObject *model) {
             if (num) value ^= num.hash;
         } else {
             switch (propertyMeta->_type & YYEncodingTypeMask) {
-                case YYEncodingTypeObject: {
+                case YYEncodingTypeObject:
+                case YYEncodingTypeClass:
+                case YYEncodingTypeBlock: {
                     id v = ((YYSendR_id)(void *)objc_msgSend)(self, propertyMeta->_getter);
-                    if (v) value ^= [v hash];
-                } break;
-                case YYEncodingTypeClass: {
-                    Class v = ((YYSendR_class)(void *)objc_msgSend)(self, propertyMeta->_getter);
                     if (v) value ^= [v hash];
                 } break;
                 case YYEncodingTypeSEL: {
@@ -1775,7 +1826,7 @@ static NSString *ModelDescription(NSObject *model) {
 
 - (BOOL)yy_modelIsEqual:(id)model {
     if (self == model) return YES;
-    if (![model isKindOfClass:self.class]) return NO;
+    if (![model isMemberOfClass:self.class]) return NO;
     _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:self.class];
     if (modelMeta->_nsType) return [self isEqual:model];
     if ([self hash] != [model hash]) return NO;
@@ -1789,15 +1840,12 @@ static NSString *ModelDescription(NSObject *model) {
             if (p1 != p2 && ![p1 isEqualToNumber:p2]) return NO;
         } else {
             switch (propertyMeta->_type & YYEncodingTypeMask) {
-                case YYEncodingTypeObject: {
+                case YYEncodingTypeObject:
+                case YYEncodingTypeClass:
+                case YYEncodingTypeBlock: {
                     id p1 = ((YYSendR_id)(void *)objc_msgSend)(self, propertyMeta->_getter);
                     id p2 = ((YYSendR_id)(void *)objc_msgSend)(model, propertyMeta->_getter);
                     if (p1 != p2 && ![p1 isEqual:p2]) return NO;
-                } break;
-                case YYEncodingTypeClass: {
-                    Class p1 = ((YYSendR_class)(void *)objc_msgSend)(self, propertyMeta->_getter);
-                    Class p2 = ((YYSendR_class)(void *)objc_msgSend)(model, propertyMeta->_getter);
-                    if (p1 != p2) return NO;
                 } break;
                 case YYEncodingTypeSEL: {
                     SEL p1 = ((YYSendR_sel)(void *)objc_msgSend)(self, propertyMeta->_getter);

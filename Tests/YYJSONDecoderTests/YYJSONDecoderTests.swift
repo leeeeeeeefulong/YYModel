@@ -132,6 +132,29 @@ final class YYJSONDecoderTests: XCTestCase {
         XCTAssertEqual(box.baseId, 101)
     }
 
+    func testLargeIntegerPrecisionAndBounds() throws {
+        struct IDModel: Codable {
+            var id: Int64
+            var uid: UInt64
+        }
+        let jsonStr = #"{"id": 9007199254740993, "uid": 18446744073709551615}"#
+        let data = jsonStr.data(using: .utf8)!
+        let obj = try JSONSerialization.jsonObject(with: data, options: [])
+
+        let m1 = try YYJSONDecoder().decode(IDModel.self, from: data)
+        XCTAssertEqual(m1.id, 9007199254740993)
+        XCTAssertEqual(m1.uid, 18446744073709551615)
+
+        let m2 = try YYJSONDecoder().decode(IDModel.self, from: obj)
+        XCTAssertEqual(m2.id, 9007199254740993)
+        XCTAssertEqual(m2.uid, 18446744073709551615)
+
+        let maxStr = #"{"id": 9223372036854775807, "uid": 9223372036854775807}"#
+        let maxObj = try JSONSerialization.jsonObject(with: maxStr.data(using: .utf8)!, options: [])
+        let m3 = try YYJSONDecoder().decode(IDModel.self, from: maxObj)
+        XCTAssertEqual(m3.id, Int64.max)
+    }
+
     func testUsersFixturePerformance() throws {
         let data = try fixture("users")
         let iterations = 1000

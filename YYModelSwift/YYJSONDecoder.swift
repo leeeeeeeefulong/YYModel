@@ -29,6 +29,11 @@ public struct YYJSONDecoder: Sendable {
     }
 
     public func decode<T: Decodable>(_ type: T.Type, from object: Any) throws -> T {
+        if JSONSerialization.isValidJSONObject(object),
+           let data = try? JSONSerialization.data(withJSONObject: object, options: []),
+           let value = try? Self.fastDecoder().decode(type, from: data) {
+            return value
+        }
         return try YYJSONValueDecoder.decode(type, from: object, codingPath: [])
     }
 
@@ -126,11 +131,11 @@ enum YYJSONValueDecoder {
         if T.self == Int16.self { return integer(value, Int16.self) as? T }
         if T.self == Int32.self { return integer(value, Int32.self) as? T }
         if T.self == Int64.self { return integer(value, Int64.self) as? T }
-        if T.self == UInt.self { return unsigned(value, UInt.self) as? T }
-        if T.self == UInt8.self { return unsigned(value, UInt8.self) as? T }
-        if T.self == UInt16.self { return unsigned(value, UInt16.self) as? T }
-        if T.self == UInt32.self { return unsigned(value, UInt32.self) as? T }
-        if T.self == UInt64.self { return unsigned(value, UInt64.self) as? T }
+        if T.self == UInt.self { return integer(value, UInt.self) as? T }
+        if T.self == UInt8.self { return integer(value, UInt8.self) as? T }
+        if T.self == UInt16.self { return integer(value, UInt16.self) as? T }
+        if T.self == UInt32.self { return integer(value, UInt32.self) as? T }
+        if T.self == UInt64.self { return integer(value, UInt64.self) as? T }
         if T.self == URL.self {
             guard let text = value as? String, let url = URL(string: text), !text.isEmpty else { return nil }
             return url as? T
@@ -189,28 +194,28 @@ enum YYJSONValueDecoder {
         return nil
     }
 
-    private static func integer<I: FixedWidthInteger & SignedInteger>(_ value: Any, _ type: I.Type) -> I? {
-        guard let number = wholeNumber(from: value) else { return nil }
-        return I(exactly: number)
-    }
-
-    private static func unsigned<I: FixedWidthInteger & UnsignedInteger>(_ value: Any, _ type: I.Type) -> I? {
-        guard let number = wholeNumber(from: value), number >= 0 else { return nil }
-        return I(exactly: number)
-    }
-
-    private static func wholeNumber(from value: Any) -> Int64? {
+    private static func integer<I: FixedWidthInteger>(_ value: Any, _ type: I.Type) -> I? {
         if let number = value as? NSNumber {
-            if isBoolean(number) { return number.boolValue ? 1 : 0 }
-            let double = number.doubleValue
-            guard double.isFinite else { return nil }
-            return Int64(double.rounded(.towardZero))
+            if isBoolean(number) {
+                return I(number.boolValue ? 1 : 0)
+            }
+            if CFNumberIsFloatType(number as CFNumber) {
+                let d = number.doubleValue
+                guard d.isFinite else { return nil }
+                return I(exactly: d.rounded(.towardZero))
+            }
+            let typeChar = number.objCType.pointee
+            if typeChar == 67 || typeChar == 83 || typeChar == 73 || typeChar == 76 || typeChar == 81 {
+                return I(exactly: number.uint64Value)
+            } else {
+                return I(exactly: number.int64Value)
+            }
         }
         if let text = value as? String {
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-            if let exact = Int64(trimmed) { return exact }
-            if let double = Double(trimmed), double.isFinite {
-                return Int64(double.rounded(.towardZero))
+            if let exact = I(trimmed) { return exact }
+            if let d = Double(trimmed), d.isFinite {
+                return I(exactly: d.rounded(.towardZero))
             }
         }
         return nil

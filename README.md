@@ -9,7 +9,7 @@ High performance JSON model framework for iOS/macOS.
 [![License](https://img.shields.io/cocoapods/l/YYModel2.svg)](https://github.com/leeeeeeeefulong/YYModel/blob/master/LICENSE)
 [![Platform](https://img.shields.io/cocoapods/p/YYModel2.svg)](https://cocoapods.org/pods/YYModel2)
 
-Current release: **2.1.5** (`pod 'YYModel2', '2.1.5'`, SPM `from: "2.1.5"`).
+Current release: **2.1.6** (`pod 'YYModel2', '2.1.6'`, SPM `from: "2.1.6"`).
 
 ---
 
@@ -175,7 +175,7 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/leeeeeeeefulong/YYModel", from: "2.1.5")
+    .package(url: "https://github.com/leeeeeeeefulong/YYModel", from: "2.1.6")
 ]
 ```
 
@@ -185,7 +185,7 @@ dependencies: [
 
 ```ruby
 # New pod name (original YYModel owned by ibireme on trunk)
-pod 'YYModel2', '2.1.5'
+pod 'YYModel2', '2.1.6'
 ```
 
 > **Note**: The original `YYModel` pod on CocoaPods trunk is owned by ibireme and will not receive updates. This fork is published as `YYModel2`. CocoaPods trunk becomes read-only on 2026-12-02.
@@ -353,7 +353,7 @@ let users = NSArray.yy_modelArray(with: User.self, json: data) as? [User]
 
 | Distribution | What you import | What you call |
 |--------------|-----------------|---------------|
-| ✅ CocoaPods `YYModel2` 2.1.5 | `import YYModel2` | `YYJSONDecoder` and `yy_model(withJSON:)` / `yy_modelArray(with:json:)` |
+| ✅ CocoaPods `YYModel2` 2.1.6 | `import YYModel2` | `YYJSONDecoder` and `yy_model(withJSON:)` / `yy_modelArray(with:json:)` |
 | ✅ SPM | `import YYModel` and `import YYModelSwift` | same two APIs, two modules |
 
 Objective-C classes keep `modelCustomPropertyMapper` and `modelContainerPropertyGenericClass`. Swift structs keep `CodingKeys`. The two parsers do not share a mapping table.

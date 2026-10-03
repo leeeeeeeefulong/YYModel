@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.1.6 — Code Review Enhancements & Contract Precision (2026-10-03)
+
+- **Swift 64-Bit Integer Precision & Safety (R1)**: Fixed `wholeNumber` in `YYJSONDecoder.swift` by inspecting `CFNumberIsFloatType` and `objCType`, preserving exact 64-bit integers (`Int64` / `UInt64`, e.g. Snowflake IDs) from `Any` / Dictionary input without Double truncation (at 53 bits) and eliminating SIGTRAP overflow crashes on `Int64.max`.
+- **Whitelist & Blacklist Contract Parity (R2)**: Strictly distinguished `nil` (no filter) from empty `@[]` (blocks all properties); subclasses can now override and clear superclass filter lists as per original contract.
+- **O(1) Date Dispatch & Performance Parity (R3 & R8)**: Restored original length-indexed dispatch table `blocks[string.length]`, fixing year-only truncation bugs (e.g. `2026-09-05` becoming year 2026) and reducing date parsing benchmark latency from 86ms to 32ms (surpassing original 33.6ms).
+- **NSNumber Conversion Aliases (R4)**: Restored full 24-entry alias table for boolean (`"yes"`, `"Yes"`, `"no"`, `"No"`) and null representations (`"<null>"`, `"(NULL)"`, `"Null"`).
+- **Block Equality & Hash Consistency (R5)**: Included Block properties in `yy_modelIsEqual:` and `yy_modelHash`.
+- **Model Equality Symmetry (R6)**: Enforced `[model isMemberOfClass:self.class]` in `yy_modelIsEqual:`, guaranteeing mathematical symmetry (`parent.isEqual(child) == child.isEqual(parent) == false`).
+- **NSSecureCoding for Custom Model Containers (R7)**: Prioritized collection type decoding in `yy_modelInitWithCoder:` and included container classes + `_genericCls` in allowed classes, enabling full `NSSecureCoding` round-trip with nested custom models.
+- ✅ `XCTest`: 27 passed, 0 failed.
+- ✅ `Demo`: 84 passed, 0 failed (0 warnings).
+- ✅ `swift test`: 16 passed, 0 failed.
+- ✅ `E2E Review Suite`: 9/9 acceptance criteria verified green, release gate passed.
+
 ## 2.1.5 — Swift 6 Strict Concurrency & Full Parity (2026-10-03)
 
 - **Swift 6 Strict Concurrency**: Added `nonisolated(unsafe)` compiler guards for static `ISO8601DateFormatter` instances.
