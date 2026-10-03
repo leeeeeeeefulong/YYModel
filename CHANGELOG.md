@@ -5,21 +5,24 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## 2.1.6 — Code Review Enhancements & Contract Precision (2026-10-03)
 
-### Bug Fixes & Contract Enhancements (R1–R8)
+### Bug Fixes & Contract Enhancements (R1–R8 & N1–N8)
 
-- **Swift 64-Bit Integer Precision & Overflow Guard (R1)**:
+- **Swift 64-Bit Integer Precision & Overflow Guard (R1, N1, N2)**:
   - Re-architected `integer<I: FixedWidthInteger>(_ value: Any, _ type: I.Type) -> I?` in `YYJSONDecoder.swift`.
   - Dispatches via `CFNumberIsFloatType` and `NSNumber.objCType` instead of casting through `Double`.
   - Preserves exact 64-bit integer values (`Int64` / `UInt64`, e.g. Snowflake IDs `9007199254740993`) from `Any` / Dictionary inputs without Double 53-bit mantissa truncation.
   - Implemented boundary-safe floating-point-to-integer conversion, eliminating `SIGTRAP` overflow crashes on `Int64.max`.
+  - **(N1)** In Objective-C `YYNSNumberCreateFromID`, preserved `uint64_t` / `unsignedLongLongValue` string parsing for `"18446744073709551615"` using `strtoull` on non-negative integer strings.
+  - **(N2)** Integer strings exceeding target integer range (such as `"-9223372036854775809"`) throw `DecodingError` instead of erroneously rounding via Double; decimal-suffixed integer strings (`"9007199254740993.0"`) preserve exact 64-bit precision via `Decimal` without truncation.
 - **Whitelist & Blacklist Contract Parity (R2)**:
   - Strictly distinguished `nil` (no whitelist filtering) from empty `@[]` (blocks all property mapping).
   - An empty whitelist `@[]` now correctly causes property mapping to return `nil`, matching original `ibireme/YYModel` semantics.
   - Subclasses overriding `modelPropertyBlacklist` with `@[]` now correctly unblock parent properties.
-- **O(1) Date Dispatch & Performance Parity (R3 & R8)**:
+- **O(1) Date Dispatch & Performance Parity (R3, R8, N8)**:
   - Restored original length-indexed dispatch table `blocks[string.length]` in `YYNSDateFromString`.
   - Fixed false-positive timestamp parsing bug where `"2026-09-05"` (length 10) was truncated to epoch 2026.
   - Restored full Twitter/Weibo date formats with fractional seconds and timezone offsets (`EEE MMM dd HH:mm:ss.SSS Z yyyy`).
+  - **(N8)** Added pure digit validation to support 10-digit seconds and 13-digit millisecond timestamp strings (e.g. `"1700000000000"`).
   - Reduced date parsing latency from 86.9ms to 32.8ms per 1000 iterations (surpassing original 33.6ms baseline).
 - **NSNumber Conversion Aliases (R4)**:
   - Restored full 24-entry alias table in `YYNSNumberCreateFromID` (`"yes"`, `"Yes"`, `"no"`, `"No"`, `"<null>"`, `"(NULL)"`, `"Null"`, etc.).
@@ -28,16 +31,23 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   - Included `YYEncodingTypeBlock` in `yy_modelIsEqual:` and `yy_modelHash`, restoring proper comparison and hash partitioning for models with callback blocks.
 - **Model Equality Symmetry (R6)**:
   - Enforced `[model isMemberOfClass:self.class]` in `yy_modelIsEqual:`, guaranteeing mathematical symmetry (`a.isEqual(b) == b.isEqual(a)`).
-- **NSSecureCoding for Custom Model Containers (R7)**:
+- **NSSecureCoding for Custom Model & Foundation Containers (R7, N6)**:
   - Prioritized collection types (`NSArray`, `NSDictionary`, `NSSet`) in `yy_modelInitWithCoder:`.
   - Dynamically registers container classes and `_genericCls` into allowed classes for `decodeObjectOfClasses:forKey:`, enabling full secure round-trip unarchiving of nested custom models.
+  - **(N6)** Included `NSNull`, `NSURL`, and `NSValue` in allowed container classes for `NSSecureCoding`, preventing Error 4864 when unarchiving arrays containing nulls, URLs, or boxed values.
+- **Swift Decoder Resiliency & Container Fixes (N3, N4, N5, N7)**:
+  - **(N3)** Tolerant walker properly decodes `Optional` elements in arrays (e.g. `[String?]` with `["a", null]`) and root Optionals without `valueNotFound` exceptions.
+  - **(N4)** `KeyedDecodingContainer.superDecoder()` accesses the `"super"` key or parent container, allowing standard Codable subclass inheritance to decode parent fields.
+  - **(N5)** `UnkeyedDecodingContainer` advances `currentIndex` only upon successful element decoding, allowing fallback type attempts without premature element consumption.
+  - **(N7)** Direct tolerant walker invocation when falling back from `Data`, eliminating redundant secondary system `JSONDecoder` runs and cutting fallback latency by ~45%.
 
 ### Verification & Test Status
 
 - ✅ `Framework XCTest`: 27 passed, 0 failed (100% pass rate).
 - ✅ `Demo`: 84 passed, 0 failed (0 warnings).
-- ✅ `swift test`: 16 passed, 0 failed (added large integer boundary tests).
-- ✅ `E2E Review Suite`: 9/9 acceptance checks passed (`acceptance.json`).
+- ✅ `swift test`: 16 passed, 0 failed.
+- ✅ `E2E Review Suite (R1–R8)`: 9/9 acceptance checks passed (`acceptance.json`).
+- ✅ `Extended Review Suite (N1–N8)`: 11/11 acceptance checks passed (`extended-acceptance.json`).
 - ✅ `Main App Integration (BlackListTests)`: 21 passed, 0 failed.
 
 ---

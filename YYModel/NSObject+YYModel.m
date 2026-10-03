@@ -184,7 +184,13 @@ static force_inline NSNumber *YYNSNumberCreateFromID(__unsafe_unretained id valu
         } else {
             const char *cstring = ((NSString *)value).UTF8String;
             if (!cstring) return nil;
-            return @(atoll(cstring));
+            if (cstring[0] == '-') {
+                long long v = strtoll(cstring, NULL, 10);
+                return @(v);
+            } else {
+                unsigned long long v = strtoull(cstring, NULL, 10);
+                return [NSNumber numberWithUnsignedLongLong:v];
+            }
         }
     }
     return nil;
@@ -313,10 +319,31 @@ static force_inline NSDate *YYNSDateFromString(__unsafe_unretained NSString *str
         }
     });
     if (!string) return nil;
-    if (string.length > kParserNum) return nil;
-    YYNSDateParseBlock parser = blocks[string.length];
-    if (!parser) return nil;
-    return parser(string);
+    if (string.length <= kParserNum) {
+        YYNSDateParseBlock parser = blocks[string.length];
+        if (parser) {
+            NSDate *date = parser(string);
+            if (date) return date;
+        }
+    }
+    // Numeric timestamp string (seconds or milliseconds)
+    NSUInteger len = string.length;
+    if (len == 10 || len == 13) {
+        BOOL isAllDigits = YES;
+        for (NSUInteger i = 0; i < len; i++) {
+            unichar c = [string characterAtIndex:i];
+            if (c < '0' || c > '9') {
+                isAllDigits = NO;
+                break;
+            }
+        }
+        if (isAllDigits) {
+            NSTimeInterval ts = [string doubleValue];
+            if (len == 13) ts /= 1000.0;
+            if (ts > 0) return [NSDate dateWithTimeIntervalSince1970:ts];
+        }
+    }
+    return nil;
     #undef kParserNum
 }
 
@@ -1715,7 +1742,8 @@ static NSString *ModelDescription(NSObject *model) {
                                                      [NSDictionary class], [NSMutableDictionary class],
                                                      [NSSet class], [NSMutableSet class],
                                                      [NSString class], [NSNumber class],
-                                                     [NSDate class], [NSData class], nil];
+                                                     [NSDate class], [NSData class],
+                                                     [NSNull class], [NSURL class], [NSValue class], nil];
                             if (propertyMeta->_cls) [classes addObject:propertyMeta->_cls];
                             if (propertyMeta->_genericCls) [classes addObject:propertyMeta->_genericCls];
                             value = [aDecoder decodeObjectOfClasses:classes forKey:propertyMeta->_name];

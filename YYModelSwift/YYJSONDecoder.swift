@@ -25,7 +25,7 @@ public struct YYJSONDecoder: Sendable {
             return value
         }
         let object = try JSONSerialization.jsonObject(with: data, options: [.fragmentsAllowed])
-        return try decode(type, from: object)
+        return try YYJSONValueDecoder.decode(type, from: object, codingPath: [])
     }
 
     public func decode<T: Decodable>(_ type: T.Type, from object: Any) throws -> T {
@@ -60,8 +60,16 @@ public struct YYJSONDecoder: Sendable {
 }
 
 enum YYJSONValueDecoder {
+    private static func nilValue<T>(_ type: T.Type) -> T? {
+        if let optType = type as? ExpressibleByNilLiteral.Type {
+            return (optType.init(nilLiteral: ()) as! T)
+        }
+        return nil
+    }
+
     static func decode<T: Decodable>(_ type: T.Type, from value: Any, codingPath: [CodingKey]) throws -> T {
         if value is NSNull {
+            if let nilVal = nilValue(type) { return nilVal }
             if let zero = zero(type) { return zero }
             throw DecodingError.valueNotFound(type, context(codingPath, "null for \(type)"))
         }
@@ -76,6 +84,7 @@ enum YYJSONValueDecoder {
     }
 
     static func zero<T: Decodable>(_ type: T.Type) -> T? {
+        if let nilVal = nilValue(type) { return nilVal }
         switch type {
         case is String.Type: return "" as? T
         case is Bool.Type: return false as? T
@@ -214,6 +223,26 @@ enum YYJSONValueDecoder {
         if let text = value as? String {
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             if let exact = I(trimmed) { return exact }
+
+            let isIntegerString: Bool = {
+                var s = trimmed[...]
+                if s.hasPrefix("+") || s.hasPrefix("-") { s = s.dropFirst() }
+                return !s.isEmpty && s.allSatisfy { $0 >= "0" && $0 <= "9" }
+            }()
+            if isIntegerString {
+                return nil
+            }
+
+            if let dec = Decimal(string: trimmed) {
+                var rounded = Decimal()
+                var copy = dec
+                NSDecimalRound(&rounded, &copy, 0, .plain)
+                let str = "\(rounded)"
+                if let exact = I(str) {
+                    return exact
+                }
+            }
+
             if let d = Double(trimmed), d.isFinite {
                 return I(exactly: d.rounded(.towardZero))
             }
@@ -319,6 +348,13 @@ private final class _YYDecoder: Decoder {
     }
 }
 
+private struct _SuperKey: CodingKey {
+    var stringValue: String
+    var intValue: Int?
+    init(stringValue: String) { self.stringValue = stringValue; self.intValue = nil }
+    init?(intValue: Int) { self.stringValue = "\(intValue)"; self.intValue = intValue }
+}
+
 private struct YYKeyedContainer<Key: CodingKey>: KeyedDecodingContainerProtocol {
     let decoder: _YYDecoder
     let dictionary: [String: Any]
@@ -355,7 +391,11 @@ private struct YYKeyedContainer<Key: CodingKey>: KeyedDecodingContainerProtocol 
         try nestedDecoder(forKey: key).unkeyedContainer()
     }
 
-    func superDecoder() throws -> Decoder { _YYDecoder(value: NSNull(), codingPath: codingPath) }
+    func superDecoder() throws -> Decoder {
+        let key = _SuperKey(stringValue: "super")
+        let value = dictionary["super"] ?? dictionary
+        return _YYDecoder(value: value, codingPath: codingPath + [key])
+    }
     func superDecoder(forKey key: Key) throws -> Decoder { try nestedDecoder(forKey: key) }
 
     private func nestedDecoder(forKey key: Key) throws -> _YYDecoder {
@@ -386,9 +426,10 @@ private struct YYUnkeyedContainer: UnkeyedDecodingContainer {
     mutating func decode<T: Decodable>(_ type: T.Type) throws -> T {
         guard !isAtEnd else { throw end() }
         let index = currentIndex
-        currentIndex += 1
         let key = YYIndexKey(intValue: index)
-        return try YYJSONValueDecoder.decode(type, from: array[index], codingPath: codingPath + [key])
+        let result = try YYJSONValueDecoder.decode(type, from: array[index], codingPath: codingPath + [key])
+        currentIndex += 1
+        return result
     }
 
     mutating func nestedContainer<NestedKey: CodingKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> {

@@ -90,17 +90,20 @@ gh release create 2.1.5 \
 gh release create 2.1.6 \
   --repo "$REPO" \
   --title "2.1.6 — Code Review Enhancements & Contract Precision" \
-  --notes "### Production Release (R1–R8 Fixes)
-- **Swift 64-Bit Integer Precision & Overflow Guard (R1)**:
+  --notes "### Production Release (R1–R8 & N1–N8 Enhancements)
+- **Swift 64-Bit Integer Precision & Overflow Guard (R1, N1, N2)**:
   - Re-architected integer decoding in \`YYJSONDecoder.swift\` to inspect \`CFNumberIsFloatType\` and \`objCType\`.
   - Preserves exact 64-bit integer values (\`Int64\` / \`UInt64\`, e.g. Snowflake IDs \`9007199254740993\`) without Double 53-bit mantissa truncation.
   - Added boundary-safe conversion, eliminating \`SIGTRAP\` overflow crashes on \`Int64.max\`.
+  - **(N1)** Preserved Objective-C \`uint64_t\` string parsing for \`18446744073709551615\` via \`strtoull\`.
+  - **(N2)** Out-of-range integer strings throw \`DecodingError\` instead of Double rounding; decimal-suffixed integer strings (\`\"9007199254740993.0\"\`) preserve exact precision via \`Decimal\`.
 - **Whitelist & Blacklist Contract Parity (R2)**:
   - Strictly distinguished \`nil\` from empty \`@[]\` (empty whitelist blocks all properties).
   - Subclasses overriding blacklist with \`@[]\` correctly unblock parent properties.
-- **O(1) Date Dispatch & Performance Parity (R3 & R8)**:
+- **O(1) Date Dispatch & Performance Parity (R3, R8, N8)**:
   - Restored original length-indexed dispatch table \`blocks[string.length]\` in \`YYNSDateFromString\`.
   - Fixed timestamp false-positive bug where \`2026-09-05\` was truncated to epoch 2026.
+  - **(N8)** Added pure-digit validation for 10-digit seconds and 13-digit millisecond timestamp strings (\`\"1700000000000\"\`).
   - Reduced date parsing latency from 86.9ms to 32.8ms per 1000 iterations (surpassing original 33.6ms baseline).
 - **NSNumber Conversion Aliases (R4)**:
   - Restored full 24-entry alias table (\`\"yes\"\`, \`\"Yes\"\`, \`\"no\"\`, \`\"No\"\`, \`\"<null>\"\`, \`\"(NULL)\"\`, \`\"Null\"\`, etc.).
@@ -108,14 +111,21 @@ gh release create 2.1.6 \
   - Included \`YYEncodingTypeBlock\` in \`yy_modelIsEqual:\` and \`yy_modelHash\`.
 - **Model Equality Symmetry (R6)**:
   - Enforced \`[model isMemberOfClass:self.class]\` in \`yy_modelIsEqual:\`, guaranteeing mathematical symmetry.
-- **NSSecureCoding for Custom Model Containers (R7)**:
+- **NSSecureCoding for Custom Model & Foundation Containers (R7, N6)**:
   - Prioritized collection types in \`yy_modelInitWithCoder:\` and included container classes + \`_genericCls\` in allowed classes.
+  - **(N6)** Added \`NSNull\`, \`NSURL\`, \`NSValue\` to allowed container classes, preventing Error 4864.
+- **Swift Decoder Resiliency & Container Fixes (N3, N4, N5, N7)**:
+  - **(N3)** Tolerant walker properly decodes \`Optional\` elements in arrays (\`[String?]\` with \`[\"a\", null]\`) and root Optionals.
+  - **(N4)** \`KeyedDecodingContainer.superDecoder()\` accesses the \`\"super\"\` key or parent container for Codable inheritance.
+  - **(N5)** \`UnkeyedDecodingContainer\` advances \`currentIndex\` only upon successful element decoding.
+  - **(N7)** Direct tolerant walker invocation when falling back from \`Data\`, eliminating redundant secondary system \`JSONDecoder\` calls.
 
 ### Verification Status
 - ✅ Framework XCTest: 27 passed, 0 failed.
 - ✅ Demo Suite: 84 passed, 0 failed (0 warnings).
 - ✅ Swift Test: 16 passed, 0 failed.
-- ✅ E2E Review Acceptance: 9/9 checks passed.
+- ✅ E2E Review Acceptance (R1–R8): 9/9 checks passed.
+- ✅ Extended Review Acceptance (N1–N8): 11/11 checks passed.
 - ✅ Production App (BlackListTests): 21 passed, 0 failed." || true
 
 echo "✅ All releases published successfully!"
