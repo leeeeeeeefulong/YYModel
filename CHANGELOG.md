@@ -5,13 +5,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
-- Added `YYModelCodable`: synthesized Swift structs with YYModel-style JSON/dictionary/array shortcuts, ordered aliases, KeyPath mapping, filters, explicit defaults/required fields, transforms, and symmetric export.
-- Added registered associated-value enum variants and explicit seconds/milliseconds/ISO date strategies. Field policies belong to payload models; unsupported enum field policies fail explicitly.
-- Uses native scalar/collection containers plus field-local coercion, without initializing the complete model twice. Legacy `YYJSONDecoder` remains compatible.
-- Added independent CocoaPods `ObjC`/`Swift` subspecs; default selection still includes both. Swift requires a Swift 5.9+ toolchain; published 2.1.9 tags remain unchanged.
-- Fixed Objective-C negative millisecond numbers, signed/whitespace timestamp strings, zero timestamp strings, and non-finite numeric dates.
-- Updated the Framework project's deployment setting from iOS 8 to iOS 11 to match the component minimum and avoid missing libarclite in current Xcode.
-- Added reproducible public API E2E and whole-model weather/numeric verification, with separate Data/object/export timing and iOS 26.5 simulator evidence. No business App is used.
+- Swift primary APIs now accept ordinary Codable with external immutable YYJSONRules; no YY model protocol is required. Native mode directly forwards Foundation strategies/userInfo/errors. Compatible mode adapts fields once, with nested aliases/KeyPaths, explicit defaults/required validation, typed hooks, per-field dates, registered polymorphism and symmetric YYJSONEncoder output.
+- No-argument YYJSONDecoder preserves published legacy zero-fill/automatic dates but no longer retries model initialization after arbitrary errors. YYModelCodable remains optional convenience on the unified engine; process-wide business schema/variant caches were removed.
+- Fixed raw/Data strategy consistency, Optional null, nested dictionary key preservation and export-hook/polymorphic key-strategy duplication and callback paths. Added exact scalar-collection conversion, recursive finite checks, raw/Data strict-null consistency and matching legacy encoder/decoder date defaults.
+- OC unsupported-only property models restore identity equality/hash fallback. Mapper/generic inheritance restores original effective-hook defaults; modelMergesSuperclassConfiguration opts into ancestor merging. Black/white lists retain their original override behavior.
+- Removed NSObject-wide YYModel protocol conformance; Swift NSObject hook models should explicitly conform or expose @objc hooks. Deprecated unreliable isSwiftDynamic source-language detection; conservative getter returns NO.
+- Kept OC precision, controlled secure containers, optional strict nested transforms and later negative/zero/non-finite date corrections. Corrected l/L, PAC/cache and Core archive API claims; removed invalid ObjCRuntime privacy-manifest category.
+- Independent Swift/ObjC products and Pod subspecs remain. Existing 2.1.9 tag is unchanged; these are unreleased source changes. See dated delivery and migration documents for fresh acceptance and scoped performance evidence.
+- Framework deployment floor remains iOS11; current SDK deployment warnings are documented.
+
 
 ## 2.1.9 — Boundary Robustness & Unified Numeric Lexer (2026-10-04)
 
@@ -20,7 +22,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - **(G1) Objective-C UInt64 Decimal Preservation**: Preserves the full `UInt64` range (`0..18446744073709551615`) when assigning `NSDecimalNumber` and JSON decimal numbers to Objective-C unsigned 64-bit properties. Truncates fractions toward zero via `NSDecimalRound`; `NaN` and positive overflow leave existing properties untouched, and negative numbers retain legacy unsigned conversion.
 - **(G2) Swift Non-Finite Floating-Point Guard**: Rejects non-finite floating-point (`Double`/`Float`/`CGFloat`), `Decimal`, and `Date` values, including overflow introduced when narrowing `Double` to `Float`.
 - **(G3) Symmetric Millisecond Timestamp Handling**: Applies the existing automatic seconds/milliseconds threshold symmetrically to positive and negative timestamps (`abs(seconds) > 1e11`), using one shared date conversion for fast and tolerant decoding.
-- **(G4) Optional Nested Transform Failure Propagation**: Adds the root-model protocol hook `+modelRequiresSuccessfulNestedTransforms`. When enabled, nested dictionary conversions propagate failure through objects and model containers to the root parse (returning `nil`). Default behavior remains 100% compatible with original `ibireme/YYModel`.
+- **(G4) Optional Nested Transform Failure Propagation**: Adds the root-model protocol hook `+modelRequiresSuccessfulNestedTransforms`. When enabled, nested dictionary conversions propagate failure through objects and model containers to the root parse (returning `nil`). This hook defaults to NO, preserving the original nested-transform failure policy; other fork extensions have separate compatibility limits.
 - **Public API Boundary Validation Package**: Added repeatable public API boundary E2E checks (`Validation/`) covering 62 boundary scenarios and Open-Meteo weather datasets.
 
 ### Numeric Correctness & Unified Lexer (F1–F4)
@@ -221,21 +223,21 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Critical Modern iOS Fixes (P0)
 
-- **F1**: `objc_msgSend` — Non-variadic typed function pointers matching arm64 register ABI. Fixes `PAC` validation and `-Wcast-function-type-strict` compile errors in Clang 15+.
+- **F1**: `objc_msgSend` — Non-variadic typed function pointers matching arm64 register ABI. Introduced explicit typedefs; original YYModel already used typed casts. No independently established PAC defect or acceleration is claimed.
 - **F2**: `NSSecureCoding` — `decodeObjectOfClass:forKey:` (iOS 6.0+) replaces deprecated `decodeObjectForKey:`.
-- **F3**: 64-bit type encoding — `'l'`/`'L'` now uses `NSGetSizeAndAlignment()` (iOS 2.0+) for correct size on arm64 (8 bytes, was hardcoded as 4).
+- **F3**: 64-bit type encoding — `'l'`/`'L'` now uses `NSGetSizeAndAlignment()` (iOS 2.0+) for queried encoding size. Correction: l/L are 32-bit encodings on Apple arm64; C long encodes as q.
 - **F4**: `NSDecimalNumber` precision — Preserved via `decimalNumberWithDecimal:` instead of implicit `double` cast.
 - **F5**: `os_unfair_lock` (iOS 10.0+) — Replaces `dispatch_semaphore` for class info cache, eliminating priority inversion risk.
 
 ### Important Fixes (P1)
 
 - **F6**: Thread-safe `NSDateFormatter` cache protected by `os_unfair_lock`.
-- **F7**: Swift `@objc dynamic` property detection via `isSwiftDynamic` (detects `_$` ivar prefix + `D` attribute).
+- **F7**: Historically added isSwiftDynamic based on ivar/D guesses. Correction: these do not reliably identify Swift; the getter is now deprecated and conservative NO.
 - **F8**: Thread-safe `_modelMetaCache` protected by `os_unfair_lock`.
 
 ### Compliance & Interop (P2)
 
-- **F9**: Added `PrivacyInfo.xcprivacy` with `NSPrivacyAccessedAPICategoryObjCRuntime` declaration (reason: `AC6B.1`).
+- **F9**: Historically added a privacy manifest. Correction: ObjCRuntime is not an Apple required-reason category; that erroneous declaration was removed in Unreleased.
 - **F10**: Full `nullable`/`nonnull` nullability annotations for Swift interop.
 
 ---
@@ -249,21 +251,21 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### API Changes
 
-**None.** All public method signatures are unchanged. 100% backward compatible.
+Original parsing/export entry points are retained. Fork extensions and migration effects are documented separately; blanket behavior compatibility is not claimed.
 
 ### Minimum Deployment Target
 
 Changed from iOS 6.0 to **iOS 11.0** / macOS 10.9 to **macOS 10.13**.
 
-Reason: `archivedDataWithRootObject:requiringSecureCoding:error:` requires iOS 11.0+ / macOS 10.13+. This API is used in the core library's NSSecureCoding support and cannot be conditionally compiled away.
+Correction: these are distribution support floors. The Core does not call complete archivedData/unarchivedObject convenience APIs; callers and tests do. Cache locking uses os_unfair_lock.
 
 Verified API availability (from Apple Developer Documentation):
 
 | API | iOS | macOS | Used In |
 |-----|-----|-------|---------|
 | `os_unfair_lock` | 10.0+ | 10.12+ | **Core** — Thread-safe caches (F5, F6, F8) |
-| `archivedDataWithRootObject:requiringSecureCoding:error:` | **11.0+** | **10.13+** | **Core** — Secure archiving ← bottleneck |
-| `unarchivedObjectOfClass:fromData:error:` | **11.0+** | **10.13+** | **Core** — Secure unarchiving ← bottleneck |
+| `archivedDataWithRootObject:requiringSecureCoding:error:` | **11.0+** | **10.13+** | Caller/demo secure archiving |
+| `unarchivedObjectOfClass:fromData:error:` | **11.0+** | **10.13+** | Caller/demo secure unarchiving |
 | `NSSecureCoding` | 6.0+ | 10.8+ | **Core** — Protocol |
 | `decodeObjectOfClass:forKey:` | 6.0+ | 10.8+ | **Core** — Type-safe unarchiving |
 | `NSGetSizeAndAlignment` | 2.0+ | 10.0+ | **Core** — Type encoding size |

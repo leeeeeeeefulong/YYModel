@@ -1,0 +1,203 @@
+import Foundation
+
+#if compiler(>=6.0)
+public typealias YYJSONUserInfoValue = any Sendable
+#else
+public typealias YYJSONUserInfoValue = Any
+#endif
+
+public enum YYJSONMode: Sendable {
+    /// Foundation semantics, with no YY rules or model retries.
+    case native
+    /// Field-local conversions; absent nonoptional values require explicit defaults.
+    case compatible
+    /// Published 2.x zero-fill and automatic-date semantics, without whole-model retries.
+    case legacy
+}
+
+/// Immutable, invocation-independent rules. Models remain ordinary Codable.
+/// JSON defaults are copied on registration. Hooks must synchronize their captured mutable state.
+public struct YYJSONRules: @unchecked Sendable {
+    fileprivate var entries: [ObjectIdentifier: YYJSONTypeRule] = [:]
+    public init() {}
+    public var isEmpty: Bool { entries.isEmpty }
+
+    /// Names refer to CodingKey.stringValue. The first existing alias wins, including null.
+    public func forType<Model>(_ type: Model.Type, configure: (inout YYModelConfiguration<Model>) throws -> Void) throws -> Self {
+        guard !YYJSONValueDecoder.isLeaf(type), !(type is YYModelNativeCollection.Type) else {
+            throw YYModelFailure.invalidObject("Register rules on model types; scalar/collection policies belong to their containing model")
+        }
+        var configuration = YYModelConfiguration<Model>(dateStrategy: .native)
+        try configure(&configuration)
+        var result = self
+        var rule = try YYJSONTypeRule(configuration)
+        if let previous = entries[ObjectIdentifier(type)], previous.polymorphicDecode != nil {
+            try rule.validatePolymorphic()
+            rule.polymorphicDecode = previous.polymorphicDecode; rule.polymorphicEncode = previous.polymorphicEncode
+        }
+        result.entries[ObjectIdentifier(type)] = rule
+        return result
+    }
+
+    /// Dispatch an ordinary Codable enum/base value using explicit payload registrations.
+    public func polymorphic<Root: Codable>(_ type: Root.Type, discriminator: YYModelKey = "type", variants: [String: YYModelVariant<Root>]) throws -> Self {
+        try YYModelPolicy(mapper: ["discriminator": discriminator]).validate()
+        guard !variants.isEmpty else { throw YYModelFailure.invalidObject("Empty polymorphic variants") }
+        var result = self
+        var rule = result.entries[ObjectIdentifier(type)] ?? YYJSONTypeRule()
+        try rule.validatePolymorphic()
+        rule.polymorphicDecode = { try YYModelPolymorphism.decode(from: $0, discriminator: discriminator, variants: variants) }
+        rule.polymorphicEncode = { value, encoder in
+            guard let root = value as? Root else { throw YYModelFailure.invalidObject("Unexpected polymorphic value") }
+            try YYModelPolymorphism.encode(root, to: encoder, discriminator: discriminator, variants: variants)
+        }
+        result.entries[ObjectIdentifier(type)] = rule
+        return result
+    }
+}
+
+struct YYJSONTypeRule {
+    var policy = YYModelPolicy(date: .native, missing: .inherit)
+    var will: (([String: Any]) throws -> [String: Any]?)?
+    var needsInput = false
+    var finish: ((Any, [String: Any]?) throws -> Any)?
+    var export: ((Any, inout [String: Any]) throws -> Bool)?
+    var polymorphicDecode: ((Decoder) throws -> Any)?
+    var polymorphicEncode: ((Any, Encoder) throws -> Void)?
+    init() {}
+    init<M>(_ configuration: YYModelConfiguration<M>) throws {
+        // Snapshot JSON values, rather than retaining mutable NSMutableDictionary/Array defaults.
+        let defaults = try configuration.defaultValues.mapValues { try YYModelJSONValue($0).raw }
+        policy = YYModelPolicy(mapper: configuration.mapper, blacklist: Set(configuration.blacklist),
+                               whitelist: configuration.whitelist.map(Set.init), required: Set(configuration.requiredProperties),
+                               defaults: defaults, date: configuration.dateStrategy, missing: configuration.missingStrategy,
+                               fieldDates: configuration.fieldDateStrategies)
+        try policy.validate()
+        will = configuration.willTransform
+        needsInput = configuration.didTransform != nil || will != nil
+        if configuration.transform != nil || configuration.validate != nil || configuration.didTransform != nil {
+            finish = { value, input in
+                guard var model = value as? M else { throw YYModelFailure.invalidObject("Unexpected rule type") }
+                try configuration.transform?(&model)
+                if let hook = configuration.didTransform, let input, try !hook(&model, input) { throw YYModelFailure.invalidObject("didTransform rejected model") }
+                try configuration.validate?(model)
+                return model
+            }
+        }
+        if let hook = configuration.transformTo {
+            export = { value, object in
+                guard let model = value as? M else { throw YYModelFailure.invalidObject("Unexpected export type") }
+                return try hook(model, &object)
+            }
+        }
+    }
+    func validatePolymorphic() throws {
+        guard policy.mapper.isEmpty, policy.blacklist.isEmpty, policy.whitelist == nil,
+              policy.required.isEmpty, policy.defaults.isEmpty, policy.fieldDates.isEmpty,
+              policy.date == .native || policy.date == .automatic else {
+            throw YYModelFailure.invalidObject("Declare polymorphic field/date policies on payload types")
+        }
+    }
+    func resolved(defaults: YYModelPolicy) -> YYModelPolicy {
+        var result = policy
+        if result.missing == .inherit { result.missing = defaults.missing }
+        return result
+    }
+}
+
+/// One context per call. It carries immutable external rules and lazily snapshots optional model rules.
+/// No model probing, process-wide schema cache, or speculative custom initialization.
+final class YYJSONContext: @unchecked Sendable {
+    static let key = CodingUserInfoKey(rawValue: "YYModelSwift.Context")!
+    private static let encodingPrefixKey = CodingUserInfoKey(rawValue: "YYModelSwift.EncodingPrefix")!
+    let rules: YYJSONRules
+    let defaults: YYModelPolicy
+    let nativeDecoder: JSONDecoder
+    let nativeEncoder: JSONEncoder
+    private var optionalRules: [ObjectIdentifier: YYJSONTypeRule] = [:]
+    private let lock = NSLock()
+    // Foundation dictionary value boxes decode synchronously within this invocation.
+    // The Decoder protocol is not Sendable; it must not escape its initialization call.
+    var dictionaryDate: YYModelDateStrategy?
+    init(mode: YYJSONMode, rules: YYJSONRules = .init(), decoder: JSONDecoder = JSONDecoder(), encoder: JSONEncoder = JSONEncoder()) {
+        self.rules = rules; nativeDecoder = decoder; nativeEncoder = encoder
+        defaults = YYModelPolicy(date: mode == .legacy ? .automatic : .native, missing: mode == .legacy ? .zeroFill : .strict)
+    }
+    static func from(_ decoder: Decoder) -> YYJSONContext { decoder.userInfo[key] as? YYJSONContext ?? YYJSONContext(mode: .legacy) }
+    static func from(_ encoder: Encoder) -> YYJSONContext { encoder.userInfo[key] as? YYJSONContext ?? YYJSONContext(mode: .legacy) }
+    func rule<T>(_ type: T.Type) throws -> YYJSONTypeRule? {
+        let id = ObjectIdentifier(type)
+        if let rule = rules.entries[id] { return rule }
+        lock.lock(); let cached = optionalRules[id]; lock.unlock()
+        if let rule = cached { return rule }
+        if let model = type as? any YYModelCodable.Type {
+            let rule = try model._yyRule()
+            lock.lock(); optionalRules[id] = rule; lock.unlock()
+            return rule
+        }
+        return nil
+    }
+    func rawDecoder(_ value: Any, path: [CodingKey], userInfo: [CodingUserInfoKey: Any]) -> _YYDecoder {
+        let decoder = _YYDecoder(value: value, codingPath: path)
+        decoder.userInfo = userInfo; decoder.userInfo[Self.key] = self
+        return decoder
+    }
+    func exportEncoder(at source: Encoder) -> JSONEncoder {
+        let encoder = JSONEncoder()
+        let prefix = source is YYModelPrefixEncoder ? source.codingPath : (source.userInfo[Self.encodingPrefixKey] as? [CodingKey] ?? []) + source.codingPath
+        encoder.outputFormatting = nativeEncoder.outputFormatting; encoder.dateEncodingStrategy = nativeEncoder.dateEncodingStrategy
+        encoder.dataEncodingStrategy = nativeEncoder.dataEncodingStrategy; encoder.keyEncodingStrategy = nativeEncoder.keyEncodingStrategy
+        encoder.nonConformingFloatEncodingStrategy = nativeEncoder.nonConformingFloatEncodingStrategy
+        encoder.userInfo = nativeEncoder.userInfo; encoder.userInfo[Self.key] = self
+        encoder.userInfo[Self.encodingPrefixKey] = prefix
+        if case .custom(let transform) = nativeEncoder.keyEncodingStrategy {
+            encoder.keyEncodingStrategy = .custom { transform(prefix + $0) }
+        }
+        if case .custom(let transform) = nativeEncoder.dateEncodingStrategy {
+            encoder.dateEncodingStrategy = .custom { date, base in try transform(date, YYModelPrefixEncoder(base: base, prefix: prefix)) }
+        }
+        if case .custom(let transform) = nativeEncoder.dataEncodingStrategy {
+            encoder.dataEncodingStrategy = .custom { data, base in try transform(data, YYModelPrefixEncoder(base: base, prefix: prefix)) }
+        }
+        return encoder
+    }
+    func decodeNative<T: Decodable>(_ type: T.Type, data: Data, path: [CodingKey]) throws -> T {
+        // Foundation's object-less API reports a scalar-local path. Restore the containing path;
+        // arbitrary errors from a caller's custom strategy pass through unchanged.
+        do { return try nativeDecoder.decode(type, from: data) }
+        catch let error as DecodingError {
+            func rebased(_ context: DecodingError.Context) -> DecodingError.Context {
+                .init(codingPath: path + context.codingPath, debugDescription: context.debugDescription, underlyingError: context.underlyingError)
+            }
+            switch error {
+            case .dataCorrupted(let c): throw DecodingError.dataCorrupted(rebased(c))
+            case .typeMismatch(let t, let c): throw DecodingError.typeMismatch(t, rebased(c))
+            case .valueNotFound(let t, let c): throw DecodingError.valueNotFound(t, rebased(c))
+            case .keyNotFound(let k, let c): throw DecodingError.keyNotFound(k, rebased(c))
+            @unknown default: throw error
+            }
+        }
+    }
+    func decodingKey(_ key: String, at path: [CodingKey]) -> String {
+        switch nativeDecoder.keyDecodingStrategy {
+        case .useDefaultKeys: return key
+        case .custom(let transform): return transform(path + [YYModelCodingKey(key)]).stringValue
+        case .convertFromSnakeCase:
+            // Follow Foundation's documented handling of boundary underscores and word case.
+            // https://github.com/swiftlang/swift-foundation/blob/a211bea22b6fa5b041c37592aaf50c7b3db5c354/Sources/FoundationEssentials/JSON/JSONDecoder.swift
+            guard let first = key.firstIndex(where: { $0 != "_" }), let last = key.lastIndex(where: { $0 != "_" }) else { return key }
+            let words = key[first...last].split(separator: "_")
+            guard words.count > 1 else { return key }
+            return String(key[..<first]) + words[0].lowercased() + words.dropFirst().map { $0.capitalized }.joined() + String(key[key.index(after: last)...])
+        @unknown default: return key
+        }
+    }
+}
+
+extension YYModelCodable {
+    static func _yyRule() throws -> YYJSONTypeRule {
+        let rule = try YYJSONTypeRule(yy_modelConfiguration)
+        if Self.self is any YYModelPolymorphic.Type { try rule.validatePolymorphic() }
+        return rule
+    }
+}

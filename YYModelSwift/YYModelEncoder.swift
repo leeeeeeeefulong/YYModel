@@ -7,39 +7,37 @@ struct YYModelEncodingBox<T: Encodable>: Encodable {
     func encode(to encoder: Encoder) throws { try YYModelEncode.value(value, to: encoder, date: date, skipHook: skipHook) }
 }
 enum YYModelEncode {
-    static func value<T: Encodable>(_ value: T, to encoder: Encoder, date: YYModelDateStrategy, skipHook: Bool = false) throws {
-        if let model = value as? any YYModelCodable { try model._yyEncode(to: encoder, skipHook: skipHook); return }
+    static func value<T: Encodable>(_ value: T, to input: Encoder, date: YYModelDateStrategy, skipHook: Bool = false) throws {
+        let encoder = (input as? YYModelEncoder)?.base ?? input
+        let context = YYJSONContext.from(input)
+        var defaults = context.defaults; defaults.date = date
+        let rule = try context.rule(T.self)
+        let policy = rule?.resolved(defaults: defaults) ?? defaults
+        if !skipHook, let hook = rule?.export {
+            let native = context.exportEncoder(at: encoder)
+            let data = try native.encode(YYModelEncodingBox(value: value, date: date, skipHook: true))
+            guard var object = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { throw YYModelFailure.invalidObject("Expected export object") }
+            guard try hook(value, &object) else { throw YYModelFailure.invalidObject("transformTo rejected model") }
+            try YYModelJSONValue(object).encode(to: encoder)
+            return
+        }
+        if let dispatch = rule?.polymorphicEncode { try dispatch(value, encoder); return }
         if let value = value as? Date {
+            if policy.date == .native { var c = encoder.singleValueContainer(); try c.encode(value); return }
             let seconds = value.timeIntervalSince1970
             guard seconds.isFinite else { throw EncodingError.invalidValue(value, .init(codingPath: encoder.codingPath, debugDescription: "Non-finite date")) }
             var c = encoder.singleValueContainer()
-            if date == .iso8601 { try c.encode(YYModelDates.shared.text(value)) }
-            else { try c.encode(date == .millisecondsSince1970 ? seconds * 1000 : seconds) }
+            if policy.date == .iso8601 { try c.encode(YYModelDates.shared.text(value)) }
+            else { try c.encode(policy.date == .millisecondsSince1970 ? seconds * 1000 : seconds) }
             return
         }
         if YYJSONValueDecoder.isLeaf(T.self) {
-            var container = encoder.singleValueContainer()
-            try container.encode(value)
-            return
+            var container = encoder.singleValueContainer(); try container.encode(value); return
         }
-        try value.encode(to: YYModelEncoder(base: encoder, policy: .init(date: date)))
-    }
-}
-extension YYModelCodable {
-    func _yyEncode(to encoder: Encoder, skipHook: Bool) throws {
-        let schema = YYModelSchemaCache.shared.schema(Self.self)
-        let policy = try schema.policy()
-        if !skipHook, let hook = schema.configuration.transformTo {
-            let native = JSONEncoder(); native.dateEncodingStrategy = .secondsSince1970
-            let bytes = try native.encode(YYModelEncodingBox(value: self, date: policy.date, skipHook: true))
-            guard var object = try JSONSerialization.jsonObject(with: bytes) as? [String: Any] else { throw YYModelFailure.invalidObject("Expected export object") }
-            guard try hook(self, &object) else { throw YYModelFailure.invalidObject("transformTo rejected model") }
-            try YYModelJSONValue(object).encode(to: encoder)
-        } else {
-            let state = YYModelEncodingState()
-            try self.encode(to: YYModelEncoder(base: encoder, policy: policy, state: state))
-            if let error = state.error { throw error }
-        }
+        if let dictionary = value as? YYModelDictionaryEncoding, try dictionary.encodeDictionary(to: encoder, date: policy.date) { return }
+        let state = YYModelEncodingState()
+        try value.encode(to: YYModelEncoder(base: encoder, policy: policy, state: state))
+        if let error = state.error { throw error }
     }
 }
 
@@ -87,7 +85,7 @@ struct YYModelKeyedEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
     mutating func encode<T: Encodable>(_ value: T, forKey key: Key) throws {
         guard var field = try destination(key) else { return }
         if YYModelDecode.isNativeValue(T.self) { try field.0.encode(value, forKey: field.1) }
-        else { try field.0.encode(YYModelEncodingBox(value: value, date: policy.date, skipHook: false), forKey: field.1) }
+        else { try field.0.encode(YYModelEncodingBox(value: value, date: policy.fieldDates[key.stringValue] ?? policy.date, skipHook: false), forKey: field.1) }
     }
     mutating func nestedContainer<NestedKey: CodingKey>(keyedBy type: NestedKey.Type, forKey key: Key) -> KeyedEncodingContainer<NestedKey> {
         do {

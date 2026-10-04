@@ -49,7 +49,7 @@ def main():
     source=args.source_root/'YYModel'
     common.execute(['clang','-O2','-fobjc-arc','-framework','Foundation','-I',source,*source.glob('*.m'),args.output/'date.m','-o',args.output/'objc'],args.output,'objc-build.log')
     common.execute([args.output/'objc',args.output/'objc.json'],args.output,'objc.log')
-    common.execute(['swiftc','-O',args.source_root/'YYModelSwift/YYJSONDecoder.swift',args.output/'date.swift','-o',args.output/'swift'],args.output,'swift-build.log')
+    common.execute(['swiftc','-O',*sorted((args.source_root/'YYModelSwift').glob('*.swift')),args.output/'date.swift','-o',args.output/'swift'],args.output,'swift-build.log')
     common.execute([args.output/'swift',args.output/'swift.json'],args.output,'swift.log')
     optional=subprocess.run(['swiftc','-typecheck',str(args.output/'optional.swift')],capture_output=True,text=True)
     (args.output/'optional.log').write_text(optional.stdout+optional.stderr)

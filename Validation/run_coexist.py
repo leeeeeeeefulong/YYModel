@@ -41,7 +41,7 @@ def main():
         common.execute(['xcrun','--sdk','iphonesimulator' if args.simulator else 'macosx','swiftc',*common.swift_flags(args),
                         '-import-objc-header', HERE/'InteropSupport.h', '-Xcc', '-I'+str(args.source_root/'YYModel'),
                         '-Xcc','-I'+str(base/'build'),'-Xcc','-Wno-nullability-completeness',
-                        args.source_root/'YYModelSwift/YYJSONDecoder.swift',base/'build/WeatherModels.swift',HERE/'CoexistE2E.swift',
+                        *sorted((args.source_root/'YYModelSwift').glob('*.swift')),base/'build/WeatherModels.swift',HERE/'CoexistE2E.swift',
                         *sorted((base/'build').glob('current-*.o')),'-o',binary],output,'build.log')
     expected = json.loads((base/'weather-expected.json').read_text())
     cases = [(mode, scenario) for mode in ['alternating','foundation-object'] for scenario in ['clean','dirty','large']]

@@ -9,53 +9,6 @@ struct YYModelCodingKey: CodingKey, Hashable {
     init(intValue: Int) { self.stringValue = String(intValue); self.intValue = intValue }
 }
 
-// Configuration snapshots are immutable. The lock protects publication, not execution of user hooks.
-final class YYModelSchemaCache: @unchecked Sendable {
-    static let shared = YYModelSchemaCache()
-    private let lock = NSLock()
-    private var values: [ObjectIdentifier: Any] = [:]
-    private var variantTables: [ObjectIdentifier: Any] = [:]
-    func schema<M: YYModelCodable>(_ type: M.Type) -> YYModelSchema<M> {
-        let key = ObjectIdentifier(type)
-        lock.lock(); let cached = values[key] as? YYModelSchema<M>; lock.unlock()
-        if let cached { return cached }
-        let fresh = YYModelSchema(configuration: M.yy_modelConfiguration)
-        lock.lock(); defer { lock.unlock() }
-        if let cached = values[key] as? YYModelSchema<M> { return cached }
-        values[key] = fresh
-        return fresh
-    }
-    func variants<M: YYModelPolymorphic>(_ type: M.Type) -> [String: YYModelVariant<M>] {
-        let key = ObjectIdentifier(type)
-        lock.lock(); let cached = variantTables[key] as? [String: YYModelVariant<M>]; lock.unlock()
-        if let cached { return cached }
-        let fresh = M.yy_modelVariants
-        lock.lock(); defer { lock.unlock() }
-        if let cached = variantTables[key] as? [String: YYModelVariant<M>] { return cached }
-        variantTables[key] = fresh; return fresh
-    }
-
-}
-struct YYModelSchema<M> {
-    let configuration: YYModelConfiguration<M>
-    private let resolved: Result<YYModelPolicy, Error>
-    init(configuration c: YYModelConfiguration<M>) {
-        configuration = c
-        let policy = YYModelPolicy(mapper: c.mapper, blacklist: Set(c.blacklist), whitelist: c.whitelist.map(Set.init),
-                                   required: Set(c.requiredProperties), defaults: c.defaultValues, date: c.dateStrategy)
-        resolved = Result {
-            try policy.validate()
-            if M.self is any YYModelPolymorphic.Type {
-                guard c.mapper.isEmpty, c.blacklist.isEmpty, c.whitelist == nil, c.requiredProperties.isEmpty, c.defaultValues.isEmpty, c.dateStrategy == .automatic else {
-                    throw YYModelFailure.invalidObject("Declare polymorphic field and date policies on the payload model, not the enum")
-                }
-            }
-            return policy
-        }
-    }
-    func policy() throws -> YYModelPolicy { try resolved.get() }
-}
-
 struct YYModelPolicy {
     var mapper: [String: YYModelKey] = [:]
     var blacklist: Set<String> = []
@@ -63,6 +16,8 @@ struct YYModelPolicy {
     var required: Set<String> = []
     var defaults: [String: Any] = [:]
     var date: YYModelDateStrategy = .automatic
+    var missing: YYJSONMissingStrategy = .zeroFill
+    var fieldDates: [String: YYModelDateStrategy] = [:]
     func allows(_ key: String) -> Bool { !blacklist.contains(key) && (whitelist?.contains(key) ?? true) }
     func paths(_ key: String) -> [[String]] { mapper[key]?.paths ?? [[key]] }
     func validate() throws {
@@ -136,7 +91,9 @@ indirect enum YYModelJSONValue: Codable {
     }
     func encode(to encoder: Encoder) throws {
         switch self {
-        case .object(let v): var c = encoder.container(keyedBy: YYModelCodingKey.self); for (key, value) in v { try c.encode(value, forKey: YYModelCodingKey(key)) }
+        // These are physical JSON keys (including completed hook output), not CodingKeys.
+        // Foundation's String-key dictionary path preserves them without applying key strategy again.
+        case .object(let v): var c = encoder.singleValueContainer(); try c.encode(v)
         case .array(let v): var c = encoder.unkeyedContainer(); for value in v { try c.encode(value) }
         default:
             var c = encoder.singleValueContainer()
@@ -205,18 +162,21 @@ final class YYModelJSONInput: @unchecked Sendable {
         root = value
         return value
     }
-    func object(at path: [CodingKey]) throws -> Any {
+    func object(at path: [CodingKey], context: YYJSONContext?) throws -> Any {
         var value = try snapshot()
-        for key in path {
+        for (index, key) in path.enumerated() {
             if let array = value as? [Any], let index = key.intValue, array.indices.contains(index) { value = array[index] }
             else if let dictionary = value as? [String: Any], let next = dictionary[key.stringValue] { value = next }
+            else if let dictionary = value as? [String: Any],
+                    let physical = dictionary.keys.first(where: { (context?.decodingKey($0, at: Array(path.prefix(index))) ?? $0) == key.stringValue }),
+                    let next = dictionary[physical] { value = next }
             else { throw DecodingError.keyNotFound(key, .init(codingPath: path, debugDescription: "Missing hook input path")) }
         }
         return value
     }
     static func object(from decoder: Decoder) throws -> Any {
         if let raw = decoder as? _YYDecoder { return raw.value }
-        if let input = decoder.userInfo[key] as? YYModelJSONInput { return try input.object(at: decoder.codingPath) }
+        if let input = decoder.userInfo[key] as? YYModelJSONInput { return try input.object(at: decoder.codingPath, context: decoder.userInfo[YYJSONContext.key] as? YYJSONContext) }
         return try YYModelJSONValue(from: decoder).raw
     }
 }

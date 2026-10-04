@@ -1,6 +1,6 @@
 import Foundation
 
-/// A Swift value model with synthesized Codable and YYModel mapping semantics.
+/// Optional convenience for model-owned rules. Ordinary Codable needs no YY protocol.
 public protocol YYModelCodable: Codable {
     static var yy_modelConfiguration: YYModelConfiguration<Self> { get }
 }
@@ -18,21 +18,29 @@ public struct YYModelKey: ExpressibleByStringLiteral, ExpressibleByArrayLiteral,
 
 public enum YYModelDateStrategy: Sendable {
     /// Recognize seconds, large millisecond timestamps, and common textual formats. Export seconds.
-    case automatic, secondsSince1970, millisecondsSince1970, iso8601
+    case native, automatic, secondsSince1970, millisecondsSince1970, iso8601
 }
 
+public enum YYJSONMissingStrategy: Sendable { case inherit, strict, zeroFill }
+
 /// Keys refer to CodingKeys (property names when CodingKeys is synthesized).
-/// Configuration is cached per type. Captured state in hooks must be thread safe.
+/// External rules snapshot this value; there is no process-wide business configuration cache.
+/// Captured state in hooks must be thread safe when a decoder is shared.
 public struct YYModelConfiguration<Model> {
-    public let mapper: [String: YYModelKey]
-    public let blacklist: [String]
-    public let whitelist: [String]?
-    public let requiredProperties: [String]
-    public let defaultValues: [String: Any]
-    public let dateStrategy: YYModelDateStrategy
-    public let willTransform: (([String: Any]) throws -> [String: Any]?)?
-    public let didTransform: ((inout Model, [String: Any]) throws -> Bool)?
-    public let transformTo: ((Model, inout [String: Any]) throws -> Bool)?
+    public var mapper: [String: YYModelKey]
+    public var blacklist: [String]
+    public var whitelist: [String]?
+    public var requiredProperties: [String]
+    public var defaultValues: [String: Any]
+    public var dateStrategy: YYModelDateStrategy
+    public var missingStrategy: YYJSONMissingStrategy = .inherit
+    public var fieldDateStrategies: [String: YYModelDateStrategy] = [:]
+    /// Typed hooks do not request or materialize a raw JSON dictionary.
+    public var validate: ((Model) throws -> Void)?
+    public var transform: ((inout Model) throws -> Void)?
+    public var willTransform: (([String: Any]) throws -> [String: Any]?)?
+    public var didTransform: ((inout Model, [String: Any]) throws -> Bool)?
+    public var transformTo: ((Model, inout [String: Any]) throws -> Bool)?
     public init(mapper: [String: YYModelKey] = [:], blacklist: [String] = [], whitelist: [String]? = nil,
                 requiredProperties: [String] = [], defaultValues: [String: Any] = [:],
                 dateStrategy: YYModelDateStrategy = .automatic,
@@ -72,18 +80,10 @@ public extension Array where Element: YYModelCodable {
 /// Generic entry points also support arrays and dictionaries containing YYModel values.
 public enum YYModelJSON {
     public static func decode<T: Decodable>(_ type: T.Type, from json: Any) throws -> T {
-        if let data = json as? Data {
-            let decoder = JSONDecoder()
-            decoder.userInfo[YYModelJSONInput.key] = YYModelJSONInput(data: data)
-            return try decoder.decode(YYModelDecodingBox<T>.self, from: data).value
-        }
-        if let text = json as? String { return try decode(type, from: Data(text.utf8)) }
-        return try YYModelDecode.value(type, from: _YYDecoder(value: json, codingPath: []), date: .automatic)
+        try YYJSONDecoder(mode: .legacy).decode(type, from: json)
     }
     public static func encode<T: Encodable>(_ value: T) throws -> Data {
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .secondsSince1970
-        return try encoder.encode(YYModelEncodingBox(value: value, date: .automatic, skipHook: false))
+        try YYJSONEncoder(mode: .legacy).encode(value)
     }
 }
 

@@ -21,7 +21,7 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     args.sdk = subprocess.check_output(['xcrun','--sdk','iphonesimulator','--show-sdk-path'],text=True).strip() if args.simulator else None
     swift = args.output/'swift-boundary'
-    common.execute(['swiftc',*common.swift_flags(args),args.source_root/'YYModelSwift/YYJSONDecoder.swift',HERE/'BoundaryE2E.swift','-o',swift],args.output,'swift-build.log')
+    common.execute(['swiftc',*common.swift_flags(args),*sorted((args.source_root/'YYModelSwift').glob('*.swift')),HERE/'BoundaryE2E.swift','-o',swift],args.output,'swift-build.log')
     common.execute(common.binary_command(args,[swift,args.output/'swift.json']),args.output,'swift.log')
     for label, source in [('current',args.source_root/'YYModel'),('original',args.original_source)]:
         if source is None: continue

@@ -3,9 +3,8 @@
 //  YYModel
 //
 //  Decodes plain Swift Codable values. Models do not conform to a YYModel protocol.
-//  Data that already matches Codable uses JSONDecoder (Unix seconds for dates).
-//  If that fails, a tolerant walker zero-fills missing keys and nulls, and coerces
-//  string, number, and bool values. Key renames stay on Swift CodingKeys.
+//  Native mode delegates directly to Foundation. Enhanced modes select their
+//  container adapter before initializing the model; they never retry a model.
 //
 //  URL and raw-value enums have no zero value: keep those properties optional
 //  when the key may be absent. A value that cannot be coerced throws.
@@ -13,41 +12,53 @@
 
 import Foundation
 
-public struct YYJSONDecoder: Sendable {
-    public init() {}
+/// Ordinary Decodable values. Choose `.native` for Foundation semantics or
+/// `.compatible` for field-local YY conversions and external rules. The no-argument
+/// initializer preserves published 2.x zero-fill/date behavior through `.legacy`.
+/// Configure before sharing; userInfo and captured hook state require caller synchronization.
+public struct YYJSONDecoder: @unchecked Sendable {
+    public let mode: YYJSONMode
+    public let rules: YYJSONRules
+    public var dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .deferredToDate
+    public var dataDecodingStrategy: JSONDecoder.DataDecodingStrategy = .base64
+    public var keyDecodingStrategy: JSONDecoder.KeyDecodingStrategy = .useDefaultKeys
+    public var nonConformingFloatDecodingStrategy: JSONDecoder.NonConformingFloatDecodingStrategy = .throw
+    public var userInfo: [CodingUserInfoKey: YYJSONUserInfoValue] = [:]
+    public init(mode: YYJSONMode = .legacy, rules: YYJSONRules = .init()) { self.mode = mode; self.rules = rules }
 
-    /// `Data` that already matches `Codable` is decoded with `JSONDecoder`.
-    /// Dates in that pass are Unix seconds. If that decode throws, the tolerant
-    /// walker runs: it zero-fills missing keys and nulls, and coerces string,
-    /// number, and bool values.
-    public func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
-        if let value = try? Self.fastDecoder().decode(type, from: data) {
-            return value
-        }
-        let object = try JSONSerialization.jsonObject(with: data, options: [.fragmentsAllowed])
-        return try YYJSONValueDecoder.decode(type, from: object, codingPath: [])
-    }
-
-    public func decode<T: Decodable>(_ type: T.Type, from object: Any) throws -> T {
-        if JSONSerialization.isValidJSONObject(object),
-           let data = try? JSONSerialization.data(withJSONObject: object, options: []),
-           let value = try? Self.fastDecoder().decode(type, from: data) {
-            return value
-        }
-        return try YYJSONValueDecoder.decode(type, from: object, codingPath: [])
-    }
-
-    private static func fastDecoder() -> JSONDecoder {
+    private func foundationDecoder() -> JSONDecoder {
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .custom { decoder in
-            let container = try decoder.singleValueContainer()
-            if let seconds = try? container.decode(Double.self),
-               let date = YYJSONValueDecoder.date(from: seconds) { return date }
-            if let text = try? container.decode(String.self),
-               let date = YYJSONValueDecoder.date(from: text) { return date }
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Invalid date format"))
-        }
+        decoder.dateDecodingStrategy = dateDecodingStrategy; decoder.dataDecodingStrategy = dataDecodingStrategy
+        decoder.keyDecodingStrategy = keyDecodingStrategy; decoder.nonConformingFloatDecodingStrategy = nonConformingFloatDecodingStrategy
+        decoder.userInfo = userInfo
         return decoder
+    }
+    public func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
+        let decoder = foundationDecoder()
+        if mode == .native {
+            guard rules.isEmpty else { throw YYModelFailure.invalidObject("YY rules require compatible mode") }
+            return try decoder.decode(type, from: data)
+        }
+        let context = YYJSONContext(mode: mode, rules: rules, decoder: foundationDecoder())
+        decoder.userInfo[YYJSONContext.key] = context
+        decoder.userInfo[YYModelJSONInput.key] = YYModelJSONInput(data: data)
+        return try decoder.decode(YYModelDecodingBox<T>.self, from: data).value
+    }
+    public func decode<T: Decodable>(_ type: T.Type, from json: String) throws -> T {
+        try decode(type, from: Data(json.utf8))
+    }
+    /// Compatible mode consumes an already parsed Foundation object directly.
+    /// Native mode must serialize it to Data because Foundation exposes no object entry point.
+    public func decode<T: Decodable>(_ type: T.Type, from object: Any) throws -> T {
+        if let data = object as? Data { return try decode(type, from: data) }
+        if let text = object as? String { return try decode(type, from: text) }
+        if mode == .native {
+            guard rules.isEmpty else { throw YYModelFailure.invalidObject("YY rules require compatible mode") }
+            return try decode(type, from: JSONSerialization.data(withJSONObject: object, options: [.fragmentsAllowed]))
+        }
+        let context = YYJSONContext(mode: mode, rules: rules, decoder: foundationDecoder())
+        let raw = context.rawDecoder(object, path: [], userInfo: userInfo)
+        return try YYModelDecode.value(type, from: raw, date: context.defaults.date)
     }
 }
 
@@ -492,7 +503,13 @@ final class _YYDecoder: Decoder {
         guard let dictionary = value as? [String: Any] else {
             throw DecodingError.typeMismatch([String: Any].self, DecodingError.Context(codingPath: codingPath, debugDescription: "expected object"))
         }
-        return KeyedDecodingContainer(YYKeyedContainer(decoder: self, dictionary: dictionary))
+        var keys: [String: Any] = [:]
+        let context = userInfo[YYJSONContext.key] as? YYJSONContext
+        for (key, value) in dictionary {
+            let transformed = context?.decodingKey(key, at: codingPath) ?? key
+            if keys[transformed] == nil { keys[transformed] = value }
+        }
+        return KeyedDecodingContainer(YYKeyedContainer(decoder: self, dictionary: keys))
     }
 
     func unkeyedContainer() throws -> UnkeyedDecodingContainer {
@@ -553,7 +570,7 @@ private struct YYKeyedContainer<Key: CodingKey>: KeyedDecodingContainerProtocol 
     func superDecoder() throws -> Decoder {
         let key = _SuperKey(stringValue: "super")
         let value = dictionary["super"] ?? dictionary
-        return _YYDecoder(value: value, codingPath: codingPath + [key])
+        let child = _YYDecoder(value: value, codingPath: codingPath + [key]); child.userInfo = decoder.userInfo; return child
     }
     func superDecoder(forKey key: Key) throws -> Decoder { try nestedDecoder(forKey: key) }
 
@@ -561,7 +578,7 @@ private struct YYKeyedContainer<Key: CodingKey>: KeyedDecodingContainerProtocol 
         guard let value = dictionary[key.stringValue] else {
             throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: codingPath, debugDescription: key.stringValue))
         }
-        return _YYDecoder(value: value, codingPath: codingPath + [key])
+        let child = _YYDecoder(value: value, codingPath: codingPath + [key]); child.userInfo = decoder.userInfo; return child
     }
 }
 
@@ -595,6 +612,7 @@ private struct YYUnkeyedContainer: UnkeyedDecodingContainer {
         guard !isAtEnd else { throw end() }
         let index = currentIndex
         let subDecoder = _YYDecoder(value: array[index], codingPath: codingPath + [YYIndexKey(intValue: index)])
+        subDecoder.userInfo = decoder.userInfo
         let container = try subDecoder.container(keyedBy: type)
         currentIndex += 1
         return container
@@ -604,6 +622,7 @@ private struct YYUnkeyedContainer: UnkeyedDecodingContainer {
         guard !isAtEnd else { throw end() }
         let index = currentIndex
         let subDecoder = _YYDecoder(value: array[index], codingPath: codingPath + [YYIndexKey(intValue: index)])
+        subDecoder.userInfo = decoder.userInfo
         let container = try subDecoder.unkeyedContainer()
         currentIndex += 1
         return container
@@ -613,7 +632,7 @@ private struct YYUnkeyedContainer: UnkeyedDecodingContainer {
         guard !isAtEnd else { throw end() }
         let index = currentIndex
         currentIndex += 1
-        return _YYDecoder(value: array[index], codingPath: codingPath + [YYIndexKey(intValue: index)])
+        let child = _YYDecoder(value: array[index], codingPath: codingPath + [YYIndexKey(intValue: index)]); child.userInfo = decoder.userInfo; return child
     }
 
     private func end() -> DecodingError {

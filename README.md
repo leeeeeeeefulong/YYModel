@@ -21,43 +21,23 @@ This fork addresses verified modern Xcode / Clang compatibility issues. Passing 
 
 > All API availability claims below are verified against [Apple Developer Documentation](https://developer.apple.com/documentation/).
 
-### Fixes Applied
+### Maintained behavior and extensions
 
-| # | Fix | Priority | Description |
-|---|-----|----------|-------------|
-| F1 | `objc_msgSend` typed function pointers | **P0** | Non-variadic typedefs matching arm64 register ABI. Fixes PAC validation and `-Wcast-function-type-strict` errors in modern Clang. |
-| F2 | `NSSecureCoding` support | **P0** | `decodeObjectOfClass:forKey:` (iOS 6.0+) replaces deprecated `decodeObjectForKey:`. |
-| F3 | 64-bit type encoding | **P0** | `'l'`/`'L'` now uses `NSGetSizeAndAlignment()` (iOS 2.0+) for correct size on arm64 (8 bytes). |
-| F4 | `NSDecimalNumber` precision | **P0** | Preserved via `decimalNumberWithDecimal:` — no implicit `double` cast. |
-| F5 | `os_unfair_lock` | **P0** | Replaces `dispatch_semaphore` (priority inversion safe). **Requires iOS 10.0+ / macOS 10.12+.** |
-| F6 | Thread-safe date formatters | **P1** | `os_unfair_lock` protects `NSDateFormatter` cache. |
-| F7 | Swift `@objc dynamic` detection | **P1** | `isSwiftDynamic` property detects `_$` ivar prefix + `D` attribute. |
-| F8 | Thread-safe model cache | **P1** | `_modelMetaCache` protected by `os_unfair_lock`. |
-| F9 | `PrivacyInfo.xcprivacy` | **P2** | Required Reason API declaration for `NSPrivacyAccessedAPICategoryObjCRuntime`. |
-| F10 | Nullability annotations | **P2** | Full `nullable`/`nonnull` coverage for Swift interop. |
+| Area | Current behavior |
+|------|------------------|
+| Runtime calls and cache | Explicit msgSend typedefs and os_unfair_lock. Original YYModel already had typed casts and metadata caches; no standalone PAC/performance claim. |
+| Type encoding | l/L size queries retained; these encodings are 32-bit on Apple arm64, while `@encode(long)` uses q. |
+| Numeric precision | UInt64 and NSDecimalNumber boundary corrections, with documented tolerant OC conversion semantics. |
+| Secure decoding | Allowed property/container classes; custom members still need NSSecureCoding and correct declared classes. |
+| Dates | Original formats plus explicit fork extensions; ISO output access is serialized. Automatic units remain heuristic. |
+| Runtime language metadata | isSwiftDynamic is deprecated and conservatively NO. The Dynamic flag does not prove Swift origin. |
+| Privacy manifest | Component-only declarations; no invented ObjCRuntime required-reason category. See [Apple TN3183](https://developer.apple.com/documentation/technotes/tn3183-adding-required-reason-api-entries-to-your-privacy-manifest). |
 
-### API Availability (Verified)
-
-Each API used in this fork has been verified against [Apple Developer Documentation](https://developer.apple.com/documentation/):
-
-| API | iOS | macOS | Used In |
-|-----|-----|-------|---------|
-| `os_unfair_lock` | 10.0+ | 10.12+ | **Core** — Thread-safe caches (F5, F6, F8) |
-| `archivedDataWithRootObject:requiringSecureCoding:error:` | **11.0+** | **10.13+** | **Core** — Secure archiving |
-| `unarchivedObjectOfClass:fromData:error:` | **11.0+** | **10.13+** | **Core** — Secure unarchiving |
-| `NSSecureCoding` | 6.0+ | 10.8+ | **Core** — Protocol conformance |
-| `decodeObjectOfClass:forKey:` | 6.0+ | 10.8+ | **Core** — Type-safe unarchiving (F2) |
-| `NSGetSizeAndAlignment` | 2.0+ | 10.0+ | **Core** — Type encoding size (F3) |
-| `dispatch_once` | 4.0+ | 10.6+ | **Core** — One-time initialization |
-| `NSJSONSerialization` | 5.0+ | 10.7+ | **Core** — JSON parsing |
-
-**Minimum deployment target: iOS 11.0 / macOS 10.13** (constrained by `archivedDataWithRootObject:requiringSecureCoding:error:`).
-
-> All NSSecureCoding APIs work without `@available` fallbacks. No conditional compilation needed.
+**Supported distribution floors: iOS 11.0 / macOS 10.13.** Core uses os_unfair_lock (iOS10/macOS10.12) and coder allowed-class methods; complete archive convenience methods used by callers/tests are not a Core dependency. Current SDK may warn about the older deployment floor.
 
 ### API Compatibility
 
-Existing Objective-C method signatures are retained. Mapper/container configuration now merges ancestor entries, and strict nested transform validation is opt-in. See the delivery report for defaults, behavioral differences and date limitations.
+Existing Objective-C method signatures are retained. Mapper/container hooks now follow original subclass override defaults. Ancestor merging and strict nested transform validation are explicit opt-ins. See [OC migration](docs/OBJC-MIGRATION.md) for fork migration and documented limits.
 
 ```objc
 // Existing Objective-C entry points
@@ -168,7 +148,7 @@ The complete matrix contains 96 paths per runtime with 14 batch-average samples 
 
 ## Requirements
 
-- **iOS 11.0+** / **macOS 10.13+** (required by `os_unfair_lock` + `NSSecureCoding` archiving)
+- **iOS 11.0+** / **macOS 10.13+** (supported distribution policy)
 - watchOS 4.0+ / tvOS 11.0+
 - Xcode 14+ (modern Clang fully supported)
 - ARC
@@ -319,11 +299,24 @@ NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:jsonArray];
 @end
 ```
 
-### Swift YYModel on master (unreleased)
+### Swift on master (unreleased): ordinary Codable + external rules
 
-The Swift product now provides `YYModelCodable` for ordinary structs with synthesized Codable, `yy_model(withJSON:)`, dictionary/array entry points, declarative aliases and KeyPaths, filters, defaults, required fields, model transforms, registered enum variants, and symmetric JSON export. No NSObject or handwritten decoding is needed for ordinary models. See [the Swift model contract and examples](docs/SWIFT-MODEL.md) and [validation measurements](Validation/RESULTS-swift-model.md).
+The main APIs are `YYJSONDecoder`, `YYJSONEncoder` and immutable `YYJSONRules`. No YY model protocol, property wrapper, macro or NSObject is required. Use `.native` for direct Foundation semantics; `.compatible` adds field-local conversions, aliases/KeyPaths, explicit defaults, required validation, typed hooks, dates, registered polymorphism and symmetric export. `YYModelCodable` remains optional convenience on the same engine.
 
-SPM products remain independent. CocoaPods now offers `YYModel2/ObjC` and `YYModel2/Swift`; the default includes both. These APIs and subspecs are on master, **not in the published 2.1.9 tag**. Pin the delivered commit until a new version is released.
+```swift
+struct User: Codable { let id: UInt64; let name: String; let age: Int? }
+let rules = try YYJSONRules().forType(User.self) {
+    $0.mapper = ["id": ["id", "uid"], "name": "profile.name"]
+    $0.requiredProperties = ["id"]
+}
+let decoder = YYJSONDecoder(mode: .compatible, rules: rules)
+let user = try decoder.decode(User.self, from: data)
+let output = try YYJSONEncoder(mode: .compatible, rules: rules).encode(user)
+```
+
+The no-argument `YYJSONDecoder()` retains legacy zero-fill and automatic-date behavior. Enhanced modes no longer retry an entire model after an arbitrary error. `.native` rejects YY rules instead of silently ignoring them. See [Swift usage and limits](docs/SWIFT-EXTERNAL-RULES.md), [OC migration](docs/OBJC-MIGRATION.md), and [current delivery](docs/DELIVERY-EXTERNAL-RULES-20261004.md).
+
+SPM products `YYModel` and `YYModelSwift` remain independent. CocoaPods provides `YYModel2/ObjC` and `YYModel2/Swift`; default includes both. These changes are on master, **not in published 2.1.9**. Pin the delivered commit until a new version is released.
 
 ### Published 2.1.9 compatibility APIs
 
@@ -349,7 +342,7 @@ NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:data];
 
 #### 2. Swift only
 
-For existing models that conform only to `Codable`, use `YYJSONDecoder`. New `YYModelCodable` models use the shortcuts described above.
+Ordinary Codable models use YYJSONDecoder; current master adds external rules. YYModelCodable shortcuts are optional.
 
 ```swift
 import YYModelSwift          // SPM product YYModelSwift

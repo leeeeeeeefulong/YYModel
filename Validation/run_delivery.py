@@ -21,8 +21,7 @@ VARIANTS = [('current', 'oc-only', ['oc']),
 
 def source_hashes(folder):
     files = sorted((folder/'YYModel').glob('*.[mh]'))
-    swift = folder/'YYModelSwift/YYJSONDecoder.swift'
-    if swift.exists(): files.append(swift)
+    files.extend(sorted((folder/'YYModelSwift').glob('*.swift')))
     return {str(p.relative_to(folder)): common.sha(p) for p in files}
 
 
@@ -47,9 +46,9 @@ def build(args):
                         *objects, HERE/'InteropRunner.m', '-o', output/f'{version}-oc-only'], args.output, f'build-{version}-oc.log')
         common.execute(['xcrun', '--sdk', 'iphonesimulator' if args.simulator else 'macosx', 'swiftc', *common.swift_flags(args), '-DINTEROP', '-import-objc-header', HERE/'InteropSupport.h',
                         '-Xcc', '-I'+str(root/'YYModel'), '-Xcc', '-I'+str(output), '-Xcc', '-Wno-nullability-completeness',
-                        args.source_root/'YYModelSwift/YYJSONDecoder.swift', output/'WeatherModels.swift', HERE/'InteropRunner.swift',
+                        *sorted((args.source_root/'YYModelSwift').glob('*.swift')), output/'WeatherModels.swift', HERE/'InteropRunner.swift',
                         *objects, '-o', output/f'{version}-mixed'], args.output, f'build-{version}-mixed.log')
-    common.execute(['xcrun', '--sdk', 'iphonesimulator' if args.simulator else 'macosx', 'swiftc', *common.swift_flags(args), args.source_root/'YYModelSwift/YYJSONDecoder.swift',
+    common.execute(['xcrun', '--sdk', 'iphonesimulator' if args.simulator else 'macosx', 'swiftc', *common.swift_flags(args), *sorted((args.source_root/'YYModelSwift').glob('*.swift')),
                     output/'WeatherModels.swift', HERE/'InteropRunner.swift', '-o', output/'current-swift-only'],
                    args.output, 'build-swift-only.log')
 

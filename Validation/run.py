@@ -108,7 +108,7 @@ def fixtures(output):
 def run_weather(args,output):
     expected=fixtures(output)
     swift=output/'weather-swift'
-    execute(['swiftc',*swift_flags(args),args.source_root/'YYModelSwift/YYJSONDecoder.swift',HERE/'WeatherE2E.swift','-o',swift],output,'weather-swift-build.log')
+    execute(['swiftc',*swift_flags(args),*sorted((args.source_root/'YYModelSwift').glob('*.swift')),HERE/'WeatherE2E.swift','-o',swift],output,'weather-swift-build.log')
     engines={'swiftNative':(swift,'native'),'swiftYY':(swift,'yy')}
     for name,sources in [('ocCurrent',args.source_root/'YYModel'),('ocOriginal',args.original_source)]:
         if sources is None:continue
@@ -155,7 +155,7 @@ def run_weather(args,output):
 def run_numeric(args,output):
     inputs=output/'numeric-cases.json'; inputs.write_text(json.dumps(cases(),indent=2,ensure_ascii=False))
     binary=output/'numeric-e2e'
-    execute(['swiftc',*swift_flags(args),args.source_root/'YYModelSwift/YYJSONDecoder.swift',HERE/'NumericE2E.swift','-o',binary],output,'numeric-build.log')
+    execute(['swiftc',*swift_flags(args),*sorted((args.source_root/'YYModelSwift').glob('*.swift')),HERE/'NumericE2E.swift','-o',binary],output,'numeric-build.log')
     result=output/'numeric-results.json'
     execute(binary_command(args,[binary,inputs,result]),output,'numeric.log')
     values=json.loads(result.read_text()); failures=[x for x in values if not x['passed']]

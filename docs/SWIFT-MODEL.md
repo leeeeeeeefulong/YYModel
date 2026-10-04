@@ -1,3 +1,5 @@
+> 当前推荐入口是普通 Codable + 外部 YYJSONRules，见 [SWIFT-EXTERNAL-RULES.md](SWIFT-EXTERNAL-RULES.md)。本页保留可选 YYModelCodable 便利写法；不是模型必须采用的协议。配置现在按调用快照，不使用进程级 schema cache。
+
 # Swift YYModel 使用与合同
 
 此文档对应 `master` 的未发布实现。2.1.9 tag 不含 `YYModelCodable`；不要把新接口写成已发布的 2.1.9 能力。
@@ -77,7 +79,7 @@ static var yy_modelConfiguration: YYModelConfiguration<Self> {
 
 will 返回 nil，或 did/to 返回 false，均拒绝对应操作。嵌套拒绝传播到根；不默默丢弃数组里的坏模型。新接口不会在原生解码失败后再初始化整个模型，避免初始化/钩子的业务副作用重复。导出钩子产生非 JSON 对象时失败。
 
-配置按类型缓存，按不可变声明使用。钩子捕获的业务对象、计数器等由调用方保证并发安全；框架没有把任意 struct 自动声明为 Sendable。
+配置每次调用按类型建立不可变快照，不再使用进程级业务缓存。钩子捕获的业务对象、计数器等由调用方保证并发安全；框架没有把任意 struct 自动声明为 Sendable。
 
 ## 日期线格式
 
