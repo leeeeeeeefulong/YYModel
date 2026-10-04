@@ -187,4 +187,28 @@ gh release create 2.1.9 \
 - ✅ Swift Test: 16 passed, 0 failed.
 - ✅ Validation Suite (Boundary & Weather): 82/82 checks passed." || true
 
+# 2.2.0
+gh release create 2.2.0 \
+  --repo "$REPO" \
+  --title "2.2.0 — Swift External Rules & Decoupled Codable Engine" \
+  --notes "### Swift Features & Architecture
+- **Ordinary Codable & External Rules**: Primary APIs decode ordinary \`Codable\` models with immutable external \`YYJSONRules\`; no model protocol required.
+- **Unified Three Modes**:
+  - \`.native\`: Directly forwards Foundation strategies, userInfo, and errors with zero overhead.
+  - \`.compatible\`: Adapts fields in one pass, supporting nested aliases/KeyPaths, defaults, required validation, typed hooks, per-field dates, registered polymorphism, and symmetric \`YYJSONEncoder\`.
+  - \`.legacy\`: Preserves published 2.x zero-fill and automatic dates without whole-model retry on arbitrary errors.
+- **Independent Products**: Independent Swift (\`YYModelSwift\`) and Objective-C (\`YYModel\`) SPM targets and CocoaPods subspecs (\`YYModel2/ObjC\`, \`YYModel2/Swift\`).
+
+### Objective-C Parity & Contract Hardening
+- **Mapper/Generic Hook Defaults**: Restored original effective-hook defaults; added \`+modelMergesSuperclassConfiguration\` opt-in for projects needing ancestor mapper/generic merging.
+- **Identity Fallback**: Models with unsupported-only properties restore identity equality/hash fallback (\`self == model\`).
+- **Cleaned NSObject Category**: Removed NSObject-wide \`YYModel\` protocol conformance so Swift models don't inadvertently appear to conform; deprecated unreliable \`isSwiftDynamic\`.
+- **Deployment Floor**: Supported distribution floors maintained at iOS 11.0 / macOS 10.13.
+
+### Verification Status
+- ✅ Framework XCTest: 27 passed, 0 failed.
+- ✅ Demo Suite: 84 passed, 0 failed (0 warnings).
+- ✅ Swift Test: 16 passed, 0 failed.
+- ✅ Validation Suite (Contract, Boundary, Rules, Weather): 100% passed." || true
+
 echo "✅ All releases published successfully!"

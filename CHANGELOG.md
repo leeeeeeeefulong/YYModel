@@ -3,16 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 2.2.0 — Swift External Rules & Decoupled Codable Engine (2026-10-05)
 
-- Swift primary APIs now accept ordinary Codable with external immutable YYJSONRules; no YY model protocol is required. Native mode directly forwards Foundation strategies/userInfo/errors. Compatible mode adapts fields once, with nested aliases/KeyPaths, explicit defaults/required validation, typed hooks, per-field dates, registered polymorphism and symmetric YYJSONEncoder output.
-- No-argument YYJSONDecoder preserves published legacy zero-fill/automatic dates but no longer retries model initialization after arbitrary errors. YYModelCodable remains optional convenience on the unified engine; process-wide business schema/variant caches were removed.
+### Swift Features & Architecture
+- Swift primary APIs now accept ordinary `Codable` with external immutable `YYJSONRules`; no YY model protocol is required. Native mode directly forwards Foundation strategies/userInfo/errors. Compatible mode adapts fields once, with nested aliases/KeyPaths, explicit defaults/required validation, typed hooks, per-field dates, registered polymorphism and symmetric `YYJSONEncoder` output.
+- No-argument `YYJSONDecoder` preserves published legacy zero-fill/automatic dates but no longer retries model initialization after arbitrary errors. `YYModelCodable` remains optional convenience on the unified engine; process-wide business schema/variant caches were removed.
 - Fixed raw/Data strategy consistency, Optional null, nested dictionary key preservation and export-hook/polymorphic key-strategy duplication and callback paths. Added exact scalar-collection conversion, recursive finite checks, raw/Data strict-null consistency and matching legacy encoder/decoder date defaults.
-- OC unsupported-only property models restore identity equality/hash fallback. Mapper/generic inheritance restores original effective-hook defaults; modelMergesSuperclassConfiguration opts into ancestor merging. Black/white lists retain their original override behavior.
-- Removed NSObject-wide YYModel protocol conformance; Swift NSObject hook models should explicitly conform or expose @objc hooks. Deprecated unreliable isSwiftDynamic source-language detection; conservative getter returns NO.
-- Kept OC precision, controlled secure containers, optional strict nested transforms and later negative/zero/non-finite date corrections. Corrected l/L, PAC/cache and Core archive API claims; removed invalid ObjCRuntime privacy-manifest category.
-- Independent Swift/ObjC products and Pod subspecs remain. Existing 2.1.9 tag is unchanged; these are unreleased source changes. See dated delivery and migration documents for fresh acceptance and scoped performance evidence.
-- Framework deployment floor remains iOS11; current SDK deployment warnings are documented.
+- Independent Swift/ObjC products (`YYModel`, `YYModelSwift`) and Pod subspecs (`YYModel2/ObjC`, `YYModel2/Swift`).
+
+### Objective-C Parity & Contract Hardening
+- Restored original effective-hook defaults for property mapper and generic containers. Added optional `+modelMergesSuperclassConfiguration` opt-in for projects needing ancestor mapper/generic merging. Black/white lists retain original override behavior.
+- Models with unsupported-only properties (pointer, CString, CArray) restore identity equality/hash fallback (`self == model`).
+- Removed NSObject-wide `YYModel` protocol conformance; Swift NSObject hook models should explicitly conform or expose `@objc` hooks. Deprecated unreliable `isSwiftDynamic` source-language detection; conservative getter returns `NO`.
+- Maintained exact 64-bit integer precision, controlled secure containers, optional strict nested transforms (`+modelRequiresSuccessfulNestedTransforms`), and symmetric negative/non-finite date parsing.
+- Framework deployment floor remains iOS 11.0 / macOS 10.13.
 
 
 ## 2.1.9 — Boundary Robustness & Unified Numeric Lexer (2026-10-04)
