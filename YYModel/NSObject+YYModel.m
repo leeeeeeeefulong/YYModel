@@ -329,21 +329,20 @@ static force_inline NSDate *YYNSDateFromString(__unsafe_unretained NSString *str
             if (date) return date;
         }
     }
-    // Numeric timestamp string (seconds or milliseconds)
-    NSUInteger len = string.length;
-    if (len == 10 || len == 13) {
+    // Keep the original format dispatch, then accept signed 10/13-digit timestamps.
+    NSString *timestamp = [string stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    NSUInteger start = [timestamp hasPrefix:@"-"] || [timestamp hasPrefix:@"+"] ? 1 : 0;
+    NSUInteger digits = timestamp.length - start;
+    if (digits == 10 || digits == 13) {
         BOOL isAllDigits = YES;
-        for (NSUInteger i = 0; i < len; i++) {
-            unichar c = [string characterAtIndex:i];
-            if (c < '0' || c > '9') {
-                isAllDigits = NO;
-                break;
-            }
+        for (NSUInteger i = start; i < timestamp.length; i++) {
+            unichar c = [timestamp characterAtIndex:i];
+            if (c < '0' || c > '9') { isAllDigits = NO; break; }
         }
         if (isAllDigits) {
-            NSTimeInterval ts = [string doubleValue];
-            if (len == 13) ts /= 1000.0;
-            if (ts > 0) return [NSDate dateWithTimeIntervalSince1970:ts];
+            NSTimeInterval ts = timestamp.doubleValue;
+            if (digits == 13) ts /= 1000.0;
+            if (isfinite(ts)) return [NSDate dateWithTimeIntervalSince1970:ts];
         }
     }
 
@@ -1004,8 +1003,12 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                         ((YYSendV_id)(void *)objc_msgSend)(model, meta->_setter, YYNSDateFromString(value));
                     } else if ([value isKindOfClass:[NSNumber class]]) {
                         NSTimeInterval ts = ((NSNumber *)value).doubleValue;
-                        if (ts > 1e11) ts /= 1000.0;
-                        ((YYSendV_id)(void *)objc_msgSend)(model, meta->_setter, [NSDate dateWithTimeIntervalSince1970:ts]);
+                        NSDate *date = nil;
+                        if (isfinite(ts)) {
+                            if (fabs(ts) > 1e11) ts /= 1000.0;
+                            date = [NSDate dateWithTimeIntervalSince1970:ts];
+                        }
+                        ((YYSendV_id)(void *)objc_msgSend)(model, meta->_setter, date);
                     }
                 } break;
 
