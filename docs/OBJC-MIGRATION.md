@@ -59,17 +59,17 @@ SEL、long double 等在 fork 中已参与的比较规则保留。这里修复�
 
 模型 hook 仍通过 `respondsToSelector:` 识别，不要求旧 OC 模型为了继续解析而新增 `<YYModel>`。只有需要协议类型/运行时协议识别的模型才显式声明 `<YYModel>`；不要用 `conformsToProtocol:YYModel` 代替判断某个 NSObject 是否有可解析属性。
 
-## isSwiftDynamic 的兼容与弃用
+## isSwiftDynamic 的移除
 
-公开 getter `YYClassPropertyInfo.isSwiftDynamic` 保留，标记 deprecated，保守返回 NO。Objective-C 的 Dynamic 属性标记或形似 Swift 的 ivar 名称不能可靠证明属性来自 Swift；旧 getter 的 YES 判断可能误报纯 OC 属性。
+2.3.0 起公开 getter `YYClassPropertyInfo.isSwiftDynamic` 已从 Objective-C 产品中完全移除：ObjC 产品不再包含任何 Swift 相关 API，也没有废弃声明残留。此前（2.2.0）该 getter 已被标记 deprecated 且保守返回 NO，因此移除不改变任何可观察的解析行为。
 
-需要判断 Objective-C runtime 的动态属性标记时，使用：
+Objective-C 的 Dynamic 属性标记或形似 Swift 的 ivar 名称不能可靠证明属性来自 Swift。需要判断 Objective-C runtime 的动态属性标记时，使用：
 
 ```objc
 BOOL dynamic = (propertyInfo.type & YYEncodingTypePropertyDynamic) != 0;
 ```
 
-这只表示 runtime Dynamic 标记，不是 Swift 来源检测。旧 getter 调用现在会有弃用提示；本次不会再通过猜测 ivar 前缀提供“自动 Swift 检测”。
+这只表示 runtime Dynamic 标记，不是 Swift 来源检测。框架不会通过猜测 ivar 前缀提供"自动 Swift 检测"。
 
 ## 保留的能力与限制
 

@@ -1296,7 +1296,7 @@ static BOOL ModelSetDictionary(id model, NSDictionary *dic, ModelValidationConte
     context.dictionary = (__bridge void *)(dic);
     context.validation = validation;
 
-    if (modelMeta->_keyMappedCount >= CFDictionaryGetCount((CFDictionaryRef)dic)) {
+    if (modelMeta->_keyMappedCount >= (NSUInteger)CFDictionaryGetCount((CFDictionaryRef)dic)) {
         CFDictionaryApplyFunction((CFDictionaryRef)dic, ModelSetWithDictionaryFunction, &context);
         if (modelMeta->_keyPathPropertyMetas) {
             CFArrayApplyFunction((CFArrayRef)modelMeta->_keyPathPropertyMetas,

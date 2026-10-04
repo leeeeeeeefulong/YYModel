@@ -6,7 +6,7 @@
 
 - ibireme 对照：`c7df27538c043e5f54f5b6605958544bb529892f`。
 - 已发布2.1.9：`00329f245752ed0e264e8c90bc14a6bd4e4e46e5`，tag保持不变。
-- 新生产实现：OC契约修复`e50e794`，Swift外部规则`ad01ae0`，属于Unreleased。依赖应固定交付提交，不能仍固定2.1.9却期待新接口。
+- 新生产实现：OC契约修复`e50e794`，Swift外部规则`ad01ae0`，已随 2.2.0 发布并由 2.3.0 延续（写作时为发布前的 master 快照）。依赖应固定 2.2.0 及以上的 tag，不能仍固定2.1.9却期待新接口。
 - SPM产品`YYModel`/`YYModelSwift`可独立选择；CocoaPods为`YYModel2/ObjC`、`YYModel2/Swift`。Swift纯Codable不需要链接OC产品。
 
 ## OC：迁移需要关注什么
@@ -17,7 +17,7 @@
 | 黑/白名单 | 保留有效hook覆盖，不因合并开关改变 | 不自动合并名单 |
 | Pointer/CString-only equality/hash | 没有可比较字段时按实例身份判断 | 同一实例相等，两个不同实例不相等 |
 | NSObject协议识别 | category不再使全部NSObject conform YYModel | Swift NSObject hook模型显式conform或导出@objc hook；旧OC hook仍按respondsToSelector识别 |
-| Swift来源判断 | isSwiftDynamic弃用且保守NO | Dynamic flag只说明runtime标记，不能证明语言来源 |
+| Swift来源判断 | 2.3.0起 isSwiftDynamic 已移除，ObjC产品无任何Swift相关API | Dynamic flag只说明runtime标记，不能证明语言来源；用 `type & YYEncodingTypePropertyDynamic` 查询 |
 | secure归档 | 容器允许基础类和声明的generic成员；成员需支持NSSecureCoding | 正确声明允许成员类；不自动允许任意id/异构自定义类 |
 
 保留的UInt64/Decimal、日期和受控安全容器能力是相对原版的增强。SEL/long double比较也保留fork扩展，**不能描述为与原版所有比较规则相同**。已实例化模型在generic NSDictionary中的过滤沿用原版既有边界。详见[OC迁移说明](OBJC-MIGRATION.md)。

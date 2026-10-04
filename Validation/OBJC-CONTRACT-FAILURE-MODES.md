@@ -9,7 +9,7 @@
 5. 新 hook `+modelMergesSuperclassConfiguration`：缺省 NO；明确 YES 才合并 Mapper/泛型；子类同名项覆盖；继承 YES 可由子类 NO 关闭。
 6. 黑/白名单：无论合并开关如何，仍只使用当前类有效 hook；不自动父子合并。
 7. NSObject：导入 YYModel 后不能自动 conform YYModel；显式 conform 的模型仍可识别；未显式 conform 的模型 hook 继续通过 respondsToSelector 工作。
-8. 纯 Objective-C @dynamic 与形似 Swift 的 ivar 命名不能证明 Swift 来源；兼容旧 isSwiftDynamic getter，保守返回 NO；Dynamic 编码标记仍保持。
+8. 纯 Objective-C @dynamic 与形似 Swift 的 ivar 命名不能证明 Swift 来源；2.3.0 起旧 isSwiftDynamic getter 已完全移除（ObjC 产品无任何 Swift 相关 API）；Dynamic 编码标记仍保持。
 9. 现有增强不能丢：UInt64 高精度、负毫秒/零/非有限日期边界、正确 generic 的 NSSecureCoding 容器往返。
 10. 已知限制不被扩大承诺：未声明允许类的 secure 自定义容器、泛型 NSDictionary 的已实例化成员、自动日期单位歧义另行记录，不通过更改断言掩盖。
 

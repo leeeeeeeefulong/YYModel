@@ -15,7 +15,6 @@
 //  - Query l/L encoding sizes without assuming the size of C long
 //  - Cache synchronization with os_unfair_lock
 //  - Nullable type encoding handling
-//  - Deprecated conservative isSwiftDynamic compatibility getter
 //
 
 #import "YYClassInfo.h"
@@ -239,10 +238,6 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
                  [_name substringFromIndex:1]]);
         }
     }
-
-    // Dynamic attributes and ivar names also occur in Objective-C classes;
-    // neither provides a reliable Swift-origin test. Keep the legacy getter.
-    _isSwiftDynamic = NO;
 
     return self;
 }

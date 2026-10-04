@@ -12,6 +12,9 @@ import PackageDescription
 let package = Package(
     name: "YYModel",
     platforms: [
+        // iOS 11 / macOS 10.13 / tvOS 11 / watchOS 4 are the declared distribution
+        // floors (see README). The toolchain suggests iOS 12 as its oldest supported
+        // minimum; these lower floors are an intentional policy, not an oversight.
         .iOS(.v11),
         .macOS(.v10_13),
         .tvOS(.v11),

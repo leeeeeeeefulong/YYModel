@@ -3,6 +3,7 @@
 
 .build/
 Demo/yymodel_test
+.workbuddy-ai/
 
 # Xcode
 #

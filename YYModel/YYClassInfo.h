@@ -120,9 +120,6 @@ YYEncodingType YYEncodingGetType(const char * _Nullable typeEncoding);
 @property (nullable, nonatomic, strong, readonly) NSArray<NSString *> *protocols;
 @property (nonatomic, assign, readonly) SEL getter;
 @property (nonatomic, assign, readonly) SEL setter;
-/// Compatibility getter; always NO because runtime metadata cannot prove Swift origin.
-@property (nonatomic, assign, readonly) BOOL isSwiftDynamic
-    __attribute__((deprecated("Runtime metadata cannot identify Swift properties; inspect YYEncodingTypePropertyDynamic for the dynamic flag.")));
 
 - (nullable instancetype)initWithProperty:(objc_property_t)property;
 @end

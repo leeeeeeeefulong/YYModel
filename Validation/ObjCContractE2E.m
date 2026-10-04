@@ -213,7 +213,8 @@ int main(int argc, const char *argv[]) { @autoreleasepool {
 
     YYClassPropertyInfo *info = [[YYClassPropertyInfo alloc] initWithProperty:class_getProperty(ContractDynamic.class,"name")];
     Check(checks,@"dynamic:flag",@((info.type & YYEncodingTypePropertyDynamic) != 0),@YES);
-    Check(checks,@"dynamic:legacyDetection",[info valueForKey:@"isSwiftDynamic"],@NO);
+    // 2.3.0: the legacy isSwiftDynamic getter is fully removed from the ObjC product.
+    Check(checks,@"dynamic:legacyRemoved",@([info respondsToSelector:NSSelectorFromString(@"isSwiftDynamic")]),@NO);
     ContractValue *number = [ContractValue yy_modelWithDictionary:@{@"identifier":[NSDecimalNumber decimalNumberWithString:@"18446744073709551615"]}];
     Check(checks,@"numeric:UInt64",[NSString stringWithFormat:@"%llu",number.identifier],@"18446744073709551615");
     ContractValue *date = [ContractValue yy_modelWithDictionary:@{@"date":@-1700000000000LL}];

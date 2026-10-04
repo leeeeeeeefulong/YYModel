@@ -211,4 +211,21 @@ gh release create 2.2.0 \
 - ✅ Swift Test: 16 passed, 0 failed.
 - ✅ Validation Suite (Contract, Boundary, Rules, Weather): 100% passed." || true
 
+# 2.3.0
+gh release create 2.3.0 \
+  --repo "$REPO" \
+  --title "2.3.0 — Objective-C / Swift Product Separation" \
+  --notes "### Breaking Change (Objective-C)
+- **Removed \`isSwiftDynamic\`**: The deprecated \`YYClassPropertyInfo.isSwiftDynamic\` getter is gone. The Objective-C product now contains no Swift-related API and no deprecated declarations. Inspect the plain \`YYEncodingTypePropertyDynamic\` runtime flag instead; the getter had conservatively returned \`NO\` since 2.2.0, so no observable parsing behavior changes.
+- **CocoaPods**: \`swift_versions\` now declared on the \`Swift\` subspec only; the \`ObjC\` subspec carries no Swift declaration or toolchain requirement. SPM products \`YYModel\` (ObjC) and \`YYModelSwift\` remain independently selectable.
+
+### Migration
+- Replace \`propertyInfo.isSwiftDynamic\` with \`(propertyInfo.type & YYEncodingTypePropertyDynamic) != 0\`.
+
+### Verification Status
+- ✅ Objective-C contract E2E re-run on macOS and iOS 26.5 simulator.
+- ✅ Framework XCTest, Demo suite, and Swift tests pass with the removal in place.
+- ✅ Swift-reference scan over the ObjC product: zero matches.
+- ✅ Deployment floor maintained at iOS 11.0 / macOS 10.13." || true
+
 echo "✅ All releases published successfully!"

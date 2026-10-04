@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## 2.3.0 — Objective-C / Swift Product Separation (2026-10-05)
+
+### Breaking Change (Objective-C)
+- Removed the deprecated `YYClassPropertyInfo.isSwiftDynamic` getter. The Objective-C product now contains **no Swift-related API whatsoever**. Runtime metadata cannot identify a property's source language; inspect the plain `YYEncodingTypePropertyDynamic` flag (set by Objective-C `@dynamic` declarations and dynamic property encodings) when you need the Dynamic marker. The getter had conservatively returned `NO` since 2.2.0, so removal does not change observable parsing behavior.
+- CocoaPods: `swift_versions` moved into the `Swift` subspec only; the `ObjC` subspec carries no Swift declaration or toolchain requirement. SPM products `YYModel` (ObjC) and `YYModelSwift` remain independent.
+- Removed the unreferenced `Bridge/YYModelBridge.swift` draft from the shipped tree; mixed usage is side-by-side SPM products or the single `YYModel2` pod.
+
+### Fixes
+- Added an explicit `(NSUInteger)` cast at the `CFDictionaryGetCount` comparison in `NSObject+YYModel.m` (inherited from the original upstream), so projects building with `-Wsign-compare -Werror` are no longer blocked.
+- `Package.swift` documents that the iOS 11 / tvOS 11 floors are an intentional distribution policy below the toolchain's suggested minimum.
+- README: clarified that the 2.1.9 performance table measured the removed native-first decoder architecture; current no-argument decoder costs are in the 2.2.0 delivery report. Delivery docs no longer describe the released interface as "Unreleased".
+
+### Migration
+- Replace `propertyInfo.isSwiftDynamic` with `(propertyInfo.type & YYEncodingTypePropertyDynamic) != 0`. See [OC migration](docs/OBJC-MIGRATION.md).
+
+### Verification
+- Objective-C contract E2E (macOS + iOS 26.5 simulator), original XCTest suite, Demo suite, and Swift tests re-run with the removal in place; Swift-reference scan over the ObjC product returns zero matches.
+
 ## 2.2.0 — Swift External Rules & Decoupled Codable Engine (2026-10-05)
 
 ### Swift Features & Architecture

@@ -11,7 +11,7 @@ High performance JSON model framework for iOS/macOS.
 
 [2.1.9 中文交付说明与完整性能数据](docs/DELIVERY-2.1.9-zh.md) · [公开验证回执](Validation/receipts/delivery-2.1.9-20261004.json) · [192 路径 CSV](Validation/receipts/delivery-2.1.9-measurements.csv)
 
-Current release: **2.2.0** (`pod 'YYModel2', '2.2.0'`, SPM `from: "2.2.0"`).
+Current release: **2.3.0** (`pod 'YYModel2', '2.3.0'`, SPM `from: "2.3.0"`).
 
 ---
 
@@ -30,7 +30,7 @@ This fork addresses verified modern Xcode / Clang compatibility issues. Passing 
 | Numeric precision | UInt64 and NSDecimalNumber boundary corrections, with documented tolerant OC conversion semantics. |
 | Secure decoding | Allowed property/container classes; custom members still need NSSecureCoding and correct declared classes. |
 | Dates | Original formats plus explicit fork extensions; ISO output access is serialized. Automatic units remain heuristic. |
-| Runtime language metadata | isSwiftDynamic is deprecated and conservatively NO. The Dynamic flag does not prove Swift origin. |
+| Runtime language metadata | `isSwiftDynamic` was removed in 2.3.0: the ObjC product contains no Swift-related API. Inspect `YYEncodingTypePropertyDynamic` for the plain runtime Dynamic flag. |
 | Privacy manifest | Component-only declarations; no invented ObjCRuntime required-reason category. See [Apple TN3183](https://developer.apple.com/documentation/technotes/tn3183-adding-required-reason-api-entries-to-your-privacy-manifest). |
 
 **Supported distribution floors: iOS 11.0 / macOS 10.13.** Core uses os_unfair_lock (iOS10/macOS10.12) and coder allowed-class methods; complete archive convenience methods used by callers/tests are not a Core dependency. Current SDK may warn about the older deployment floor.
@@ -116,6 +116,8 @@ Test Suite 'All tests' passed:
 
 ### 2.1.9 Component Performance Verification
 
+> **Architecture note**: this table was measured on the 2.1.9 decoder, which still tried native `JSONDecoder` first and fell back to the tolerant decoder on failure. That native-first architecture was **removed** in 2.2.0: the no-argument `YYJSONDecoder()` now runs the field-adaptation path directly and costs about 5× native `JSONDecoder` on standard data. Use `.native` mode for Foundation-level speed; current paired measurements are in [the 2.2.0 delivery report](docs/DELIVERY-EXTERNAL-RULES-20261004.md).
+
 Measured on Apple M1 Max / arm64, macOS 26.7 and iOS 26.5 Simulator, Xcode 26.6 / Swift 6.3.3, OC `-O2` and Swift `-O`. The offline Open-Meteo clean fixture is 15,785 bytes with 3 cities and 288 hourly rows. No business App is used.
 
 Main matrix medians, **milliseconds per Data → Model operation**:
@@ -129,7 +131,7 @@ OC and Swift have different array representations: OC retains Foundation values,
 
 The complete matrix contains 96 paths per runtime with 14 batch-average samples each. It retains slower first-round results; adjacent ABBA remeasurement of all 10 OC workloads found changes from −8.39% to +8.47% relative to fixed ibireme commit `c7df275`. No persistent regression above the predeclared +10% observation line was reproduced; this is neither a statistical equivalence test nor a universal speedup claim.
 
-`YYJSONDecoder` still tries native `JSONDecoder` first, then its tolerant decoder after failure. Dirty data costs about 5× clean decoding in this fixture. Native dirty/sparse rejection is excluded from successful throughput. OC setters are invoked via typed `objc_msgSend`; metadata caching was already present in the original. No independent evidence attributes these timings to direct memory writes, a particular lock, or a new parsing algorithm.
+In the 2.1.9 architecture, `YYJSONDecoder` tried native `JSONDecoder` first, then its tolerant decoder after failure; dirty data cost about 5× clean decoding in this fixture. OC setters are invoked via typed `objc_msgSend`; metadata caching was already present in the original. No independent evidence attributes these timings to direct memory writes, a particular lock, or a new parsing algorithm.
 
 **Known date limits:** configure Swift `JSONEncoder.dateEncodingStrategy = .secondsSince1970` for YY date round-trips. Objective-C negative millisecond timestamps remain unsupported or misinterpreted; Swift timestamp handling is separate.
 
@@ -167,7 +169,7 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/leeeeeeeefulong/YYModel", from: "2.2.0")
+    .package(url: "https://github.com/leeeeeeeefulong/YYModel", from: "2.3.0")
 ]
 ```
 
@@ -177,7 +179,7 @@ dependencies: [
 
 ```ruby
 # New pod name (original YYModel owned by ibireme on trunk)
-pod 'YYModel2', '2.2.0'
+pod 'YYModel2', '2.3.0'
 ```
 
 > **Note**: The original `YYModel` pod on CocoaPods trunk is owned by ibireme and will not receive updates. This fork is published as `YYModel2`. CocoaPods trunk becomes read-only on 2026-12-02.
@@ -318,11 +320,11 @@ The no-argument `YYJSONDecoder()` retains legacy zero-fill and automatic-date be
 
 SPM products `YYModel` and `YYModelSwift` remain independent. CocoaPods provides `YYModel2/ObjC` and `YYModel2/Swift`; default includes both.
 
-### Published 2.2.0 compatibility APIs
+### Published compatibility APIs (introduced 2.2.0)
 
 `YYJSONDecoder` accepts `Data` or an already parsed object. Swift models stay plain `Codable` structs and do not adopt a YYModel protocol. Missing keys and JSON `null` become `0`, `""`, `false`, `[]`, or an empty nested object. Strings, numbers, and bools are coerced. Rename keys with `CodingKeys`. `URL` and raw-value enums have no zero value; make those properties optional when the key may be absent. A value that cannot be coerced throws.
 
-`Bridge/YYModelBridge.swift` is not part of the pod or the Swift package.
+Mixed ObjC + Swift usage is supported by importing the two SPM products (or the single `YYModel2` pod) side by side; there is no separate bridge file to ship.
 
 #### 1. Objective-C only
 
@@ -337,7 +339,7 @@ NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:data];
 
 | Distribution | Import |
 |--------------|--------|
-| ✅ CocoaPods `YYModel2` 2.2.0 | `#import "YYModel.h"` or `@import YYModel2;` |
+| ✅ CocoaPods `YYModel2` 2.3.0 | `#import "YYModel.h"` or `@import YYModel2;` |
 | ✅ SPM product `YYModel` | `#import <YYModel/YYModel.h>` |
 
 #### 2. Swift only
@@ -346,7 +348,7 @@ Ordinary Codable models use YYJSONDecoder with optional external rules (`YYJSONR
 
 ```swift
 import YYModelSwift          // SPM product YYModelSwift
-// import YYModel2           // CocoaPods 2.2.0: YYJSONDecoder is in this module
+// import YYModel2           // CocoaPods 2.3.0: YYJSONDecoder is in this module
 
 struct Level: Codable {
     var floorNumber: Int
@@ -367,7 +369,7 @@ let same = try YYJSONDecoder().decode(Level.self, from: dictionary)
 | Distribution | Import | API |
 |--------------|--------|-----|
 | ✅ SPM | `import YYModelSwift` | `YYJSONDecoder` |
-| ✅ CocoaPods `YYModel2` 2.2.0 | `import YYModel2` | `YYJSONDecoder` |
+| ✅ CocoaPods `YYModel2` 2.3.0 | `import YYModel2` | `YYJSONDecoder` |
 
 SPM keeps the Swift decoder in its own target because a Swift package target cannot mix `.swift` and `.m`.
 
@@ -378,7 +380,7 @@ Use this when one Swift file both decodes new `Codable` structs and fills existi
 ```swift
 import YYModel                // SPM: Objective-C yy_model
 import YYModelSwift           // SPM: YYJSONDecoder
-// CocoaPods 2.2.0: a single `import YYModel2` exposes both.
+// CocoaPods 2.3.0: a single `import YYModel2` exposes both.
 
 let level = try YYJSONDecoder().decode(Level.self, from: data)
 let user = User.yy_model(withJSON: jsonString)
@@ -387,7 +389,7 @@ let users = NSArray.yy_modelArray(with: User.self, json: data) as? [User]
 
 | Distribution | What you import | What you call |
 |--------------|-----------------|---------------|
-| ✅ CocoaPods `YYModel2` 2.2.0 | `import YYModel2` | `YYJSONDecoder` and `yy_model(withJSON:)` / `yy_modelArray(with:json:)` |
+| ✅ CocoaPods `YYModel2` 2.3.0 | `import YYModel2` | `YYJSONDecoder` and `yy_model(withJSON:)` / `yy_modelArray(with:json:)` |
 | ✅ SPM | `import YYModel` and `import YYModelSwift` | same two APIs, two modules |
 
 Objective-C classes keep `modelCustomPropertyMapper` and `modelContainerPropertyGenericClass`. Swift structs keep `CodingKeys`. The two parsers do not share a mapping table.

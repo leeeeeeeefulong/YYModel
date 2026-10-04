@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name         = 'YYModel'
   s.summary      = 'High performance JSON model framework for iOS/macOS.'
-  s.version      = '2.2.0'
+  s.version      = '2.3.0'
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.authors      = { 'ibireme' => 'ibireme@gmail.com', 'leeeeeeeefulong' => 'leeeeeeeefulong@github.com' }
   s.homepage     = 'https://github.com/leeeeeeeefulong/YYModel'
@@ -27,11 +27,11 @@ Pod::Spec.new do |s|
 
   s.subspec 'Swift' do |swift|
     swift.source_files = 'YYModelSwift/*.swift'
+    # The Swift subspec requires a Swift 5.9+ toolchain.
+    # The ObjC subspec carries no Swift declaration or dependency.
+    swift.swift_versions = ['5.9', '6.0']
   end
 
   s.frameworks = 'Foundation', 'CoreFoundation'
-
-  # The Swift product requires a Swift 5.9+ toolchain. ObjC has no Swift dependency.
-  s.swift_versions = ['5.9', '6.0']
 
 end

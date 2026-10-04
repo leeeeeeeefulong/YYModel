@@ -1,6 +1,6 @@
 # Swift：普通 Codable 与外部规则
 
-本接口在 master 的 Unreleased 源码中，已发布 2.1.9 tag 不含这些新接口。安装 Swift 独立 SPM 产品 `YYModelSwift`，或 CocoaPods 的 `YYModel2/Swift`；无需链接 OC 产品。
+本接口随 2.2.0 引入、2.3.0 起为正式发布接口。安装 Swift 独立 SPM 产品 `YYModelSwift`，或 CocoaPods 的 `YYModel2/Swift`；无需链接 OC 产品。
 
 ## 选择执行方式
 
