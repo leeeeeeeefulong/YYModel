@@ -27,17 +27,21 @@ Pod::Spec.new do |s|
   s.source       = { :git => 'https://github.com/leeeeeeeefulong/YYModel.git', :tag => s.version.to_s }
 
   s.requires_arc = true
-  s.source_files = 'YYModel/*.{h,m}', 'YYModelSwift/*.swift'
-  s.public_header_files = 'YYModel/*.{h}'
+  s.default_subspecs = 'ObjC', 'Swift'
+
+  s.subspec 'ObjC' do |oc|
+    oc.source_files = 'YYModel/*.{h,m}'
+    oc.public_header_files = 'YYModel/*.{h}'
+    oc.resource_bundles = { 'YYModel' => ['PrivacyInfo.xcprivacy'] }
+  end
+
+  s.subspec 'Swift' do |swift|
+    swift.source_files = 'YYModelSwift/*.swift'
+  end
 
   s.frameworks = 'Foundation', 'CoreFoundation'
 
-  # Privacy manifest for iOS 17+ (Required Reason API)
-  s.resource_bundles = {
-    'YYModel' => ['PrivacyInfo.xcprivacy']
-  }
-
-  # Swift bridge (optional, for Codable coexistence)
-  s.swift_versions = ['5.0', '5.5', '5.9', '6.0']
+  # The Swift product requires a Swift 5.9+ toolchain. ObjC has no Swift dependency.
+  s.swift_versions = ['5.9', '6.0']
 
 end

@@ -319,7 +319,13 @@ NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:jsonArray];
 @end
 ```
 
-### Which call to use — 2.1.7
+### Swift YYModel on master (unreleased)
+
+The Swift product now provides `YYModelCodable` for ordinary structs with synthesized Codable, `yy_model(withJSON:)`, dictionary/array entry points, declarative aliases and KeyPaths, filters, defaults, required fields, model transforms, registered enum variants, and symmetric JSON export. No NSObject or handwritten decoding is needed for ordinary models. See [the Swift model contract and examples](docs/SWIFT-MODEL.md) and [validation measurements](Validation/RESULTS-swift-model.md).
+
+SPM products remain independent. CocoaPods now offers `YYModel2/ObjC` and `YYModel2/Swift`; the default includes both. These APIs and subspecs are on master, **not in the published 2.1.9 tag**. Pin the delivered commit until a new version is released.
+
+### Published 2.1.9 compatibility APIs
 
 `YYJSONDecoder` accepts `Data` or an already parsed object. Swift models stay plain `Codable` structs and do not adopt a YYModel protocol. Missing keys and JSON `null` become `0`, `""`, `false`, `[]`, or an empty nested object. Strings, numbers, and bools are coerced. Rename keys with `CodingKeys`. `URL` and raw-value enums have no zero value; make those properties optional when the key may be absent. A value that cannot be coerced throws.
 
@@ -343,7 +349,7 @@ NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:data];
 
 #### 2. Swift only
 
-Use this when the model is a `struct` or a Swift class that is only `Codable`. Do not call `yy_model`.
+For existing models that conform only to `Codable`, use `YYJSONDecoder`. New `YYModelCodable` models use the shortcuts described above.
 
 ```swift
 import YYModelSwift          // SPM product YYModelSwift

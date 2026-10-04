@@ -108,3 +108,16 @@ python3 Validation/run_usage.py --output Validation/artifacts/usage
 参数、iOS 模拟器命令、固定发布快照方法见交付说明。性能任务按顺序执行，不能与其他基准或编译并行。原生对 dirty/sparse 的预期拒绝不计成功吞吐；object 与 Data 阶段不能混比；混合程序处理两份独立响应不等于一份数据重复解析。
 
 公开保存的 [JSON 回执](receipts/delivery-2.1.9-20261004.json)包含完整计时样本、源码/输入身份和逐项判定；[CSV](receipts/delivery-2.1.9-measurements.csv)包含两个环境合计 192 条路径统计。P95 是批平均样本 P95，14 个样本时等于最大值，不是生产请求 P95。构建日志、完整模型输出和二进制只在忽略的 artifacts 目录生成。
+
+
+## Swift model contract (unreleased)
+
+Ordinary structs now use `YYModelCodable` and declarative mappings/hooks. The published 2.1.9 tag remains unchanged. See [the API guide](../docs/SWIFT-MODEL.md) and [the complete delivery results](RESULTS-swift-model.md).
+
+```sh
+python3 Validation/run_swift_model.py --output /tmp/yy-model-contract
+python3 Validation/run_swift_model_import.py --output /tmp/yy-model-import
+python3 Validation/run_swift_model_data.py --output /tmp/yy-model-data --iterations 100
+```
+
+Use `--simulator <UUID>` for iOS 26.5. Use `--mixed` on the data runner to link the OC component. Run performance jobs sequentially, after builds finish; compare adjacent validated artifacts with `run_swift_model_paired.py`.

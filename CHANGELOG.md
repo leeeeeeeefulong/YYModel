@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+- Added `YYModelCodable`: synthesized Swift structs with YYModel-style JSON/dictionary/array shortcuts, ordered aliases, KeyPath mapping, filters, explicit defaults/required fields, transforms, and symmetric export.
+- Added registered associated-value enum variants and explicit seconds/milliseconds/ISO date strategies. Field policies belong to payload models; unsupported enum field policies fail explicitly.
+- Uses native scalar/collection containers plus field-local coercion, without initializing the complete model twice. Legacy `YYJSONDecoder` remains compatible.
+- Added independent CocoaPods `ObjC`/`Swift` subspecs; default selection still includes both. Swift requires a Swift 5.9+ toolchain; published 2.1.9 tags remain unchanged.
+- Fixed Objective-C negative millisecond numbers, signed/whitespace timestamp strings, zero timestamp strings, and non-finite numeric dates.
+- Updated the Framework project's deployment setting from iOS 8 to iOS 11 to match the component minimum and avoid missing libarclite in current Xcode.
+- Added reproducible public API E2E and whole-model weather/numeric verification, with separate Data/object/export timing and iOS 26.5 simulator evidence. No business App is used.
+
 ## 2.1.9 — Boundary Robustness & Unified Numeric Lexer (2026-10-04)
 
 ### Boundary Correctness & Optional Nested Validation (G1–G4)

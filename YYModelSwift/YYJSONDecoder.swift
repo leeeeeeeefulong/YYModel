@@ -478,7 +478,7 @@ enum YYJSONValueDecoder {
     }
 }
 
-private final class _YYDecoder: Decoder {
+final class _YYDecoder: Decoder {
     var codingPath: [CodingKey]
     var userInfo: [CodingUserInfoKey: Any] = [:]
     let value: Any
