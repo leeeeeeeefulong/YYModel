@@ -1,0 +1,66 @@
+{
+  "createdUTC": "2026-10-04T21:25:24.223609+00:00",
+  "status": "Legacy non-secure heterogeneous archives passed with and without a generic declaration; no production-source defect reproduced in these scenarios.",
+  "productionCommit": "ad01ae094785f9dc449375b7108dadf6a99ea2bb",
+  "publishedTag": "2.1.9",
+  "publishedTagCommit": "00329f245752ed0e264e8c90bc14a6bd4e4e46e5",
+  "productionSourceHashes": {
+    "YYModel/NSObject+YYModel.h": "26225f5b0d362bb3d5e9c78a49572703f9a0b148e18f0e9040fbd6ac6246bed4",
+    "YYModel/NSObject+YYModel.m": "c94c595390dbbb8e4c4e38b1902beb5978b7f91b3be85a91c2cacc0f492eb498",
+    "YYModel/YYClassInfo.h": "a590a29787d5da10c0ac5dcba314092b3bb664abc4de332d8f3ec096045db138",
+    "YYModel/YYClassInfo.m": "53c3db232d50225998b13a7fd45a7c0ba5f221bfc6e1224d1c4e56ec7569e907",
+    "YYModel/YYModel.h": "d7a2281ce363542dcac56eba01657a3f1f305ed925687bc1d735d99ac9c4b072",
+    "YYModelSwift/YYJSONDecoder.swift": "d9b1c90548533d1861260d0fc5235a594e44db7ae69a8d7b5d39a04cb74b126f",
+    "YYModelSwift/YYJSONEncoder.swift": "0d25b44a1d1b325dd787d3b149de6d481a544c9d79405b9644afef50bb17b7b9",
+    "YYModelSwift/YYJSONRules.swift": "ca60fcdc7639ec6480308da9be6da6d92b8abefd8d02734e21480ea0a2504436",
+    "YYModelSwift/YYModelCodable.swift": "4811d66ba696e74f989569e39e6dec79ae7b1c75356b26e24982ffced0e7b08c",
+    "YYModelSwift/YYModelDecoder.swift": "2da5d8086f41ea70cabf55ef313828dc567f710cc8a80c4c6825a22db30d2fff",
+    "YYModelSwift/YYModelDictionary.swift": "3becad8fe095e9e7e76f70cc9ca0c95d96432b46acad8e411a9feed5aa1b272f",
+    "YYModelSwift/YYModelEncoder.swift": "04988f08052110bbf8516a953dcf71b52bbca5756b08241be0adb316aa1fbf66",
+    "YYModelSwift/YYModelJSONValue.swift": "2a94d2ce33f4a04bd12d7ae5a641d951b95f07e473505835cbfe0ab92b0541c3",
+    "YYModelSwift/YYModelNativeBridge.swift": "d42974943957448814b014a52233654f8ab606f0a1b20cad0868a56f45dc517a",
+    "YYModelSwift/YYModelPolymorphic.swift": "b40d0755ebeb95e7106489dc0d4b19bb6b2c8d4c502858d599375aab1c8a329b",
+    "YYModelSwift/YYModelScalarDecoding.swift": "22319e64c58a019e59aba92f4ef85a4b88a5b408f1f035aba1b4cd53c1a2faf9"
+  },
+  "harnessHashes": {
+    "Validation/ObjCContractE2E.m": "0e2bc694e734628e2b00a01ac7afe5d132792686846de1358ec30d3908365a13",
+    "Validation/run_objc_contract.py": "4bceed97eb857041e75965bac11b94e73c8ad76eca6321060e6bc9521cfc7c0b",
+    "Validation/OBJC-CONTRACT-FAILURE-MODES.md": "7350005c3b6e37644131b4461e21cbfbc011ad48c2694c7f920cf4a383977f62"
+  },
+  "historicalEvidence": {
+    "index": "Validation/receipts/external-rules-20261004.json",
+    "SHA256": "4ab7074de5851c0f3d3bc3d427da4f9bba4709f61c4993b98e2d4f65a75134a1",
+    "historicalProbeSHA256": "2f71e595b05334e79777c48c8053ef7e9b514f72fb927e27fd3a7969812d1397",
+    "checksPreservedPerRuntime": 33,
+    "performanceRerun": false,
+    "reason": "Only validation and documentation changed; all production source bytes match the delivered source index."
+  },
+  "incomingDraft": {
+    "backupDirectory": "/tmp/YYModel-incoming-20261005",
+    "probeSHA256": "ef24bb835283b230b81a0ba29360a601e3426005f5918bde520837eb4f78d5d6",
+    "failedBuildLog": "/tmp/YYModel-incoming-20261005/unmodified/build.log",
+    "failedBuildLogSHA256": "4b5617449ba883d395826aa790e3fd8829f4fda9524ab8e23fa9acbe25f63a33",
+    "failure": "Duplicate ContractArchive interface and property declarations; corrected validation harness, no production change."
+  },
+  "counts": {
+    "mac": 43,
+    "ios": 43
+  },
+  "newChecksPerRuntime": 10,
+  "allPassed": true,
+  "artifactHashes": {
+    "Validation/receipts/archive-followup-20261005/mac-acceptance.json": "e475032bc9ec4e982e166b8673f63d9042277f1326d194093ded17fd8b2c37a0",
+    "Validation/receipts/archive-followup-20261005/mac-environment.json": "8998820579666923468eea46dc6e37508725d305573f4ef7c80af19ea73bfb0b",
+    "Validation/receipts/archive-followup-20261005/ios-acceptance.json": "e475032bc9ec4e982e166b8673f63d9042277f1326d194093ded17fd8b2c37a0",
+    "Validation/receipts/archive-followup-20261005/ios-environment.json": "029dc5272bc50c737154e32833bf45a407cc7dc889ef67c0db62ad65615636fa"
+  },
+  "localArtifactRoot": "/tmp/YYModel-incoming-20261005",
+  "reproductionGuide": "docs/UPGRADE-COMPAT-GUIDE-20261004.md",
+  "notes": [
+    "The previous 33 checks retain exactly the same actual/expected/passed results.",
+    "Legacy non-secure archive behavior does not imply secure archives may decode arbitrary unknown custom member classes.",
+    "iOS26.5 simulator on Apple Silicon, not a physical iPhone.",
+    "No production business application was used or modified.",
+    "The original failed incoming probe and logs remain local; machine JSON outcomes and hashes are committed."
+  ]
+}

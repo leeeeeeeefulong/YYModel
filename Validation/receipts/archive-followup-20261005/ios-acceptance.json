@@ -1,0 +1,266 @@
+{
+  "exitCode": 0,
+  "result": {
+    "allPassed": 1,
+    "checks": {
+      "archive:declaredNonSecure:count": {
+        "actual": 4,
+        "expected": 4,
+        "passed": true
+      },
+      "archive:declaredNonSecure:models": {
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      "archive:declaredNonSecure:null": {
+        "actual": 1,
+        "expected": true,
+        "passed": true
+      },
+      "archive:declaredNonSecure:number": {
+        "actual": 7,
+        "expected": 7,
+        "passed": true
+      },
+      "archive:declaredNonSecure:values": {
+        "actual": [
+          "one",
+          "two"
+        ],
+        "expected": [
+          "one",
+          "two"
+        ],
+        "passed": true
+      },
+      "archive:error": {
+        "actual": null,
+        "expected": null,
+        "passed": true
+      },
+      "archive:secureContainer": {
+        "actual": [
+          {
+            "name": "secure"
+          }
+        ],
+        "expected": [
+          {
+            "name": "secure"
+          }
+        ],
+        "passed": true
+      },
+      "archive:undeclaredNonSecure:count": {
+        "actual": 4,
+        "expected": 4,
+        "passed": true
+      },
+      "archive:undeclaredNonSecure:models": {
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      "archive:undeclaredNonSecure:null": {
+        "actual": 1,
+        "expected": true,
+        "passed": true
+      },
+      "archive:undeclaredNonSecure:number": {
+        "actual": 7,
+        "expected": 7,
+        "passed": true
+      },
+      "archive:undeclaredNonSecure:values": {
+        "actual": [
+          "one",
+          "two"
+        ],
+        "expected": [
+          "one",
+          "two"
+        ],
+        "passed": true
+      },
+      "blacklist:override": {
+        "actual": {
+          "name": "N"
+        },
+        "expected": {
+          "name": "N"
+        },
+        "passed": true
+      },
+      "cstring:distinct": {
+        "actual": false,
+        "expected": false,
+        "passed": true
+      },
+      "date:negativeMillis": {
+        "actual": -1700000000,
+        "expected": -1700000000,
+        "passed": true
+      },
+      "date:nonfinite": {
+        "actual": 1,
+        "expected": true,
+        "passed": true
+      },
+      "date:zeroString": {
+        "actual": 0,
+        "expected": 0,
+        "passed": true
+      },
+      "dynamic:flag": {
+        "actual": 1,
+        "expected": true,
+        "passed": true
+      },
+      "dynamic:legacyDetection": {
+        "actual": false,
+        "expected": false,
+        "passed": true
+      },
+      "generic:childType": {
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      "generic:defaultCount": {
+        "actual": 3,
+        "expected": 3,
+        "passed": true
+      },
+      "generic:defaultType": {
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      "generic:optInCount": {
+        "actual": 1,
+        "expected": 1,
+        "passed": true
+      },
+      "generic:optInType": {
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      "mapper:childWins": {
+        "actual": "winner",
+        "expected": "winner",
+        "passed": true
+      },
+      "mapper:default": {
+        "actual": "normal",
+        "expected": "normal",
+        "passed": true
+      },
+      "mapper:defaultExport": {
+        "actual": {
+          "name": "normal",
+          "other": "tail"
+        },
+        "expected": {
+          "name": "normal",
+          "other": "tail"
+        },
+        "passed": true
+      },
+      "mapper:disableInherited": {
+        "actual": "normal",
+        "expected": "normal",
+        "passed": true
+      },
+      "mapper:optIn": {
+        "actual": "ancestor",
+        "expected": "ancestor",
+        "passed": true
+      },
+      "mapper:optInExport": {
+        "actual": {
+          "legacy": "ancestor",
+          "other": "tail"
+        },
+        "expected": {
+          "legacy": "ancestor",
+          "other": "tail"
+        },
+        "passed": true
+      },
+      "mapper:withoutProtocol": {
+        "actual": false,
+        "expected": false,
+        "passed": true
+      },
+      "mixed:pointerStillIgnored": {
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      "mixed:valueStillCompared": {
+        "actual": false,
+        "expected": false,
+        "passed": true
+      },
+      "numeric:UInt64": {
+        "actual": "18446744073709551615",
+        "expected": "18446744073709551615",
+        "passed": true
+      },
+      "pointer:constantHash": {
+        "actual": false,
+        "expected": false,
+        "passed": true
+      },
+      "pointer:different": {
+        "actual": false,
+        "expected": false,
+        "passed": true
+      },
+      "pointer:identity": {
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      "pointer:reverse": {
+        "actual": false,
+        "expected": false,
+        "passed": true
+      },
+      "pointer:sameValueDistinctInstances": {
+        "actual": false,
+        "expected": false,
+        "passed": true
+      },
+      "pointer:set": {
+        "actual": 2,
+        "expected": 2,
+        "passed": true
+      },
+      "protocol:explicit": {
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      "protocol:NSObject": {
+        "actual": false,
+        "expected": false,
+        "passed": true
+      },
+      "whitelist:override": {
+        "actual": {
+          "tail": "T"
+        },
+        "expected": {
+          "tail": "T"
+        },
+        "passed": true
+      }
+    },
+    "passed": 43,
+    "total": 43
+  },
+  "allPassed": 1
+}

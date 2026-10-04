@@ -314,7 +314,7 @@ let user = try decoder.decode(User.self, from: data)
 let output = try YYJSONEncoder(mode: .compatible, rules: rules).encode(user)
 ```
 
-The no-argument `YYJSONDecoder()` retains legacy zero-fill and automatic-date behavior. Enhanced modes no longer retry an entire model after an arbitrary error. `.native` rejects YY rules instead of silently ignoring them. See [Swift usage and limits](docs/SWIFT-EXTERNAL-RULES.md), [OC migration](docs/OBJC-MIGRATION.md), and [current delivery](docs/DELIVERY-EXTERNAL-RULES-20261004.md).
+The no-argument `YYJSONDecoder()` retains legacy zero-fill and automatic-date behavior. Enhanced modes no longer retry an entire model after an arbitrary error. `.native` rejects YY rules instead of silently ignoring them. See [Swift usage and limits](docs/SWIFT-EXTERNAL-RULES.md), [OC migration](docs/OBJC-MIGRATION.md), and [current delivery](docs/DELIVERY-EXTERNAL-RULES-20261004.md), and [verified upgrade guide](docs/UPGRADE-COMPAT-GUIDE-20261004.md).
 
 SPM products `YYModel` and `YYModelSwift` remain independent. CocoaPods provides `YYModel2/ObjC` and `YYModel2/Swift`; default includes both. These changes are on master, **not in published 2.1.9**. Pin the delivered commit until a new version is released.
 

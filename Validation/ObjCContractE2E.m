@@ -126,6 +126,38 @@
 }
 @end
 
+// Legacy non-secure archive round trips are checked separately from secure
+// allowlist requirements, with and without a declared generic member class.
+@interface ContractGapItem : NSObject <NSSecureCoding>
+@property(nonatomic,copy) NSString *name;
+@end
+@implementation ContractGapItem
++ (BOOL)supportsSecureCoding { return YES; }
+- (void)encodeWithCoder:(NSCoder *)coder { [self yy_modelEncodeWithCoder:coder]; }
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    self = [super init];
+    return [self yy_modelInitWithCoder:coder];
+}
+@end
+@interface ContractGapArchive : NSObject <NSCoding>
+@property(nonatomic,strong) NSArray *members;
+@end
+
+@interface ContractGapUndeclaredArchive : ContractGapArchive @end
+@implementation ContractGapUndeclaredArchive
++ (NSDictionary *)modelContainerPropertyGenericClass { return nil; }
+@end
+@implementation ContractGapArchive
++ (NSDictionary *)modelContainerPropertyGenericClass { return @{@"members":ContractGapItem.class}; }
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    self = [super init];
+    return [self yy_modelInitWithCoder:aDecoder];
+}
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [self yy_modelEncodeWithCoder:aCoder];
+}
+@end
+
 static void Check(NSMutableDictionary *checks, NSString *name, id actual, id expected) {
     actual = actual ?: NSNull.null;
     expected = expected ?: NSNull.null;
@@ -197,6 +229,24 @@ int main(int argc, const char *argv[]) { @autoreleasepool {
     ContractArchive *decoded = data ? [NSKeyedUnarchiver unarchivedObjectOfClass:ContractArchive.class fromData:data error:&error] : nil;
     Check(checks,@"archive:secureContainer",[[decoded yy_modelToJSONObject] objectForKey:@"members"],@[@{@"name":@"secure"}]);
     Check(checks,@"archive:error",error.localizedDescription,nil);
+
+    for (Class archiveClass in @[ContractGapArchive.class, ContractGapUndeclaredArchive.class]) {
+        NSString *prefix = archiveClass == ContractGapArchive.class ? @"archive:declaredNonSecure" : @"archive:undeclaredNonSecure";
+        ContractGapArchive *gap = [archiveClass new];
+        gap.members = @[[ContractGapItem new], NSNull.null, @7, [ContractGapItem new]];
+        ((ContractGapItem *)gap.members[0]).name = @"one";
+        ((ContractGapItem *)gap.members[3]).name = @"two";
+        NSData *gapData = [NSKeyedArchiver archivedDataWithRootObject:gap];
+        ContractGapArchive *gapDecoded = [NSKeyedUnarchiver unarchiveObjectWithData:gapData];
+        Check(checks,[prefix stringByAppendingString:@":count"],@(gapDecoded.members.count),@4);
+        Check(checks,[prefix stringByAppendingString:@":null"],@(gapDecoded.members.count > 1 && [gapDecoded.members[1] isKindOfClass:NSNull.class]),@YES);
+        Check(checks,[prefix stringByAppendingString:@":number"],gapDecoded.members.count > 2 ? gapDecoded.members[2] : nil,@7);
+        BOOL models = gapDecoded.members.count == 4 &&
+            [gapDecoded.members[0] isKindOfClass:ContractGapItem.class] &&
+            [gapDecoded.members[3] isKindOfClass:ContractGapItem.class];
+        Check(checks,[prefix stringByAppendingString:@":models"],@(models),@YES);
+        Check(checks,[prefix stringByAppendingString:@":values"],models ? @[((ContractGapItem *)gapDecoded.members[0]).name, ((ContractGapItem *)gapDecoded.members[3]).name] : nil,@[@"one",@"two"]);
+    }
     NSUInteger passed = 0;
     for (NSDictionary *check in checks.allValues) if ([check[@"passed"] boolValue]) passed++;
     NSDictionary *receipt = @{@"checks":checks,@"total":@(checks.count),@"passed":@(passed),@"allPassed":@(passed == checks.count)};

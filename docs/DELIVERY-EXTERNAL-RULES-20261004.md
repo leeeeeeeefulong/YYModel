@@ -142,3 +142,9 @@ python3 Validation/run_interop_pairs.py --existing /tmp/yy-interop --output /tmp
 - SPM `YYModel`/`YYModelSwift` 产品与 CocoaPods `YYModel2/ObjC`、`YYModel2/Swift` 已独立选择，Swift产品无需链接OC。它们仍在同一仓库；拆成两个仓库是后续分发决策，不影响当前使用。
 
 更完整的 API、错误策略与例子见 [Swift 外部规则](SWIFT-EXTERNAL-RULES.md)。
+
+## 7. 2026-10-05 归档验证补充
+
+生产源码与上列交付 SHA 完全一致。新增的未提交归档探针曾有重复类声明，原样不能编译；校正探针后检查有、无 generic 声明的旧非 secure 异构数组往返。macOS 与 iOS26.5 模拟器各 **43/43** 通过，其中原33项实际/预期结果逐项保持一致，新增10项验证成员数量、null、数字、模型类型和值。本场景没有复现库源码缺陷，不修改生产代码或扩大 secure 允许类。
+
+原33项及性能回执保留为2026-10-04快照，无关性能未重跑。[新增机器回执](../Validation/receipts/archive-followup-20261005.json)保存当前来源与探针SHA及独立结果；[升级兼容指南](UPGRADE-COMPAT-GUIDE-20261004.md)给出准确的迁移边界和复跑方式。
