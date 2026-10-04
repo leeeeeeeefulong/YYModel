@@ -1,0 +1,605 @@
+{
+  "startedUTC": "2026-10-04T12:46:35.318751+00:00",
+  "scope": "Observed behavior, including reproduced failures; not an all-passed claim",
+  "currentCommit": "f42d50a7e4f5bb622acb08efa3ac055b6bcd17e4",
+  "runnerSHA256": "a33731ff3a7a73148e93838fd3ccc4dd972418e19b28e18316b0092d25caaf36",
+  "swift": {
+    "sourceHashes": {
+      "YYModelSwift/YYJSONDecoder.swift": "39a230414049adbe302eae4f1e10bff160515b71f27602ceba82a0a3fbb77342",
+      "YYModelSwift/YYModelCodable.swift": "13bac38ececb36f63ea3eb43326ede21039b4284c7cc87b6ba3707fe73f280ea",
+      "YYModelSwift/YYModelDecoder.swift": "bbfad6891dc66f99d262f94c00b47de1c567738767d3168fc064edcaae20a083",
+      "YYModelSwift/YYModelEncoder.swift": "97a8bb4a2efdadb4fb333fe02cfb475a5ca0251be56f50080e92422a1718722b",
+      "YYModelSwift/YYModelJSONValue.swift": "44aaf8f194b9bd552a1a16837ec3abbe46954a9ec9970c7496aa17e386fb8405",
+      "YYModelSwift/YYModelPolymorphic.swift": "394c8c874c219e6a32f378ccebb429e00bd7928a484611dda9e9fee753794cb5"
+    },
+    "probeSHA256": "6a19022acb2c8276d7c9c3ec8f0b1c4785b0d36bb036de67cd60167d9842bafd",
+    "observations": {
+      "observations": [
+        {
+          "case": "businessRejection",
+          "error": "main.Rejection.business",
+          "initializations": 1,
+          "mode": "native"
+        },
+        {
+          "case": "businessRejection",
+          "error": "main.Rejection.business",
+          "initializations": 2,
+          "mode": "legacy"
+        },
+        {
+          "case": "businessRejection",
+          "error": "main.Rejection.business",
+          "initializations": 1,
+          "mode": "model"
+        },
+        {
+          "case": "declarationDefaults",
+          "legacyAge": 0,
+          "legacyName": "",
+          "nativeError": "DecodingError.keyNotFound: Key 'name' not found in keyed decoding container. Debug description: No value associated with key CodingKeys(stringValue: \"name\", intValue: nil) (\"name\")."
+        },
+        {
+          "case": "entrySpecificMapper",
+          "legacyID": 0,
+          "modelID": 42
+        },
+        {
+          "case": "dateDefaults",
+          "legacyUnixEpoch": 0,
+          "nativeUnixEpoch": 978307200
+        },
+        {
+          "case": "plainCodableNestedArray",
+          "count": 2,
+          "firstAgeIsNil": true,
+          "secondAge": 3
+        },
+        {
+          "case": "numericCoercion",
+          "exactID": "9007199254740993",
+          "malformedSuffixRejected": true
+        },
+        {
+          "case": "internalExternalPolicyFeasibility",
+          "exactID": "9007199254740993",
+          "modelConformance": "Codable only",
+          "title": "Weather"
+        },
+        {
+          "case": "internalExternalPolicyInvalidIntermediate",
+          "id": "42",
+          "noCrash": true,
+          "title": ""
+        }
+      ]
+    }
+  },
+  "objc": {
+    "original": {
+      "sourceHashes": {
+        "YYModel/NSObject+YYModel.h": "5755c48608db9a009c3765a7f61f633d43460a32af9dd7b8110ef17c543b3545",
+        "YYModel/NSObject+YYModel.m": "3fed548469c0954a2b0c69b7dcb4e2cb2bf10ebaf06449ea82a72819af0c85c4",
+        "YYModel/YYClassInfo.h": "1c65e6a8a7a6dcb1210797227a01277153998d1f3c792a1e24446676309702f4",
+        "YYModel/YYClassInfo.m": "5870d95947dea115be7fb45da1a9ef1bf436180db65b917a757e0726d2421567",
+        "YYModel/YYModel.h": "0645dc5cbf2bdcf89e8fce3c333320b29bb4d2b4b4336236a7b6ba585099b670"
+      },
+      "result": {
+        "ancestorEquality": {
+          "childToParent": false,
+          "parentToChild": false
+        },
+        "blacklistOverride": {
+          "legacy": "ancestor"
+        },
+        "dates": {
+          "__NSCFConstantString:0000000000": null,
+          "__NSCFConstantString:01/02/2023": null,
+          "__NSCFConstantString:1e3": null,
+          "__NSCFConstantString:02/01/2023": null,
+          "__NSCFConstantString:2023-11-14T22:13:20Z": 1700000000,
+          "__NSCFConstantString:1700000000": null,
+          "__NSCFConstantString:1000000000000": null,
+          "NSConstantIntegerNumber:0": null,
+          "NSConstantIntegerNumber:1000000000000": null
+        },
+        "differentPointers": {
+          "distinctObjects": 1,
+          "equal": false,
+          "hashEqual": 0
+        },
+        "encodingL": {
+          "FoundationSize": 4,
+          "longEncode": "q",
+          "YYType": 7
+        },
+        "existingContainers": {
+          "arrayCount": 1,
+          "dictionaryCount": 0,
+          "setCount": 1
+        },
+        "genericOverride": {
+          "count": 3,
+          "firstClass": "NSConstantDictionary",
+          "json": {
+            "members": [
+              {
+                "name": "one"
+              },
+              null,
+              42
+            ]
+          }
+        },
+        "legacyArchive": {
+          "anythingClass": "ArchiveMember",
+          "arrayCount": 1,
+          "decodeError": null,
+          "dictionaryCount": 1,
+          "encodeError": null,
+          "objectClass": "ArchiveMember",
+          "rootPresent": 1,
+          "setCount": 1
+        },
+        "longDoubleDifferentEquals": true,
+        "mapperOverride": {
+          "json": {
+            "name": "normal",
+            "other": "tail"
+          },
+          "name": "normal",
+          "tail": "tail"
+        },
+        "NSObjectConformsYYModel": false,
+        "secureArchive": {
+          "anythingClass": null,
+          "arrayCount": 0,
+          "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+          "dictionaryCount": 0,
+          "encodeError": null,
+          "objectClass": null,
+          "rootPresent": 0,
+          "setCount": 0
+        },
+        "secureSeparateFields": {
+          "anything": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 0,
+            "setCount": 0
+          },
+          "array": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 0,
+            "setCount": 0
+          },
+          "dictionary": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 0,
+            "setCount": 0
+          },
+          "object": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 0,
+            "setCount": 0
+          },
+          "set": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 0,
+            "setCount": 0
+          }
+        },
+        "secureTypedContainers": {
+          "array": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 0,
+            "setCount": 0
+          },
+          "dictionary": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 0,
+            "setCount": 0
+          },
+          "set": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 0,
+            "setCount": 0
+          }
+        },
+        "selectorDifferentEquals": true,
+        "whitelistOverride": {
+          "tail": "tail"
+        }
+      }
+    },
+    "tag": {
+      "sourceHashes": {
+        "YYModel/NSObject+YYModel.h": "6ef9f0c2d9a1ed732a4bd186db20ecde312d66aab1ca66c2eda636cddfa02ce1",
+        "YYModel/NSObject+YYModel.m": "4aecfb31d428c95d6a7cb69b2194128fb88701c5e480988f0d18f74ed3719cc6",
+        "YYModel/YYClassInfo.h": "8d13197d5a669e4f5b7f2bc5065f8bb419be1e60874366d8f14f690e34dbb84e",
+        "YYModel/YYClassInfo.m": "a2e6d559282e11399bf4ce08734b27163bfc592b187da7421911ffe6a7ec07ab",
+        "YYModel/YYModel.h": "296a7c9ce83cb876c591022dff04bc8bd3c7dcd938ecf0b83cbd8f929fa6866d"
+      },
+      "result": {
+        "ancestorEquality": {
+          "childToParent": false,
+          "parentToChild": false
+        },
+        "blacklistOverride": {
+          "legacy": "ancestor"
+        },
+        "dates": {
+          "__NSCFConstantString:0000000000": null,
+          "__NSCFConstantString:01/02/2023": 1672617600,
+          "__NSCFConstantString:1e3": null,
+          "__NSCFConstantString:02/01/2023": 1675209600,
+          "__NSCFConstantString:2023-11-14T22:13:20Z": 1700000000,
+          "__NSCFConstantString:1700000000": 1700000000,
+          "__NSCFConstantString:1000000000000": 1000000000,
+          "NSConstantIntegerNumber:0": 0,
+          "NSConstantIntegerNumber:1000000000000": 1000000000
+        },
+        "differentPointers": {
+          "distinctObjects": 1,
+          "equal": true,
+          "hashEqual": 1
+        },
+        "encodingL": {
+          "FoundationSize": 4,
+          "longEncode": "q",
+          "YYType": 7
+        },
+        "existingContainers": {
+          "arrayCount": 1,
+          "dictionaryCount": 0,
+          "setCount": 1
+        },
+        "genericOverride": {
+          "count": 1,
+          "firstClass": "ArchiveMember",
+          "json": {
+            "members": [
+              {
+                "name": "one"
+              }
+            ]
+          }
+        },
+        "legacyArchive": {
+          "anythingClass": "ArchiveMember",
+          "arrayCount": 1,
+          "decodeError": null,
+          "dictionaryCount": 1,
+          "encodeError": null,
+          "objectClass": "ArchiveMember",
+          "rootPresent": 1,
+          "setCount": 1
+        },
+        "longDoubleDifferentEquals": false,
+        "mapperOverride": {
+          "json": {
+            "legacy": "ancestor",
+            "other": "tail"
+          },
+          "name": "ancestor",
+          "tail": "tail"
+        },
+        "NSObjectConformsYYModel": true,
+        "pureObjCDynamicMarkedSwift": true,
+        "secureArchive": {
+          "anythingClass": null,
+          "arrayCount": 0,
+          "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+          "dictionaryCount": 0,
+          "encodeError": null,
+          "objectClass": null,
+          "rootPresent": 0,
+          "setCount": 0
+        },
+        "secureSeparateFields": {
+          "anything": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 0,
+            "setCount": 0
+          },
+          "array": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 0,
+            "setCount": 0
+          },
+          "dictionary": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 0,
+            "setCount": 0
+          },
+          "object": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": null,
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": "ArchiveMember",
+            "rootPresent": 1,
+            "setCount": 0
+          },
+          "set": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 0,
+            "setCount": 0
+          }
+        },
+        "secureTypedContainers": {
+          "array": {
+            "anythingClass": null,
+            "arrayCount": 1,
+            "decodeError": null,
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 1,
+            "setCount": 0
+          },
+          "dictionary": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": null,
+            "dictionaryCount": 1,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 1,
+            "setCount": 0
+          },
+          "set": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": null,
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 1,
+            "setCount": 1
+          }
+        },
+        "selectorDifferentEquals": false,
+        "whitelistOverride": {
+          "tail": "tail"
+        }
+      }
+    },
+    "master": {
+      "sourceHashes": {
+        "YYModel/NSObject+YYModel.h": "6ef9f0c2d9a1ed732a4bd186db20ecde312d66aab1ca66c2eda636cddfa02ce1",
+        "YYModel/NSObject+YYModel.m": "03600c8f862781aee6dc99b32ceaa1cf2ecd998af22bd89c27785bf82e69ad86",
+        "YYModel/YYClassInfo.h": "8d13197d5a669e4f5b7f2bc5065f8bb419be1e60874366d8f14f690e34dbb84e",
+        "YYModel/YYClassInfo.m": "a2e6d559282e11399bf4ce08734b27163bfc592b187da7421911ffe6a7ec07ab",
+        "YYModel/YYModel.h": "296a7c9ce83cb876c591022dff04bc8bd3c7dcd938ecf0b83cbd8f929fa6866d"
+      },
+      "result": {
+        "ancestorEquality": {
+          "childToParent": false,
+          "parentToChild": false
+        },
+        "blacklistOverride": {
+          "legacy": "ancestor"
+        },
+        "dates": {
+          "__NSCFConstantString:0000000000": 0,
+          "__NSCFConstantString:01/02/2023": 1672617600,
+          "__NSCFConstantString:1e3": null,
+          "__NSCFConstantString:02/01/2023": 1675209600,
+          "__NSCFConstantString:2023-11-14T22:13:20Z": 1700000000,
+          "__NSCFConstantString:1700000000": 1700000000,
+          "__NSCFConstantString:1000000000000": 1000000000,
+          "NSConstantIntegerNumber:0": 0,
+          "NSConstantIntegerNumber:1000000000000": 1000000000
+        },
+        "differentPointers": {
+          "distinctObjects": 1,
+          "equal": true,
+          "hashEqual": 1
+        },
+        "encodingL": {
+          "FoundationSize": 4,
+          "longEncode": "q",
+          "YYType": 7
+        },
+        "existingContainers": {
+          "arrayCount": 1,
+          "dictionaryCount": 0,
+          "setCount": 1
+        },
+        "genericOverride": {
+          "count": 1,
+          "firstClass": "ArchiveMember",
+          "json": {
+            "members": [
+              {
+                "name": "one"
+              }
+            ]
+          }
+        },
+        "legacyArchive": {
+          "anythingClass": "ArchiveMember",
+          "arrayCount": 1,
+          "decodeError": null,
+          "dictionaryCount": 1,
+          "encodeError": null,
+          "objectClass": "ArchiveMember",
+          "rootPresent": 1,
+          "setCount": 1
+        },
+        "longDoubleDifferentEquals": false,
+        "mapperOverride": {
+          "json": {
+            "legacy": "ancestor",
+            "other": "tail"
+          },
+          "name": "ancestor",
+          "tail": "tail"
+        },
+        "NSObjectConformsYYModel": true,
+        "pureObjCDynamicMarkedSwift": true,
+        "secureArchive": {
+          "anythingClass": null,
+          "arrayCount": 0,
+          "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+          "dictionaryCount": 0,
+          "encodeError": null,
+          "objectClass": null,
+          "rootPresent": 0,
+          "setCount": 0
+        },
+        "secureSeparateFields": {
+          "anything": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 0,
+            "setCount": 0
+          },
+          "array": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 0,
+            "setCount": 0
+          },
+          "dictionary": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 0,
+            "setCount": 0
+          },
+          "object": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": null,
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": "ArchiveMember",
+            "rootPresent": 1,
+            "setCount": 0
+          },
+          "set": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": "The data couldn’t be read because it isn’t in the correct format.",
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 0,
+            "setCount": 0
+          }
+        },
+        "secureTypedContainers": {
+          "array": {
+            "anythingClass": null,
+            "arrayCount": 1,
+            "decodeError": null,
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 1,
+            "setCount": 0
+          },
+          "dictionary": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": null,
+            "dictionaryCount": 1,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 1,
+            "setCount": 0
+          },
+          "set": {
+            "anythingClass": null,
+            "arrayCount": 0,
+            "decodeError": null,
+            "dictionaryCount": 0,
+            "encodeError": null,
+            "objectClass": null,
+            "rootPresent": 1,
+            "setCount": 1
+          }
+        },
+        "selectorDifferentEquals": false,
+        "whitelistOverride": {
+          "tail": "tail"
+        }
+      }
+    }
+  },
+  "objcProbeSHA256": "29ee4bfd4fb37289dcc2b584d5c236c1757e018d6efb58cea4172ee5b4e3ede9",
+  "finishedUTC": "2026-10-04T12:46:51.170658+00:00"
+}

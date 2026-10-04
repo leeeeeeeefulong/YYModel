@@ -1,0 +1,26 @@
+{
+  "scope": "Selected original-default contract checks; false indicates a reproduced deviation/regression, not a probe execution failure",
+  "versions": {
+    "original": {
+      "pointerDistinctEqualityShouldBeFalse": true,
+      "mapperSubclassOverrideShouldUseName": true,
+      "genericSubclassOverrideShouldPreserveThreeItems": true,
+      "blacklistSubclassOverridePreserved": true,
+      "whitelistSubclassOverridePreserved": true
+    },
+    "tag": {
+      "pointerDistinctEqualityShouldBeFalse": false,
+      "mapperSubclassOverrideShouldUseName": false,
+      "genericSubclassOverrideShouldPreserveThreeItems": false,
+      "blacklistSubclassOverridePreserved": true,
+      "whitelistSubclassOverridePreserved": true
+    },
+    "master": {
+      "pointerDistinctEqualityShouldBeFalse": false,
+      "mapperSubclassOverrideShouldUseName": false,
+      "genericSubclassOverrideShouldPreserveThreeItems": false,
+      "blacklistSubclassOverridePreserved": true,
+      "whitelistSubclassOverridePreserved": true
+    }
+  }
+}
