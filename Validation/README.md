@@ -84,3 +84,27 @@ python3 Validation/run.py --simulator SIMULATOR_UUID --original-source /tmp/YYMo
 本次修复的运行回执见 [RESULTS-numeric-fix.md](RESULTS-numeric-fix.md)；[2.1.8 历史回执](RESULTS-2.1.8.md) 保留修复前结论。
 
 G1–G4 后续修复的行为、兼容策略与新鲜回执见 [RESULTS-boundary-fix.md](RESULTS-boundary-fix.md)。
+
+## 2.1.9 交付与跨语言性能验证
+
+[详细中文交付说明](../docs/DELIVERY-2.1.9-zh.md)给出 ibireme 固定版本对照、Swift→OC/Swift→Swift/OC→OC、Data/object/encode、混合程序与同进程独立响应的分项数据。先阅读 [先行失败判定与测量方案](DELIVERY-METHOD.md)。
+
+新增入口均使用既有天气模型，不复制模型实现：
+
+- `run_delivery.py`：构建原版/当前 OC-only 与 mixed、当前 Swift-only 共五个程序，183 项判定通过后运行 96 条性能路径。`--no-benchmark` 先构建/验收，`--benchmark-only` 验证身份并复用成功构建。
+- `run_coexist.py`：在同一进程实际调用两套 API 处理独立响应，并测 Swift 直接传 NSDictionary 的映射入口；12 项判定、6 条性能路径。
+- `run_paired.py`：基于同一已验收目录做相邻 ABBA 复测，10 组原版 OC 对照加 4 组调用/链接/原生对照。
+- `run_usage.py`：日期编码约定与 Swift Optional 数值暴露探针；退出 0 表示探针完成，不意味着已知限制修复。
+
+```sh
+python3 Validation/run_delivery.py --original-root /tmp/YYModel-original --output Validation/artifacts/delivery-mac --no-benchmark
+python3 Validation/run_coexist.py --delivery-output Validation/artifacts/delivery-mac --no-benchmark
+python3 Validation/run_delivery.py --original-root /tmp/YYModel-original --output Validation/artifacts/delivery-mac --benchmark-only
+python3 Validation/run_coexist.py --delivery-output Validation/artifacts/delivery-mac --benchmark-only
+python3 Validation/run_paired.py --delivery-output Validation/artifacts/delivery-mac
+python3 Validation/run_usage.py --output Validation/artifacts/usage
+```
+
+参数、iOS 模拟器命令、固定发布快照方法见交付说明。性能任务按顺序执行，不能与其他基准或编译并行。原生对 dirty/sparse 的预期拒绝不计成功吞吐；object 与 Data 阶段不能混比；混合程序处理两份独立响应不等于一份数据重复解析。
+
+公开保存的 [JSON 回执](receipts/delivery-2.1.9-20261004.json)包含完整计时样本、源码/输入身份和逐项判定；[CSV](receipts/delivery-2.1.9-measurements.csv)包含两个环境合计 192 条路径统计。P95 是批平均样本 P95，14 个样本时等于最大值，不是生产请求 P95。构建日志、完整模型输出和二进制只在忽略的 artifacts 目录生成。
