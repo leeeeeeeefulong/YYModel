@@ -256,7 +256,7 @@ private final class OCCompany: NSObject {
     @objc var bs: String = ""
 }
 
-private final class OCUser: NSObject {
+private final class OCUser: NSObject, YYModel {
     @objc var userId: Int = 0
     @objc var name: String = ""
     @objc var username: String = ""
@@ -268,7 +268,7 @@ private final class OCUser: NSObject {
     @objc var companyName: String = ""
     @objc var homepage: String = ""
 
-    override class func modelCustomPropertyMapper() -> [String: Any]? {
+    class func modelCustomPropertyMapper() -> [String: Any]? {
         [
             "userId": "id",
             "companyName": "company.name",

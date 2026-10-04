@@ -11,15 +11,14 @@
 //  Modern iOS Compatible — 2026.10 Revision
 //  Minimum deployment target: iOS 11.0 / macOS 10.13
 //
-//  Features & Modernizations:
-//  - 100% Behavioral & contract fidelity with original ibireme/YYModel specification
-//  - Fully typed objc_msgSend non-variadic function pointers (Clang 17 / Xcode 27 -Wcast-function-type-strict safe)
-//  - Thread-safe caching with os_unfair_lock (replaces dispatch_semaphore, priority inversion safe)
-//  - Thread-safe ISO8601 & custom date formatters
-//  - Secure coding (NSSecureCoding) support with fallback
-//  - Superclass property & custom mapper bottom-up inheritance
-//  - Full polymorphic model resolution (modelCustomClassForDictionary:)
-//  - Safe dictionary keyPath traversal without KVC exceptions
+//  Compatibility maintenance:
+//  - Original Objective-C entry points and effective configuration hooks
+//  - Explicit function-pointer typedefs for objc_msgSend; original YYModel
+//    already used typed non-variadic casts
+//  - Cache locking with os_unfair_lock and serialized ISO date output
+//  - Secure decoding with declared property/container classes
+//  - Optional ancestor Mapper/generic merging and nested validation
+//  - Numeric/date boundary corrections documented in docs/OBJC-MIGRATION.md
 //
 
 #import "NSObject+YYModel.h"
@@ -586,12 +585,16 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
     if (!classInfo) return nil;
     self = [super init];
 
-    // Collect class hierarchy from root ancestor down to subclass
-    NSMutableArray *classHierarchy = [NSMutableArray new];
-    for (Class c = cls; c && c != [NSObject class] && c != [NSProxy class]; c = class_getSuperclass(c)) {
-        [classHierarchy addObject:c];
+    // Original YYModel invokes only the most specific effective hook.
+    NSArray *configurationClasses = @[cls];
+    if ([cls respondsToSelector:@selector(modelMergesSuperclassConfiguration)] &&
+        [(id<YYModel>)cls modelMergesSuperclassConfiguration]) {
+        NSMutableArray *classHierarchy = [NSMutableArray new];
+        for (Class c = cls; c && c != [NSObject class] && c != [NSProxy class]; c = class_getSuperclass(c)) {
+            [classHierarchy addObject:c];
+        }
+        configurationClasses = classHierarchy.reverseObjectEnumerator.allObjects;
     }
-    NSArray *reversedHierarchy = classHierarchy.reverseObjectEnumerator.allObjects;
 
     NSSet *blacklist = nil;
     if ([cls respondsToSelector:@selector(modelPropertyBlacklist)]) {
@@ -611,7 +614,7 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
     NSMutableDictionary *genericMapper = nil;
     NSMutableDictionary *customMapper = nil;
 
-    for (Class currentCls in reversedHierarchy) {
+    for (Class currentCls in configurationClasses) {
         if ([currentCls respondsToSelector:@selector(modelContainerPropertyGenericClass)]) {
             NSDictionary *mapper = [(id<YYModel>)currentCls modelContainerPropertyGenericClass];
             if (mapper.count) {
@@ -1040,7 +1043,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                 } else if ([one isKindOfClass:[NSDictionary class]]) {
                                     Class cls = meta->_genericCls;
                                     if (meta->_hasCustomClassFromDictionary) {
-                                        cls = [cls modelCustomClassForDictionary:one];
+                                        cls = [(id<YYModel>)cls modelCustomClassForDictionary:one];
                                         if (!cls) cls = meta->_genericCls;
                                     }
                                     NSObject *newOne = [cls new];
@@ -1076,7 +1079,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                 if ([oneValue isKindOfClass:[NSDictionary class]]) {
                                     Class cls = meta->_genericCls;
                                     if (meta->_hasCustomClassFromDictionary) {
-                                        cls = [cls modelCustomClassForDictionary:oneValue];
+                                        cls = [(id<YYModel>)cls modelCustomClassForDictionary:oneValue];
                                         if (!cls) cls = meta->_genericCls;
                                     }
                                     NSObject *newOne = [cls new];
@@ -1113,7 +1116,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                             } else if ([one isKindOfClass:[NSDictionary class]]) {
                                 Class cls = meta->_genericCls;
                                 if (meta->_hasCustomClassFromDictionary) {
-                                    cls = [cls modelCustomClassForDictionary:one];
+                                    cls = [(id<YYModel>)cls modelCustomClassForDictionary:one];
                                     if (!cls) cls = meta->_genericCls;
                                 }
                                 NSObject *newOne = [cls new];
@@ -1152,7 +1155,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                         if (!ModelSetNestedDictionary(one, value, validation)) return;
                     } else {
                         if (meta->_hasCustomClassFromDictionary) {
-                            cls = [cls modelCustomClassForDictionary:value] ?: cls;
+                            cls = [(id<YYModel>)cls modelCustomClassForDictionary:value] ?: cls;
                         }
                         one = [cls new];
                         if (!ModelSetNestedDictionary(one, value, validation)) return;
@@ -1587,6 +1590,23 @@ static NSString *ModelDescription(NSObject *model) {
 #pragma mark - NSObject (YYModel)
 // ============================================================
 
+// Hash and equality must agree on which properties actually contribute values.
+// Pointer/CString/CArray and unknown types retain their existing ignored-field
+// behavior; models containing only ignored fields fall back to object identity.
+static force_inline BOOL ModelPropertyParticipatesInEquality(_YYModelPropertyMeta *meta) {
+    if (!meta->_getter) return NO;
+    if (meta->_isCNumber) return YES;
+    switch (meta->_type & YYEncodingTypeMask) {
+        case YYEncodingTypeObject:
+        case YYEncodingTypeClass:
+        case YYEncodingTypeBlock:
+        case YYEncodingTypeSEL:
+        case YYEncodingTypeStruct:
+        case YYEncodingTypeUnion: return YES;
+        default: return NO;
+    }
+}
+
 @implementation NSObject (YYModel)
 
 + (NSDictionary *)_yy_dictionaryWithJSON:(id)json {
@@ -1619,7 +1639,7 @@ static NSString *ModelDescription(NSObject *model) {
     Class cls = [self class];
     _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:cls];
     if (modelMeta->_hasCustomClassFromDictionary) {
-        cls = [cls modelCustomClassForDictionary:dictionary] ?: cls;
+        cls = [(id<YYModel>)cls modelCustomClassForDictionary:dictionary] ?: cls;
     }
 
     NSObject *one = [cls new];
@@ -1916,7 +1936,7 @@ static NSString *ModelDescription(NSObject *model) {
     NSUInteger value = 0;
     NSUInteger count = 0;
     for (_YYModelPropertyMeta *propertyMeta in modelMeta->_allPropertyMetas) {
-        if (!propertyMeta->_getter) continue;
+        if (!ModelPropertyParticipatesInEquality(propertyMeta)) continue;
         value ^= [propertyMeta->_name hash];
         count++;
 
@@ -1957,8 +1977,10 @@ static NSString *ModelDescription(NSObject *model) {
     if (modelMeta->_nsType) return [self isEqual:model];
     if ([self hash] != [model hash]) return NO;
 
+    NSUInteger count = 0;
     for (_YYModelPropertyMeta *propertyMeta in modelMeta->_allPropertyMetas) {
-        if (!propertyMeta->_getter) continue;
+        if (!ModelPropertyParticipatesInEquality(propertyMeta)) continue;
+        count++;
 
         if (propertyMeta->_isCNumber) {
             NSNumber *p1 = ModelCreateNumberFromProperty(self, propertyMeta);
@@ -1992,7 +2014,7 @@ static NSString *ModelDescription(NSObject *model) {
             }
         }
     }
-    return YES;
+    return count != 0;
 }
 
 - (NSString *)yy_modelDescription {

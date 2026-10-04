@@ -6,20 +6,10 @@ Pod::Spec.new do |s|
   s.authors      = { 'ibireme' => 'ibireme@gmail.com', 'leeeeeeeefulong' => 'leeeeeeeefulong@github.com' }
   s.homepage     = 'https://github.com/leeeeeeeefulong/YYModel'
 
-  # Minimum deployment target: iOS 11.0 / macOS 10.13
-  #
-  # Constrained by NSSecureCoding archiving API (iOS 11.0+).
-  # All other APIs are available from iOS 6.0 or earlier.
-  #
-  # API availability (verified against Apple Developer Documentation):
-  #   os_unfair_lock:              iOS 10.0+ / macOS 10.12+
-  #   archivedDataWithRootObject:  iOS 11.0+ / macOS 10.13+  ← bottleneck
-  #   unarchivedObjectOfClass:     iOS 11.0+ / macOS 10.13+  ← bottleneck
-  #   NSSecureCoding:              iOS 6.0+  / macOS 10.8+
-  #   decodeObjectOfClass:forKey:  iOS 6.0+  / macOS 10.8+
-  #   NSJSONSerialization:         iOS 5.0+  / macOS 10.7+
-  #   dispatch_once:               iOS 4.0+  / macOS 10.6+
-  #   NSGetSizeAndAlignment:       iOS 2.0+  / macOS 10.0+
+  # Supported distribution floors: iOS 11.0 / macOS 10.13.
+  # Core cache locking uses os_unfair_lock (iOS 10 / macOS 10.12).
+  # Complete archivedData/unarchivedObject convenience APIs are caller/demo APIs,
+  # not an unavoidable Core dependency. See docs/OBJC-MIGRATION.md.
 
   s.ios.deployment_target = '11.0'
   s.osx.deployment_target = '10.13'

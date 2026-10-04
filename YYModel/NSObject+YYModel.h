@@ -8,11 +8,8 @@
 //  This source code is licensed under the MIT-style license found in the
 //  LICENSE file in the root directory of this source tree.
 //
-//  Modern iOS Compatible — 2026.09 Patch
-//  Changes:
-//  - FIX: NSSecureCoding support (iOS 6.0+)
-//  - FIX: Nullability annotations
-//  - ADD: Swift Codable bridge helpers
+//  Objective-C compatibility maintenance with documented fork extensions.
+//  See docs/OBJC-MIGRATION.md for defaults and migration requirements.
 //
 
 #import <Foundation/Foundation.h>
@@ -25,6 +22,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @protocol YYModel <NSObject>
 @optional
+
+/**
+ Merge ancestor entries in modelCustomPropertyMapper and
+ modelContainerPropertyGenericClass, from parent to child. Child entries win.
+ The default is NO: only the most specific effective hook is called, as in
+ original YYModel. Blacklist and whitelist hooks are never merged.
+ This class policy is inherited and may be disabled by a subclass returning NO.
+ */
++ (BOOL)modelMergesSuperclassConfiguration;
 
 /**
  Custom property mapper.
@@ -118,7 +124,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Provide methods to convert between json and model.
  */
-@interface NSObject (YYModel) <YYModel>
+@interface NSObject (YYModel)
 
 ///=============================================================================
 /// @name Create Model from JSON

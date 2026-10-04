@@ -2,7 +2,7 @@
 //  YYModel.h
 //  YYModel <https://github.com/ibireme/YYModel>
 //
-//  iOS 27 Compatible — 2026.09 Patch
+//  Objective-C model conversion with documented optional fork extensions.
 //
 
 #import <Foundation/Foundation.h>

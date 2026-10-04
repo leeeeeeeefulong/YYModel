@@ -8,12 +8,8 @@
 //  This source code is licensed under the MIT-style license found in the
 //  LICENSE file in the root directory of this source tree.
 //
-//  Modern iOS Compatible — 2026.09 Patch
-//  Changes:
-//  - Added NS_ASSUME_NONNULL annotations
-//  - Fixed YYEncodingType enum for 64-bit correctness
-//  - Added YYClassPropertyInfo.isSwift property
-//  - Thread-safe cache using os_unfair_lock (iOS 10.0+)
+//  Runtime metadata with nullable annotations and os_unfair_lock caching.
+//  Runtime type encodings do not identify the source language of a property.
 //
 
 #import <Foundation/Foundation.h>
@@ -72,7 +68,8 @@ typedef NS_OPTIONS(NSUInteger, YYEncodingType) {
 
 /**
  Get the type from a Type-Encoding string.
- Uses NSGetSizeAndAlignment for correct 64-bit size handling.
+ Uses NSGetSizeAndAlignment for l/L encodings. On Apple 64-bit targets,
+ The C long type encodes as q, while the runtime l encoding describes a 32-bit value.
 
  @param typeEncoding  A Type-Encoding string.
  @return The encoding type.
@@ -123,7 +120,9 @@ YYEncodingType YYEncodingGetType(const char * _Nullable typeEncoding);
 @property (nullable, nonatomic, strong, readonly) NSArray<NSString *> *protocols;
 @property (nonatomic, assign, readonly) SEL getter;
 @property (nonatomic, assign, readonly) SEL setter;
-@property (nonatomic, assign, readonly) BOOL isSwiftDynamic; // @objc dynamic in Swift
+/// Compatibility getter; always NO because runtime metadata cannot prove Swift origin.
+@property (nonatomic, assign, readonly) BOOL isSwiftDynamic
+    __attribute__((deprecated("Runtime metadata cannot identify Swift properties; inspect YYEncodingTypePropertyDynamic for the dynamic flag.")));
 
 - (nullable instancetype)initWithProperty:(objc_property_t)property;
 @end

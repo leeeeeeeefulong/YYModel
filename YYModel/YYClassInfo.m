@@ -11,11 +11,11 @@
 //  Modern iOS Compatible — 2026.09 Patch
 //  Minimum deployment target: iOS 11.0 / macOS 10.13
 //
-//  Changes:
-//  - FIX: 'l'/'L' type encoding uses NSGetSizeAndAlignment for 64-bit
-//  - FIX: dispatch_semaphore → os_unfair_lock (priority inversion safe)
-//  - FIX: Null safety for type encoding strings
-//  - ADD: Swift @objc dynamic property detection
+//  Maintenance:
+//  - Query l/L encoding sizes without assuming the size of C long
+//  - Cache synchronization with os_unfair_lock
+//  - Nullable type encoding handling
+//  - Deprecated conservative isSwiftDynamic compatibility getter
 //
 
 #import "YYClassInfo.h"
@@ -55,9 +55,8 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
         case 'S': return YYEncodingTypeUInt16 | qualifier;
         case 'i': return YYEncodingTypeInt32 | qualifier;
         case 'I': return YYEncodingTypeUInt32 | qualifier;
-        // FIX: 'l' and 'L' are 4 bytes on 32-bit, 8 bytes on 64-bit (LP64).
-        // Original code hardcoded Int32 — wrong on arm64.
-        // Use NSGetSizeAndAlignment to determine the actual size.
+        // Runtime l/L encodings remain 32-bit on Apple 64-bit platforms;
+        // @encode(long) uses q there. Query the encoding, not sizeof(long).
         case 'l':
         case 'L': {
             NSUInteger size = 0;
@@ -241,13 +240,9 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
         }
     }
 
-    // Detect Swift @objc dynamic properties:
-    // Swift properties compiled with @objc dynamic get a 'D' attribute
-    // and their ivar name starts with '_$' (Swift mangled prefix).
-    _isSwiftDynamic = (type & YYEncodingTypePropertyDynamic) != 0;
-    if (_ivarName && [_ivarName hasPrefix:@"_$"]) {
-        _isSwiftDynamic = YES;
-    }
+    // Dynamic attributes and ivar names also occur in Objective-C classes;
+    // neither provides a reliable Swift-origin test. Keep the legacy getter.
+    _isSwiftDynamic = NO;
 
     return self;
 }

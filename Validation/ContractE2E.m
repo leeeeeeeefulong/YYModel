@@ -23,6 +23,7 @@
 @property(nonatomic,strong) NSSet *set;
 @end
 @implementation StrictParent
++ (BOOL)modelMergesSuperclassConfiguration { return YES; }
 + (BOOL)modelRequiresSuccessfulNestedTransforms { return YES; }
 + (NSDictionary *)modelContainerPropertyGenericClass { return @{@"dictionary":[Checked class],@"set":[Checked class]}; }
 @end
