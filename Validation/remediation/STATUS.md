@@ -1,5 +1,15 @@
 # 修复工程最终核验（2026-10-05，未发布工作区）
 
+> **2026-10-06 补充（`fix/swift-phase2-remediation` 分支）**：第二阶段缺陷全量修复
+> （P0-1/P1-1~P1-6/P2-1~P2-5/P3-1~P3-6、C② 契约、D3 顶层 lossy、P2-3/P2-4 与文档收尾）
+> 按 17 项逐项提交完成。各阶段验收一并更新：
+> 公开 API E2E **555/555**、`swift test` **108/108**、Swift5/6 严格语言编译及四个
+> 平台下限 typecheck 全部通过（`verify_platforms.py`）。新增：
+> P2-4 `decodeWithReport` 抛错时把已吸收的报告挂在 `DecodingError` 的
+> `underlyingError` 上（`YYModelLossReport.attached(from:)` 可取回）；
+> D3 顶层 `decodeLossyArray`；C② 六份新契约 expectation（黑白名单、多态、transform、
+> string→number、lossy、Presence）。性能门禁未重测；G5/G7/远端 CI 仍待完成。
+
 ## 结论与验收边界
 
 本轮已复现的组合、字段、数值和编码协议缺陷均已修复。R-1字段解析、R-2直接树导出/
