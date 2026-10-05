@@ -1,0 +1,38 @@
+[
+  {
+    "name" : "presence-compatible-value",
+    "result" : "value(x.txt)"
+  },
+  {
+    "name" : "presence-compatible-null",
+    "result" : "null"
+  },
+  {
+    "name" : "presence-compatible-absent",
+    "result" : "absent"
+  },
+  {
+    "name" : "presence-compatible-encode-absent",
+    "result" : "{}"
+  },
+  {
+    "name" : "presence-compatible-encode-null",
+    "result" : "{\"file\":null}"
+  },
+  {
+    "name" : "presence-native-encode-absent",
+    "result" : "{\"file\":null}"
+  },
+  {
+    "name" : "presence-native-encode-null",
+    "result" : "{\"file\":null}"
+  },
+  {
+    "name" : "presence-native-decode-absent",
+    "errorType" : "keyNotFound",
+    "errorKey" : "file",
+    "errorPath" : [
+
+    ]
+  }
+]
