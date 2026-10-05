@@ -35,8 +35,9 @@ if args.simulator:
 
 def error_fields_match(row, expected):
     """C12: when an expectation pins errorType/errorPath/errorKey, the observed row must
-    match exactly. Absent pins fall back to the historical lenient 'any error' check."""
-    for field in ('errorType', 'errorPath', 'errorKey'):
+    match exactly. Absent pins fall back to the historical lenient 'any error' check.
+    P2-4 attachments may additionally pin attachedLosses (absorbed-element count)."""
+    for field in ('errorType', 'errorPath', 'errorKey', 'attachedLosses'):
         if field in expected and row.get(field) != expected[field]:
             return False
     return True
@@ -119,7 +120,7 @@ for consumer, extra in [('BridgePathsConsumer', []), ('BridgeConsumer', []),
                         ('WConsumer', []), ('PolymorphismConsumer', []),
                         ('TransformConsumer', []), ('StringToNumberConsumer', []),
                         ('LossyConsumer', []), ('PresenceConsumer', []),
-                        ('LossyArrayConsumer', [])]:
+                        ('LossyArrayConsumer', []), ('LossyAttachmentConsumer', [])]:
     run(['swiftc', *flags, *extra, '-I', out, '-L', out, '-lYYModelSwift',
          '-Xlinker', '-rpath', '-Xlinker', out, harness[consumer + '.swift'],
          '-o', out / consumer])

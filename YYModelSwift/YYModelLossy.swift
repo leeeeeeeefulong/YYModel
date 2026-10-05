@@ -21,7 +21,10 @@ import Foundation
 //          rule.lossy(\.results)
 //      }
 //
-//  并且**绝不静默**：被跳过的下标会记录到 `YYModelLossReport`，调用方随时可查。
+//  并且**绝不静默**：被跳过的下标记录在调用方安装的 `YYModelLossReport` 里，
+//  随时可查。**推荐用 `decodeWithReport`** —— 它每个调用创建独立报告并随返回值
+//  一起返回，不用手动操作 `decoder.userInfo`（后者仍然支持跨调用共享报告）。
+//  顶层数组还有专门的 `decodeLossyArray` 入口，完全无需规则配置。
 //  这解决了「跳过坏元素」与「坏数据不能被伪装成有效结果」之间的矛盾 ——
 //  丢是丢，但丢了多少、丢在哪，有据可查。
 // ============================================================================
@@ -159,6 +162,69 @@ struct YYModelLossyArrayBox<Element: Decodable>: Decodable {
         let date = YYJSONContext.from(decoder).defaults.date
         let container = try decoder.unkeyedContainer()
         elements = try Array<Element>.decodeLossyRoot(from: container, date: date, userInfo: decoder.userInfo)
+    }
+}
+
+/// `decodeWithReport` 抛错时带回已吸收的 losses（P2-4）。
+///
+/// `decodeWithReport` 在解析失败时把这个错误作为 `DecodingError` 的
+/// `underlyingError` 携带，让调用方仍能按原错误类型匹配，同时取回那次解析
+/// 已经吸收的 `YYModelLossReport` 快照。
+public struct YYModelLossReportAttachment: Error, @unchecked Sendable {
+    /// 失败前已吸收的逐元素跳过记录。
+    public let report: YYModelLossReport
+    /// 原始错误（如果它是被包装进来的）。
+    public let original: Error?
+    public init(report: YYModelLossReport, original: Error? = nil) {
+        self.report = report
+        self.original = original
+    }
+}
+
+extension YYModelLossReport {
+    /// 从 `decodeWithReport` 抛出的错误里解出失败前已吸收的报告，取不到返回 nil。
+    ///
+    /// ```swift
+    /// do { ... } catch {
+    ///     if let losses = YYModelLossReport.attached(from: error)?.losses, !losses.isEmpty {
+    ///         print("吸收了的坏元素：\(losses)")
+    ///     }
+    /// }
+    /// ```
+    public static func attached(from error: Error) -> YYModelLossReport? {
+        // 三种路径都能挂着 attachment：直接类型、DecodingError 的某个 case 的
+        // context.underlyingError、NSError userInfo 链。逐层剥到 attachment 为止。
+        if let attached = error as? YYModelLossReportAttachment { return attached.report }
+        var current: Error? = error
+        var hops = 0
+        while let e = current, hops < 8 {
+            if let attached = e as? YYModelLossReportAttachment { return attached.report }
+            if let decoding = e as? DecodingError {
+                switch decoding {
+                case .dataCorrupted(let c): current = c.underlyingError
+                case .typeMismatch(_, let c): current = c.underlyingError
+                case .valueNotFound(_, let c): current = c.underlyingError
+                case .keyNotFound(_, let c): current = c.underlyingError
+                @unknown default: current = nil
+                }
+                hops += 1
+                continue
+            }
+            if let ns = e as NSError? { current = ns.userInfo[NSUnderlyingErrorKey] as? Error; hops += 1; continue }
+            break
+        }
+        return nil
+    }
+}
+
+extension YYModelLossReportAttachment: LocalizedError, CustomStringConvertible {
+    public var errorDescription: String? {
+        if let original { return original.localizedDescription }
+        return "YYModelLossReportAttachment (no underlying error)"
+    }
+    public var description: String {
+        if let original { return String(describing: original) }
+        return "YYModelLossReportAttachment"
     }
 }
 

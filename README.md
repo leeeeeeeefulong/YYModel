@@ -320,6 +320,39 @@ The no-argument `YYJSONDecoder()` retains legacy zero-fill and automatic-date be
 
 SPM products `YYModel` and `YYModelSwift` remain independent. CocoaPods provides `YYModel2/ObjC` and `YYModel2/Swift`; default includes both.
 
+### Lossy arrays and loss reports
+
+Array decode is strict by default (a single bad element fails the whole array,
+matching Foundation). Skip bad elements explicitly — either per-property with
+`lossy(\.field)` rules, or at the top level with `decodeLossyArray`. Skipped
+elements are **never silent**; each one is recorded in a `YYModelLossReport`.
+
+The report is most convenient through `decodeWithReport`, which creates an
+isolated report for that one call and returns it alongside the value:
+
+```swift
+let (response, report) = try YYJSONDecoder(mode: .compatible, rules: rules)
+    .decodeWithReport(Response.self, from: data)
+// response.results == [Item(id:1), Item(id:2)]  — "bad" skipped
+// report.losses    == [results[1]...]
+if !report.losses.isEmpty {
+    print("skipped \(report.losses.count) bad element(s): \(report.losses)")
+}
+```
+
+For a top-level array, `decodeLossyArray` needs no rule configuration at all:
+
+```swift
+let (values, report) = try YYJSONDecoder.compatible()
+    .decodeLossyArray([Int].self, from: data)
+// values == [1, 3], report.losses.count == 1, report.losses.first?.property == "(root)"
+```
+
+You may also install your own `YYModelLossReport` into `decoder.userInfo[YYModelLossReport.key]`
+to collect losses across one decode when you are not using the `decodeWithReport`
+return value; `decodeWithReport` is the recommended way because it isolates the report
+per call and always returns it.
+
 ### Published compatibility APIs (introduced 2.2.0)
 
 `YYJSONDecoder` accepts `Data` or an already parsed object. Swift models stay plain `Codable` structs and do not adopt a YYModel protocol. Missing keys and JSON `null` become `0`, `""`, `false`, `[]`, or an empty nested object. Strings, numbers, and bools are coerced. Rename keys with `CodingKeys`. `URL` and raw-value enums have no zero value; make those properties optional when the key may be absent. A value that cannot be coerced throws.

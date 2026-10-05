@@ -1,0 +1,21 @@
+[
+  {
+    "name" : "lossy-then-strict-missing",
+    "errorType" : "keyNotFound",
+    "errorPath" : [
+
+    ],
+    "errorKey" : "count",
+    "attachedLosses" : 1
+  },
+  {
+    "name" : "lossy-then-type-mismatch",
+    "errorType" : "typeMismatch",
+    "errorPath" : ["count"],
+    "attachedLosses" : 1
+  },
+  {
+    "name" : "clean-with-report",
+    "result" : "1,3|0"
+  }
+]

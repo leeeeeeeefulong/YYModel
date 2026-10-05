@@ -220,4 +220,32 @@ final class YYModelLossyTests: XCTestCase {
     func testTopLevelStrictDecodeUnchanged() throws {
         XCTAssertThrowsError(try YYJSONDecoder.compatible().decode([Int].self, from: Data(#"[1,"bad",3]"#.utf8)))
     }
+
+    // MARK: - P2-4：decodeWithReport 抛错时保留已吸收的 losses
+
+    func testDecodeWithReportAttachesAbsorbedLossesOnMissing() {
+        struct M: Codable { var values: [Int]; var count: Int }
+        let lossy = try! YYJSONRules().forType(M.self) { $0.lossy(\.values) }
+        XCTAssertThrowsError(try YYJSONDecoder(mode: .compatible, rules: lossy)
+            .decodeWithReport(M.self, from: Data(#"{"values":[1,"bad",3]}"#.utf8))) { error in
+            guard let report = YYModelLossReport.attached(from: error) else {
+                return XCTFail("expected an attached loss report")
+            }
+            XCTAssertEqual(report.losses.count, 1)
+            XCTAssertEqual(report.losses.first?.property, "values")
+            XCTAssertEqual(report.losses.first?.index, 1)
+        }
+    }
+
+    func testDecodeWithReportAttachesOnTypeMismatch() {
+        struct M: Codable { var values: [Int]; var count: Int }
+        let rules = try! YYJSONRules().forType(M.self) { $0.lossy(\.values) }
+        XCTAssertThrowsError(try YYJSONDecoder(mode: .compatible, rules: rules)
+            .decodeWithReport(M.self, from: Data(#"{"values":[1,"bad",3],"count":"x"}"#.utf8))) { error in
+            guard let error = error as? DecodingError, case .typeMismatch(_, _) = error else {
+                return XCTFail("expected typeMismatch, got \(error)")
+            }
+            XCTAssertEqual(YYModelLossReport.attached(from: error)?.losses.count, 1)
+        }
+    }
 }

@@ -136,21 +136,44 @@ public struct YYJSONDecoder: @unchecked Sendable {
     }
 
     public func decodeWithReport<T: Decodable>(_ type: T.Type, from data: Data) throws -> (value: T, report: YYModelLossReport) {
-        let report = YYModelLossReport()
-        var copy = self
-        copy.userInfo[YYModelLossReport.key] = report
-        let value = try copy.decode(type, from: data)
-        return (value, report)
+        try decodeWithReport(type, from: data, body: { try $0.decode(type, from: data) })
     }
     public func decodeWithReport<T: Decodable>(_ type: T.Type, from json: String) throws -> (value: T, report: YYModelLossReport) {
         try decodeWithReport(type, from: Data(json.utf8))
     }
     public func decodeWithReport<T: Decodable>(_ type: T.Type, from object: Any) throws -> (value: T, report: YYModelLossReport) {
+        try decodeWithReport(type, from: object, body: { try $0.decode(type, from: object) })
+    }
+
+    /// 吸收的 losses 在抛出时保留：把 `report` 的快照挂到错误上（P2-4）。
+    /// 兼容的 `DecodingError` 保持原有 case，仅在原 `underlyingError` 上再挂一层
+    /// `YYModelLossReportAttachment`；其他错误原样保留，可通过
+    /// `YYModelLossReport.attached(from:)` 取回报告。
+    private func decodeWithReport<T: Decodable>(
+        _ type: T.Type, from input: Any, body: (YYJSONDecoder) throws -> T
+    ) throws -> (value: T, report: YYModelLossReport) {
         let report = YYModelLossReport()
         var copy = self
         copy.userInfo[YYModelLossReport.key] = report
-        let value = try copy.decode(type, from: object)
-        return (value, report)
+        do {
+            let value = try body(copy)
+            return (value, report)
+        } catch let error as DecodingError {
+            /// 保持原 case，仅把报告挂在 `underlyingError` 链上。
+            func attach(_ context: DecodingError.Context) -> DecodingError.Context {
+                let carrier = YYModelLossReportAttachment(report: report, original: context.underlyingError)
+                return .init(codingPath: context.codingPath, debugDescription: context.debugDescription, underlyingError: carrier)
+            }
+            switch error {
+            case .dataCorrupted(let c): throw DecodingError.dataCorrupted(attach(c))
+            case .typeMismatch(let t, let c): throw DecodingError.typeMismatch(t, attach(c))
+            case .valueNotFound(let t, let c): throw DecodingError.valueNotFound(t, attach(c))
+            case .keyNotFound(let k, let c): throw DecodingError.keyNotFound(k, attach(c))
+            @unknown default: throw error
+            }
+        } catch {
+            throw error
+        }
     }
 
     /// **顶层 lossy 数组**（D3）：解码 `[T]`，坏元素逐个跳过并计进返回的
