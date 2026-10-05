@@ -15,7 +15,7 @@ import Foundation
 //  这类语义变更需要版本迁移安排与业务数据对照，不能靠单场景基准数字决定。
 //  因此这里只**新增**显式入口，不动旧默认。
 //
-//  实测（release -O，70 字段负载，见 Validation/perf-isolation/）：
+//  实测（release -O，70 字段负载）：
 //    .native      ≈ 1.0× 官方   —— 标准、类型规整的数据
 //    .compatible  ≈ 3.5× 官方   —— 需要字段级容错 / 外部规则
 //    .legacy      ≈ 3.6× 官方   —— 2.x 迁移兼容

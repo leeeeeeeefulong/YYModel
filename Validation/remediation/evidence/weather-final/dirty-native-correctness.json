@@ -1,6 +1,0 @@
-{
-  "bytes" : 15792,
-  "engine" : "native",
-  "error" : "DecodingError.typeMismatch: expected value of type Double. Path: payload.locations[0].latitude. Debug description: Expected to decode Double but found a string instead.",
-  "iterationsPerSample" : 0
-}

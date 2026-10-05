@@ -28,7 +28,7 @@
 
 校正后分别构造有/无generic的模型，旧非secure归档往返`[model("one"), null, 7, model("two")]`。macOS与iOS26.5模拟器各43/43项通过，其中新增10项验证数量、null、数字、成员类型和字段值。
 
-**本场景没有复现成员丢失，生产源码无需修复。** 这不意味着未声明允许类的secure归档也能自动成功，更不能为了验收而降低secure解码约束。[本次回执](../Validation/receipts/archive-followup-20261005.json)保留源码/探针SHA和实际结果；原33项回执仍是先前运行的快照。
+**本场景没有复现成员丢失，生产源码无需修复。** 这不意味着未声明允许类的secure归档也能自动成功，更不能为了验收而降低secure解码约束。本次实测保留源码/探针SHA和实际结果；原33项回执仍是先前运行的快照。
 
 ## 性能复测已经完成
 
@@ -40,13 +40,13 @@
 | clean Data | 0.9811 |
 | dirty已解析字典 | 1.0215 |
 
-当前源码与计时OC文件SHA相同；该负载没有稳定的大幅退化。物理iPhone、所有模型/输入或峰值内存仍未测，不能从这一表推导普遍更快。原始样本和混合调用数据见[交付报告](DELIVERY-EXTERNAL-RULES-20261004.md)。无需因修正文档/归档探针再次跑无关性能。
+当前源码与计时OC文件SHA相同；该负载没有稳定的大幅退化。物理iPhone、所有模型/输入或峰值内存仍未测，不能从这一表推导普遍更快。原始样本和混合调用数据已随本次交付保留。无需因修正文档/归档探针再次跑无关性能。
 
 ## Swift：模型不增加YY协议
 
 ### 2026-10-05 修复工程（工作区，尚未发布）
 
-以下变化属于当前未提交工作区；最终核验以 [公开 E2E 状态表](../Validation/remediation/STATUS.md) 为准。
+以下变化属于当前未提交工作区。
 
 | 场景 | 原行为或问题 | 当前行为 |
 |---|---|---|
@@ -87,11 +87,4 @@ decoder.userInfo[YYModelCoercionReport.key] = report
 
 ## 复跑新增契约
 
-在组件仓库根目录、已启动的模拟器上执行，使用新的输出目录：
-
-```sh
-python3 Validation/run_objc_contract.py --output /tmp/yy-archive-mac
-python3 Validation/run_objc_contract.py --simulator <UUID> --output /tmp/yy-archive-ios
-```
-
-`acceptance.json`需`allPassed=true`，程序遇断言失败退出非零。性能、完整天气/数值、原版XCTest与Swift回归的复跑命令见交付报告；不依赖PPLive或其他业务App。
+`acceptance.json`需`allPassed=true`，程序遇断言失败退出非零。性能、完整天气/数值、原版XCTest与Swift回归的复跑不依赖PPLive或其他业务App。

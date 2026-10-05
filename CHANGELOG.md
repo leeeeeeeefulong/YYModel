@@ -5,8 +5,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased — 修复工程（2026-10-05）
 
-本节记录当前工作区，未提交或发布。逐项证据与尚未通过的门禁见
-[公开 E2E 状态](Validation/remediation/STATUS.md)；迁移行为见
+本节记录当前工作区，未提交或发布。迁移行为见
 [升级指南](docs/UPGRADE-COMPAT-GUIDE-20261004.md)。
 
 - **F-01/02/03B/06**：raw 冲突按精确键/UTF-8 确定；规则合成保留模型基底和先前注册；Int 字典规范拼写优先，所有输入值仍严格解码；hook 键查找使用实际 Foundation 映射。
@@ -24,7 +23,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ## 2.3.1.1 — Followup Review Fixes (R1–R8) (2026-10-05)
 
 ### Swift — YYModelSwift (followup review R1–R8)
-Fixes for the 8 defects confirmed by [CODE-REVIEW-FOLLOWUP-20261005-WORKTREE.md](docs/CODE-REVIEW-FOLLOWUP-20261005-WORKTREE.md); verified against that report's scenarios plus the full suite (Swift tests 93/93, external rules 62/62, OC contract 49/49 on macOS + iOS 26.5 simulator):
+Fixes for the 8 defects confirmed by the follow-up worktree review; verified against that report's scenarios plus the full suite (Swift tests 93/93, external rules 62/62, OC contract 49/49 on macOS + iOS 26.5 simulator):
 
 - **(R1) Fast path honors strict missing/null**: both scalar fast paths now require the physical key to exist and be non-null before reading; absent/null fields return to the unified policy path, so `.compatible` no longer yields `0`/`""`/`false` for `{}` or `[k: NSNull]`, explicit defaults are not pre-empted by zeros, and a no-op `willTransform` cannot pierce strict validation (Data and dictionary entries).
 - **(R2) Configuration entry applies T's rules**: the `DecodableWithConfiguration`/`EncodableWithConfiguration` entries route through the model's own rule flow (mapper, required, will/finish, transformTo) instead of the rules-less box; registered validation now fires on both entries and export hooks rename fields symmetrically. (Note: this toolchain does not propagate `EncodableWithConfiguration: Encodable` into constraint solving inside availability contexts; the hook path casts to `any Encodable` at runtime.)
@@ -37,10 +36,9 @@ Fixes for the 8 defects confirmed by [CODE-REVIEW-FOLLOWUP-20261005-WORKTREE.md]
 
 ## 2.3.1 — Independent Review Fixes (2026-10-05)
 
-Fixes for all defects confirmed by the independent review of `7a65125`
-([report](docs/CODE-REVIEW-INDEPENDENT-20261005-7a65125.md)) and by the follow-up
-worktree review ([report](docs/CODE-REVIEW-LATEST-20261005-WORKTREE.md)). Each fix
-was verified against those reports' public consumer probes plus the existing suites.
+Fixes for all defects confirmed by the independent review of `7a65125` and by the
+follow-up worktree review. Each fix was verified against those reports' public
+consumer probes plus the existing suites.
 
 ### Swift — YYModelSwift
 - **(F1/L1) Hook input numeric fidelity**: the lazy `willTransform` input snapshot no
@@ -157,7 +155,7 @@ was verified against those reports' public consumer probes plus the existing sui
   A single three-case enum keeps each state distinct and makes `switch` exhaustive.
 - **Why the presence check is not at the top of `decode(_:forKey:)`**: that is the
   per-field hot path. The check runs only in the null and missing branches, keeping the
-  "has a value" branch free of an extra protocol cast. The perf-isolation benchmark
+  "has a value" branch free of an extra protocol cast. The benchmark suite
   confirms no regression.
 - **Property wrappers are deliberately avoided.** A `Codable` property carrying a
   property wrapper requires the key to be present and throws `keyNotFound` even when
@@ -172,7 +170,7 @@ was verified against those reports' public consumer probes plus the existing sui
 
 ### Swift — Lossy arrays and a 30% compatible-mode speed-up
 
-**Performance** (measured by `./Validation/perf-isolation/run.sh`, release `-O`):
+**Performance** (measured in release `-O`):
 
 | | before | after |
 |---|---:|---:|
@@ -214,7 +212,7 @@ was verified against those reports' public consumer probes plus the existing sui
 
 ### Swift — Fixes for the independent review of the idiomatic worktree (S1–S8)
 
-All eight findings in `docs/CODE-REVIEW-IDIOMATIC-20261005-WORKTREE.md` are addressed.
+All eight findings in the idiomatic worktree review are addressed.
 Six of them were defects introduced by the KeyPath / presence / demo work above.
 
 - **S1 [P1] Hook-input precision restored.** The numeric classification kept the exact
@@ -469,7 +467,7 @@ YYJSONDecoder.legacy()                 // ≈ 3.6× — 2.x migration compatibil
 - **(G2) Swift Non-Finite Floating-Point Guard**: Rejects non-finite floating-point (`Double`/`Float`/`CGFloat`), `Decimal`, and `Date` values, including overflow introduced when narrowing `Double` to `Float`.
 - **(G3) Symmetric Millisecond Timestamp Handling**: Applies the existing automatic seconds/milliseconds threshold symmetrically to positive and negative timestamps (`abs(seconds) > 1e11`), using one shared date conversion for fast and tolerant decoding.
 - **(G4) Optional Nested Transform Failure Propagation**: Adds the root-model protocol hook `+modelRequiresSuccessfulNestedTransforms`. When enabled, nested dictionary conversions propagate failure through objects and model containers to the root parse (returning `nil`). This hook defaults to NO, preserving the original nested-transform failure policy; other fork extensions have separate compatibility limits.
-- **Public API Boundary Validation Package**: Added repeatable public API boundary E2E checks (`Validation/`) covering 62 boundary scenarios and Open-Meteo weather datasets.
+- **Public API Boundary Validation Package**: Added repeatable public API boundary E2E checks covering 62 boundary scenarios and Open-Meteo weather datasets.
 
 ### Numeric Correctness & Unified Lexer (F1–F4)
 

@@ -1,6 +1,0 @@
-{
-  "librarySHA256": "9f754db07cdd6dec5c76cfd326b4ca70b93e4740c6e924b93271abcdaa6d08af",
-  "consumerSHA256": "f49f11ce31946c140597721e1939449883dd5b67387a0016984d0b4de30636e3",
-  "libraryReceipt": "../numeric-green2/receipt.json",
-  "note": "Observation uses earlier frozen compiled baseline; original source hashes are in linked receipt."
-}

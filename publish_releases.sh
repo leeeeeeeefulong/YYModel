@@ -173,7 +173,7 @@ gh release create 2.1.9 \
 - **(G2) Swift Non-Finite Floating-Point Guard**: Rejects non-finite floating-point (\`Double\`/\`Float\`/\`CGFloat\`), \`Decimal\`, and \`Date\` values, including overflow introduced when narrowing \`Double\` to \`Float\`.
 - **(G3) Symmetric Millisecond Timestamp Handling**: Applies the existing automatic seconds/milliseconds threshold symmetrically to positive and negative timestamps (\`abs(seconds) > 1e11\`), using one shared date conversion for fast and tolerant decoding.
 - **(G4) Optional Nested Transform Failure Propagation**: Adds the root-model protocol hook \`+modelRequiresSuccessfulNestedTransforms\`. When enabled, nested dictionary conversions propagate failure through objects and model containers to the root parse (returning nil). Default behavior remains 100% compatible with original ibireme/YYModel.
-- **Public API Boundary Validation Package**: Added repeatable public API boundary E2E checks (\`Validation/\`) covering 62 boundary scenarios and Open-Meteo weather datasets.
+- **Public API Boundary Validation Package**: Added repeatable public API boundary E2E checks covering 62 boundary scenarios and Open-Meteo weather datasets.
 
 ### Numeric Correctness & Unified Lexer (F1–F4)
 - **Unified ASCII Byte Lexer**: Parses decimal and C99 hexadecimal numeric strings using an exact ASCII-byte grammar (\`NumericText\`), rejecting malformed suffixes and illegal characters before conversion.

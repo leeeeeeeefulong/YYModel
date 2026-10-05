@@ -135,4 +135,4 @@ pod 'YYModel2/ObjC',  :git => 'https://github.com/leeeeeeeefulong/YYModel.git', 
 # 默认 YYModel2 仍同时安装两者。
 ```
 
-组件代码、天气快照与复跑脚本均在本仓库；不使用正式业务 App 验收。回执见 `Validation/RESULTS-swift-model.md`。
+组件代码、天气快照与复跑脚本均在本仓库；不使用正式业务 App 验收。

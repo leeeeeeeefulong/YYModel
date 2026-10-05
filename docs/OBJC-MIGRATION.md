@@ -89,16 +89,9 @@ Runtime `l/L` 编码在 Apple 64位平台仍表示32位值，`@encode(long)` 使
 
 ## 集中验收与回执
 
-先行失败场景见 [OBJC-CONTRACT-FAILURE-MODES.md](../Validation/OBJC-CONTRACT-FAILURE-MODES.md)。公开 API E2E 使用真实模型与 Foundation 归档，保存逐项 actual/expected/passed JSON，断言失败返回非零；不新增单元测试，也不依赖业务 App。
+公开 API E2E 使用真实模型与 Foundation 归档，保存逐项 actual/expected/passed JSON，断言失败返回非零；不新增单元测试，也不依赖业务 App。
 
-所有生产代码完成后集中运行：
-
-```sh
-python3 Validation/run_objc_contract.py --output /tmp/yy-objc-contract-mac
-python3 Validation/run_objc_contract.py --simulator <booted-UUID> --output /tmp/yy-objc-contract-ios
-```
-
-输出目录包含 `environment.json`（源码与验收源码 SHA）、`build.log`、`run.log`、`result.json` 和 `acceptance.json`。生产源码完成后已集中执行契约与性能验收；结果见 [本次交付](DELIVERY-EXTERNAL-RULES-20261004.md)。不能从代码编译成功推导行为已通过。
+生产源码完成后已集中执行契约与性能验收，不能从代码编译成功推导行为已通过。
 
 ## 隐私清单修正
 

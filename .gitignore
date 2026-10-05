@@ -70,17 +70,4 @@ fastlane/test_output
 
 iOSInjectionProject/
 
-# 本地评审产物（review worktree / 复审报告，不进版本库）
-docs/review-*/
-docs/CODE-REVIEW-FOLLOWUP-*.md
-docs/CODE-REVIEW-IDIOMATIC-*.md
-docs/CODE-REVIEW-INDEPENDENT-*.md
-docs/CODE-REVIEW-LATEST-*.md
-docs/CODE-REVIEW-REREVIEW-*.md
-docs/APPLE-OFFICIAL-MECHANISMS-*.md
-docs/CODABLE-*.md
-docs/OFFICIAL-PARITY-*.md
-docs/SWIFT-IDIOMATIC-DESIGN-REVIEW-*.md
-docs/README.md
-Validation/perf-isolation/
 .zcode/

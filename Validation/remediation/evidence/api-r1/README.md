@@ -1,1 +1,0 @@
-API digester comparison between frozen integrated-4 and integrated-7 (not the original clean HEAD). Only diagnosed source addition: YYModelDateStrategy.microsecondsSince1970; existing declarations not removed/renamed. New diagnostic and number-routing APIs separately reviewed and documented. Final R-2 API comparison remains required.

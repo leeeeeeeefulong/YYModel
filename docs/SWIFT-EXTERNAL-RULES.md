@@ -139,5 +139,4 @@ Swift 版是 **「非 drop-in」替代**：日常类型规整的 Codable 数据�
 - 规则快照不包含隐式线程安全业务状态。decoder/encoder 配置完成后再共享；同步闭包捕获的可变状态，避免在初始化结束后保存/跨线程使用 Decoder/Encoder。
 - Swift copy/equality/hash/archive/更新仍使用语言标准能力；不伪装成 OC KVC 任意写属性或对象身份。
 - 当前验证为 Apple Silicon/macOS/iOS26.5模拟器，没有物理 iPhone 数据；工具链实际为Swift6.3.3，另检查Swift5语言模式，不等于安装了所有旧Swift5.9编译器。
-
-公开消费者 E2E 与复跑命令见 `Validation/run_external_rules.py`；性能条件和当前数据见 `DELIVERY-EXTERNAL-RULES-20261004.md`。
+- 公开消费者 E2E 使用真实模型与 Foundation 归档，不新增单元测试，也不依赖业务 App。

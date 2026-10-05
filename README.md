@@ -3,13 +3,11 @@
 High performance JSON model framework for iOS/macOS.
 
 > **Fork maintained with modern iOS compatibility fixes.**
-> Original by [ibireme](https://github.com/ibireme). This fork retains the original Objective-C entry points and adds modern toolchain fixes and a Swift Decodable API. Behavioral extensions and verified limits are documented in the delivery report.
+> Original by [ibireme](https://github.com/ibireme). This fork retains the original Objective-C entry points and adds modern toolchain fixes and a Swift Decodable API. Behavioral extensions and verified limits are documented in the migration guide.
 
 [![CocoaPods](https://img.shields.io/cocoapods/v/YYModel2.svg)](https://cocoapods.org/pods/YYModel2)
 [![License](https://img.shields.io/cocoapods/l/YYModel2.svg)](https://github.com/leeeeeeeefulong/YYModel/blob/master/LICENSE)
 [![Platform](https://img.shields.io/cocoapods/p/YYModel2.svg)](https://cocoapods.org/pods/YYModel2)
-
-[2.1.9 中文交付说明与完整性能数据](docs/DELIVERY-2.1.9-zh.md) · [公开验证回执](Validation/receipts/delivery-2.1.9-20261004.json) · [192 路径 CSV](Validation/receipts/delivery-2.1.9-measurements.csv)
 
 Current release: **2.3.1** (`pod 'YYModel2', '2.3.1'`, SPM `from: "2.3.1"`).
 
@@ -116,7 +114,7 @@ Test Suite 'All tests' passed:
 
 ### 2.1.9 Component Performance Verification
 
-> **Architecture note**: this table was measured on the 2.1.9 decoder, which still tried native `JSONDecoder` first and fell back to the tolerant decoder on failure. That native-first architecture was **removed** in 2.2.0: the no-argument `YYJSONDecoder()` now runs the field-adaptation path directly and costs about 5× native `JSONDecoder` on standard data. Use `.native` mode for Foundation-level speed; current paired measurements are in [the 2.2.0 delivery report](docs/DELIVERY-EXTERNAL-RULES-20261004.md).
+> **Architecture note**: this table was measured on the 2.1.9 decoder, which still tried native `JSONDecoder` first and fell back to the tolerant decoder on failure. That native-first architecture was **removed** in 2.2.0: the no-argument `YYJSONDecoder()` now runs the field-adaptation path directly and costs about 5× native `JSONDecoder` on standard data. Use `.native` mode for Foundation-level speed.
 
 Measured on Apple M1 Max / arm64, macOS 26.7 and iOS 26.5 Simulator, Xcode 26.6 / Swift 6.3.3, OC `-O2` and Swift `-O`. The offline Open-Meteo clean fixture is 15,785 bytes with 3 cities and 288 hourly rows. No business App is used.
 
@@ -134,8 +132,6 @@ The complete matrix contains 96 paths per runtime with 14 batch-average samples 
 In the 2.1.9 architecture, `YYJSONDecoder` tried native `JSONDecoder` first, then its tolerant decoder after failure; dirty data cost about 5× clean decoding in this fixture. OC setters are invoked via typed `objc_msgSend`; metadata caching was already present in the original. No independent evidence attributes these timings to direct memory writes, a particular lock, or a new parsing algorithm.
 
 **Known date limits:** configure Swift `JSONEncoder.dateEncodingStrategy = .secondsSince1970` for YY date round-trips. Objective-C negative millisecond timestamps remain unsupported or misinterpreted; Swift timestamp handling is separate.
-
-[Full Chinese delivery report](docs/DELIVERY-2.1.9-zh.md) includes all datasets, mapping/encoding stages, mixed-process checks, paired comparisons, source identity, limitations and reproduction commands. [JSON receipt](Validation/receipts/delivery-2.1.9-20261004.json) and [CSV](Validation/receipts/delivery-2.1.9-measurements.csv) preserve the complete samples and statistics.
 
 ---
 
@@ -316,7 +312,7 @@ let user = try decoder.decode(User.self, from: data)
 let output = try YYJSONEncoder(mode: .compatible, rules: rules).encode(user)
 ```
 
-The no-argument `YYJSONDecoder()` retains legacy zero-fill and automatic-date behavior. Enhanced modes no longer retry an entire model after an arbitrary error. `.native` rejects YY rules instead of silently ignoring them. See [Swift usage and limits](docs/SWIFT-EXTERNAL-RULES.md), [OC migration](docs/OBJC-MIGRATION.md), and [current delivery](docs/DELIVERY-EXTERNAL-RULES-20261004.md), and [verified upgrade guide](docs/UPGRADE-COMPAT-GUIDE-20261004.md).
+The no-argument `YYJSONDecoder()` retains legacy zero-fill and automatic-date behavior. Enhanced modes no longer retry an entire model after an arbitrary error. `.native` rejects YY rules instead of silently ignoring them. See [Swift usage and limits](docs/SWIFT-EXTERNAL-RULES.md), [OC migration](docs/OBJC-MIGRATION.md), and [verified upgrade guide](docs/UPGRADE-COMPAT-GUIDE-20261004.md).
 
 > **Not a drop-in replacement for `JSONDecoder`.** In `.compatible`/`.legacy` mode, numeric strings are coerced (`"30"` → `30`), a non-zero numeric `Bool` (only `0`/`1`) and common string booleans are tolerated, integers still **throw on overflow** (`typeMismatch` at the offending codingPath — never silently rounded), and `Data` stays Base64 (C4). Automatic dates read Unix seconds and treat `|timestamp| > 1e11` as milliseconds (including negative timestamps); implausible-magnitude dates record a `"implausible-date-magnitude"` reason in `YYModelCoercionReport` (D1). These are deliberate contracts, not missing features — the full per-behavior table lives in the [Swift rules doc](docs/SWIFT-EXTERNAL-RULES.md).
 
@@ -444,14 +440,3 @@ YYModel is available under the MIT license. See the LICENSE file for more info.
 
 Original YYModel by [ibireme](https://github.com/ibireme).
 Modern iOS compatibility patches by [leeeeeeeefulong](https://github.com/leeeeeeeefulong).
-
-### 2026-10-05 remediation worktree
-
-Unreleased fixes and repeatable public API E2E evidence are tracked in
-[the remediation status](Validation/remediation/STATUS.md). Run
-`python3 Validation/remediation/run.py --output /tmp/yymodel-acceptance-new`
-with a new output directory to freeze sources, compile independent consumers and
-retain hashes, commands and assertions. Migration behavior and new date/number
-routing/diagnostic APIs are documented in the
-[upgrade guide](docs/UPGRADE-COMPAT-GUIDE-20261004.md). Actual old OS runtime acceptance
-and independent release signatures are still pending.
