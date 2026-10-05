@@ -9,7 +9,7 @@ High performance JSON model framework for iOS/macOS.
 [![License](https://img.shields.io/cocoapods/l/YYModel2.svg)](https://github.com/leeeeeeeefulong/YYModel/blob/master/LICENSE)
 [![Platform](https://img.shields.io/cocoapods/p/YYModel2.svg)](https://cocoapods.org/pods/YYModel2)
 
-Current release: **2.3.1** (`pod 'YYModel2', '2.3.1'`, SPM `from: "2.3.1"`).
+Current release: **2.3.2** (`pod 'YYModel2', '2.3.2'`, SPM `from: "2.3.2"`).
 
 ---
 
@@ -211,7 +211,7 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/leeeeeeeefulong/YYModel", from: "2.3.1")
+    .package(url: "https://github.com/leeeeeeeefulong/YYModel", from: "2.3.2")
 ]
 ```
 
@@ -221,7 +221,7 @@ dependencies: [
 
 ```ruby
 # New pod name (original YYModel owned by ibireme on trunk)
-pod 'YYModel2', '2.3.1'
+pod 'YYModel2', '2.3.2'
 ```
 
 > **Note**: The original `YYModel` pod on CocoaPods trunk is owned by ibireme and will not receive updates. This fork is published as `YYModel2`. CocoaPods trunk becomes read-only on 2026-12-02.

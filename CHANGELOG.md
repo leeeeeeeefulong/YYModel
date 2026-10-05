@@ -3,10 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
-## Unreleased — 修复工程（2026-10-05）
+## 2.3.2 — 修复工程（2026-10-06）
 
-本节记录的修复工程**已全部提交**，但尚未发布为新版本。当时的实测结果为：公开 API E2E
-555/555、Swift 单测 108/108、OC 契约 49/49（验证脚本已随仓库精简移除，该数字为当时的
+本节记录的修复工程已随 **2.3.2** 发布。当时的实测结果为：公开 API E2E 555/555、
+Swift 单测 108/108、OC 契约 49/49（验证脚本已随仓库精简移除，该数字为当时的
 实测值）。迁移行为见
 [升级指南](docs/UPGRADE-COMPAT-GUIDE-20261004.md)。
 
