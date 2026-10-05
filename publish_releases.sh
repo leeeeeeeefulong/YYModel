@@ -249,4 +249,26 @@ gh release create 2.3.1 \
 - ✅ CocoaPods 1.17 analyzer: \`< 6.0\` → 5.0, \`5.0\` → 5.0, \`6.0\` → 6.0; both language modes compile.
 - ✅ ObjC contract E2E, Demo suite, original XCTest, Swift tests, and external-rules E2E all green." || true
 
+# 2.3.2
+gh release create 2.3.2 \
+  --repo "$REPO" \
+  --title "2.3.2 — Phase-2 Remediation and Repository Cleanup" \
+  --notes "### Swift — YYModelSwift
+- **Field Resolution & Error Propagation**: Unified resolution separating absent, explicit null, and invalid path shape; eliminated silent failure swallows in nested keypaths (F-04/F-05/A-01).
+- **Direct Tree Export**: Direct value tree export (\`YYModelTreeEncoder\`) avoiding intermediate data/serialization overhead; full parity with Foundation date/data/key strategies and Unicode keys (P-03/P-04/A-02).
+- **Precision Numeric Routing**: Unified ASCII state machine numeric parser with cached decimal capability detection and zero-truncation precision preservation; handles 64-bit snowflake IDs and \`UInt64.max\` safely.
+- **Presence & Lossy Robustness**: Enhanced \`YYModelPresence\` tri-state across arrays and dictionaries; \`YYModelLossy\` per-invocation isolation report with strict fallback order.
+- **Microsecond Dates**: Added explicit \`.microsecondsSince1970\` date strategy alongside existing automatic heuristics and ISO8601 formatting.
+
+### Repository & Documentation
+- **Clean Open-Source Library Structure**: Removed internal temporary validation suites and historical evidence trees; lightweight and clean dependency footprint.
+- **CI Modernization**: Upgraded workflow actions and streamlined SwiftPM test pipeline (108 unit tests).
+- **Version Selection Guide**: Added comprehensive ObjC vs Swift decision guide, intentional contract differences, and migration documentation in README and CHANGELOG.
+
+### Verification Status
+- ✅ SwiftPM test suite: 108/108 passed.
+- ✅ Objective-C Demo test suite: 84/84 passed (benchmark single iteration ~0.10ms).
+- ✅ Framework XCTest suite: 27/27 passed on iOS Simulator.
+- ✅ Podspec and SPM pins updated to 2.3.2." || true
+
 echo "✅ All releases published successfully!"
