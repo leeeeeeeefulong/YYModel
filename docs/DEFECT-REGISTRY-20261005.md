@@ -1,6 +1,6 @@
 # 缺陷登记册（Defect Registry）— 2026-10-05
 
-> **文档定位**：本文件是 2026-10-05 对 `YYModelSwift/` 全部 17 个源文件系统性审计的**缺陷唯一登记源**。
+> **文档定位**：本文件是 2026-10-05 对 `YYModelSwift/` 全部 20 个源文件系统性审计的**缺陷唯一登记源**。
 > 配套文档：[REMEDIATION-DESIGN](REMEDIATION-DESIGN-20261005.md)（修复方案）、
 > [REMEDIATION-IMPLEMENTATION-PLAN](REMEDIATION-IMPLEMENTATION-PLAN-20261005.md)（落地计划）、
 > [REMEDIATION-ACCEPTANCE-PLAN](REMEDIATION-ACCEPTANCE-PLAN-20261005.md)（验收计划）。
@@ -19,7 +19,7 @@
 
 ## 本轮最终处置索引（覆盖全部22项原登记与5项组合）
 
-以下是当前状态，后面的源码位置与失败叙述保留历史审计证据。公开 E2E 共475项通过；
+以下是当前状态，后面的源码位置与失败叙述保留历史审计证据。公开 E2E 共555项通过；
 可重放源码、SHA-256、编译/运行命令和观察值见
 [`Validation/remediation/evidence/final/`](../Validation/remediation/evidence/final/receipt.json)。
 “已修复”指本机公开用例与实现收敛；不是外部签署或旧 OS 运行验收。

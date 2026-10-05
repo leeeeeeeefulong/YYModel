@@ -23,15 +23,19 @@
 
 | 检查 | 结果 | 仓库证据 |
 |---|---|---|
-| 公开API E2E | **475/475**；严格Swift6、完整并发检查、warnings-as-errors、release优化 | [完整冻结回执](evidence/final/receipt.json) |
+| 公开API E2E | **555/555**；严格Swift6、完整并发检查、warnings-as-errors、release优化 | [完整冻结回执](evidence/final/receipt.json) |
 | 五类组合 | **12组两态全部通过**，含Float Set、Optional嵌套数组、Int字典、物理游标与codingPath | [观察值](evidence/final/observations.json) |
 | 完整业务与数值oracle | **1,837/1,837**；完整模型导出比较及数值位级判定 | [验收](evidence/weather-final/acceptance.json) / [源码与环境哈希](evidence/weather-final/environment.json) |
-| 既有SPM release回归 | **93/93** | [日志](evidence/swift-test-final.log) |
+| 既有SPM release回归 | **108/108** | [日志](evidence/swift-test-final.log) |
 | Swift5/6严格语言编译 | 两种均通过 | [回执](evidence/platforms-final/receipt.json) |
 | 声明部署下限（库与公开consumer） | iOS11、watchOS4、tvOS11、macOS10.13均通过；使用当前SDK，仅编译 | [回执](evidence/platforms-final/receipt.json) |
 | 公开接口比较 | 未诊断删除/改名/类型改变；µs日期enum新增case，诊断/路由新增API已公告 | [API diff](evidence/api-final/diff.log) / [迁移说明](../../docs/UPGRADE-COMPAT-GUIDE-20261004.md) |
 | Objective-C契约 | **49/49**，此前记录；本轮Swift收敛没有再改ObjC | [回执](evidence/objc-contract/acceptance.json) |
 | G4性能 | **通过本轮≤+10%回退门禁**；≤3×长期目标未达 | 同工具链修复前及最终计时证据 |
+
+> **口径说明**：本表「公开API E2E」与「既有SPM release回归」两行反映**第二阶段修复后**的源码
+> （555/555、108/108）；「业务与数值oracle」「G4性能」两行来自第二阶段之前的冻结快照，
+> 未随本轮重测，不可与 555 项视为同一次测量。
 
 最终源码与公开consumer在 `evidence/final/source/`，SHA-256在回执中。业务与下限回执记录的
 生产源码哈希与该冻结回执一致。原始命令包含当时的临时路径，归档源码不依赖那些路径即可重放。
@@ -72,7 +76,7 @@ R-1中间0.15099ms回退仍保留，不从历史中删除。
 - 公开NSNumber跨调用精度由不可变规范节点边界保持，不增加public元数据修改API。
 
 独立复核使用stage11冻结源码；最终版本只删除YYModelEncoder.swift末尾一行空白，
-随后475项、93项、业务oracle及编译再次通过。功能代码一致。
+随后555项、108项、业务oracle及编译再次通过。功能代码一致。
 
 ## 初始事实与误报排除
 

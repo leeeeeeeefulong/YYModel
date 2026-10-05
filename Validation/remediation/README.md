@@ -36,7 +36,7 @@ python3 /tmp/yymodel-acceptance-new/source/Validation/remediation/run.py \
 | `evidence/tree-foundation-baseline` | R-2 首版新增16项 Foundation编码对照，12项失败；是实施回归，须修复 |
 
 早期基线记录了源码哈希与观察值，没有完整源码副本；正式执行器新增了冻结源码重放。
-这些历史证据用于说明修复前后变化，最终验收以同一份当前源码的完整回执为准。最终结果475/475、业务数值1,837/1,837，见 [STATUS](STATUS.md)。
+这些历史证据用于说明修复前后变化，最终验收以同一份当前源码的完整回执为准。最终结果555/555、业务数值1,837/1,837，见 [STATUS](STATUS.md)。
 
 仓库内完整归档可直接重放（输出路径须不存在）：
 
