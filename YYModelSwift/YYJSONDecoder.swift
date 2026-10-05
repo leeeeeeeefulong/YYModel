@@ -152,6 +152,35 @@ public struct YYJSONDecoder: @unchecked Sendable {
         let value = try copy.decode(type, from: object)
         return (value, report)
     }
+
+    /// **顶层 lossy 数组**（D3）：解码 `[T]`，坏元素逐个跳过并计进返回的
+    /// `YYModelLossReport`，失败元素不使整个数组失败。与规则无关 —— 这是独立的
+    /// 显式入口，不改变默认的严格 `decode` 语义，也不用为 `[T]` 注册完整规则。
+    ///
+    /// ```swift
+    /// let (values, report) = try YYJSONDecoder.compatible().decodeLossyArray([Int].self, from: data)
+    /// print(values)          // [1, 3]
+    /// print(report.losses)   // [(root)[1]: ...]
+    /// ```
+    ///
+    /// 元素失败记 `property == "(root)"`、`index` 为原始下标。
+    public func decodeLossyArray<T: Decodable>(_ type: [T].Type, from data: Data) throws -> (value: [T], report: YYModelLossReport) {
+        let report = YYModelLossReport()
+        var copy = self
+        copy.userInfo[YYModelLossReport.key] = report
+        let box = try copy.decode(YYModelLossyArrayBox<T>.self, from: data)
+        return (box.elements, report)
+    }
+    public func decodeLossyArray<T: Decodable>(_ type: [T].Type, from json: String) throws -> (value: [T], report: YYModelLossReport) {
+        try decodeLossyArray(type, from: Data(json.utf8))
+    }
+    public func decodeLossyArray<T: Decodable>(_ type: [T].Type, from object: Any) throws -> (value: [T], report: YYModelLossReport) {
+        let report = YYModelLossReport()
+        var copy = self
+        copy.userInfo[YYModelLossReport.key] = report
+        let box = try copy.decode(YYModelLossyArrayBox<T>.self, from: object)
+        return (box.elements, report)
+    }
 }
 
 enum YYJSONValueDecoder {

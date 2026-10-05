@@ -182,4 +182,42 @@ final class YYModelLossyTests: XCTestCase {
             .decode(Response.self, from: Data(#"{}"#.utf8))
         XCTAssertEqual(response.results.count, 1)
     }
+
+    // MARK: - D3：顶层 decodeLossyArray 显式入口
+
+    func testTopLevelLossyArraySkipsBadElements() throws {
+        let (value, report) = try YYJSONDecoder.compatible()
+            .decodeLossyArray([Int].self, from: Data(#"[1,"bad",3]"#.utf8))
+        XCTAssertEqual(value, [1, 3])
+        XCTAssertEqual(report.losses.count, 1)
+        XCTAssertEqual(report.losses.first?.property, "(root)")
+        XCTAssertEqual(report.losses.first?.index, 1)
+    }
+
+    func testTopLevelLossyArrayFromStringAndRaw() throws {
+        let (fromString, rs) = try YYJSONDecoder.compatible().decodeLossyArray([Int].self, from: #"[1,"bad",3]"#)
+        XCTAssertEqual(fromString, [1, 3]); XCTAssertEqual(rs.losses.count, 1)
+        let (fromRaw, rr) = try YYJSONDecoder.compatible().decodeLossyArray([Int].self, from: [1, "bad", 3] as [Any])
+        XCTAssertEqual(fromRaw, [1, 3]); XCTAssertEqual(rr.losses.count, 1)
+    }
+
+    func testTopLevelLossyAllBadYieldsEmpty() throws {
+        let (value, report) = try YYJSONDecoder.compatible()
+            .decodeLossyArray([Int].self, from: Data(#"["a","b"]"#.utf8))
+        XCTAssertTrue(value.isEmpty)
+        XCTAssertEqual(report.losses.count, 2)
+    }
+
+    func testTopLevelLossyModelElements() throws {
+        struct Inner: Codable, Equatable { var v: Int }
+        let (value, report) = try YYJSONDecoder.compatible()
+            .decodeLossyArray([Inner].self, from: Data(#"[{"v":1},{"v":"bad"},{"v":3}]"#.utf8))
+        XCTAssertEqual(value, [Inner(v: 1), Inner(v: 3)])
+        XCTAssertEqual(report.losses.map(\.index), [1])
+        XCTAssertEqual(report.losses.first?.property, "(root)")
+    }
+
+    func testTopLevelStrictDecodeUnchanged() throws {
+        XCTAssertThrowsError(try YYJSONDecoder.compatible().decode([Int].self, from: Data(#"[1,"bad",3]"#.utf8)))
+    }
 }

@@ -125,6 +125,41 @@ extension Array: YYModelLossyArray where Element: Decodable {
         }
         return result
     }
+
+    /// 顶层 lossy 数组的专用实现（D3）：不依赖规则配置，逐个元素解码并在失败时跳过。
+    /// `report` 从这个方法的 `userInfo` 里读，避免调用方手动把 `YYModelLossReport`
+    /// 塞进解码器的 `userInfo`。顶层元素没有属性名，`property` 记为 `"(root)"`。
+    static func decodeLossyRoot(
+        from container: UnkeyedDecodingContainer,
+        date: YYModelDateStrategy,
+        userInfo: [CodingUserInfoKey: Any]
+    ) throws -> [Element] {
+        var container = container
+        var result: [Element] = []
+        result.reserveCapacity(container.count ?? 0)
+        let report = userInfo[YYModelLossReport.key] as? YYModelLossReport
+        while !container.isAtEnd {
+            let index = container.currentIndex
+            let elementDecoder = try container.superDecoder()
+            do {
+                result.append(try YYModelDecode.value(Element.self, from: elementDecoder, date: date))
+            } catch {
+                report?.record(property: "(root)", index: index, reason: "\(error)")
+            }
+        }
+        return result
+    }
+}
+
+/// 顶层 `decodeLossyArray` 的工作盒：让 `YYJSONDecoder` 能对 `[T]` 走 lossy 路径，
+/// 而不用为集合注册完整规则（C② 约束：集合仍禁止注册完整 `YYJSONRules`）。
+struct YYModelLossyArrayBox<Element: Decodable>: Decodable {
+    let elements: [Element]
+    init(from decoder: Decoder) throws {
+        let date = YYJSONContext.from(decoder).defaults.date
+        let container = try decoder.unkeyedContainer()
+        elements = try Array<Element>.decodeLossyRoot(from: container, date: date, userInfo: decoder.userInfo)
+    }
 }
 
 // MARK: - 规则入口

@@ -118,7 +118,8 @@ for consumer, extra in [('BridgePathsConsumer', []), ('BridgeConsumer', []),
                         ('AutomaticDatesConsumer', []), ('ErrorContractConsumer', []),
                         ('WConsumer', []), ('PolymorphismConsumer', []),
                         ('TransformConsumer', []), ('StringToNumberConsumer', []),
-                        ('LossyConsumer', []), ('PresenceConsumer', [])]:
+                        ('LossyConsumer', []), ('PresenceConsumer', []),
+                        ('LossyArrayConsumer', [])]:
     run(['swiftc', *flags, *extra, '-I', out, '-L', out, '-lYYModelSwift',
          '-Xlinker', '-rpath', '-Xlinker', out, harness[consumer + '.swift'],
          '-o', out / consumer])
