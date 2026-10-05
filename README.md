@@ -13,6 +13,52 @@ Current release: **2.3.1** (`pod 'YYModel2', '2.3.1'`, SPM `from: "2.3.1"`).
 
 ---
 
+## Which Version Should I Use?
+
+This repository ships two fully separate products. They share no mapping table, and the Swift product is **not a drop-in replacement** for the Objective-C one.
+
+| | `YYModel` — Objective-C | `YYModelSwift` — Swift `Codable` |
+|---|---|---|
+| Model | `NSObject` subclass with `@property` | `struct` conforming to `Codable` |
+| Semantics | Reference semantics; runtime property metadata and type encoding | Value semantics; compiler-synthesized `CodingKeys` |
+| Configuration | Class hooks: `modelCustomPropertyMapper`, `modelContainerPropertyGenericClass`, blacklist/whitelist | Immutable `YYJSONRules` snapshot per call; **no process-wide cache** |
+| Intrusion | Base class plus class methods | No base class, no required protocol, no property wrapper or macro |
+| Engine | Own Objective-C runtime parser | Foundation `JSONDecoder` / `JSONEncoder` plus field adaptation |
+
+Choose **Objective-C** when models are already `NSObject` subclasses, when you depend on runtime introspection / KVC, or when you must mutate an existing instance in place.
+
+Choose **Swift** when models are plain structs, when you want value semantics and no global caches, or when you need `Codable` interoperability with the rest of the Swift ecosystem.
+
+### Known Differences (the Swift version is not a behavior mirror)
+
+Migrating from the Objective-C product to the Swift product is **not** a drop-in operation. The following contracts intentionally differ:
+
+| Behavior | Objective-C product | Swift product |
+|---|---|---|
+| String → number (`"30"` → `30`) | tolerant by default | `.native` rejects with `typeMismatch`; coercion only through the explicit `.compatible` / `.legacy` modes |
+| Number → `Bool` (`2` → `true`) | tolerated | **throws** — only `0` / `1` (and common boolean strings) are accepted |
+| Integer overflow | tolerant conversion | **throws** (`typeMismatch` at the offending `codingPath`); never silently truncated |
+| `String` → `Data` | UTF-8 style conversion | **Base64** decode (Foundation contract) |
+| `Date` export / auto parse | original formats | exports Unix **seconds**; `.automatic` treats `abs(value) > 1e11` as milliseconds (including negative values) |
+
+The full per-behavior table and the configurable escape hatches live in [Swift external rules](docs/SWIFT-EXTERNAL-RULES.md); the Objective-C side is covered by the [OC migration guide](docs/OBJC-MIGRATION.md) and the [upgrade & compatibility guide](docs/UPGRADE-COMPAT-GUIDE-20261004.md).
+
+### Swift Capability Boundaries
+
+Some Objective-C capabilities have no Swift equivalent and are **not** provided by the Swift product. These are language limits, not missing work:
+
+| Objective-C capability | Swift status |
+|---|---|
+| Write into an existing instance in place (`yy_modelSetWithDictionary:`) | Not possible — structs are value types; decoding always returns a new value |
+| Runtime property metadata / type encoding | None — `Mirror` is read-only reflection and exposes no type encodings |
+| Runtime assignment to arbitrary members / KVC | None — there is no runtime setter for struct members |
+| C `struct` / `union` / pointer / `SEL` / `Block` members | Not supported — use Swift types instead |
+| Object identity in copy / hash / equality | Value semantics from the Swift standard library; the framework does not fake object identity |
+
+`YYModelCodable` remains an optional convenience over the same engine; plain `Codable` plus `YYJSONRules` is the recommended entry point. See [Swift model usage](docs/SWIFT-MODEL.md).
+
+---
+
 ## Modern iOS Compatibility (2026.09)
 
 This fork addresses verified modern Xcode / Clang compatibility issues. Passing the component checks does not establish compatibility with every model, payload or device.
@@ -46,7 +92,7 @@ NSString *str = [user yy_modelToJSONString];
 NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:jsonArray];
 ```
 
-### Verified Test Results — YYModel 2.1.7
+### Verified Test Results — YYModel 2.1.7 (historical)
 
 Measured 2026-10-03 on macOS/iOS Simulator (Apple Silicon arm64).
 
@@ -112,7 +158,7 @@ Test Suite 'All tests' passed:
 ✅ `YYBox.yy_model(withJSON:)` fills an `NSObject` model directly from Swift.
 ✅ `NSArray.yy_modelArray(with: OCUser.self, json: users.json)` parses 10 users. `company.name` lands in `companyName` (`Romaguera-Crona`) through `modelCustomPropertyMapper`.
 
-### 2.1.9 Component Performance Verification
+### 2.1.9 Component Performance Verification (historical)
 
 > **Architecture note**: this table was measured on the 2.1.9 decoder, which still tried native `JSONDecoder` first and fell back to the tolerant decoder on failure. That native-first architecture was **removed** in 2.2.0: the no-argument `YYJSONDecoder()` now runs the field-adaptation path directly and costs about 5× native `JSONDecoder` on standard data. Use `.native` mode for Foundation-level speed.
 
@@ -165,7 +211,7 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/leeeeeeeefulong/YYModel", from: "2.3.0")
+    .package(url: "https://github.com/leeeeeeeefulong/YYModel", from: "2.3.1")
 ]
 ```
 
@@ -175,7 +221,7 @@ dependencies: [
 
 ```ruby
 # New pod name (original YYModel owned by ibireme on trunk)
-pod 'YYModel2', '2.3.0'
+pod 'YYModel2', '2.3.1'
 ```
 
 > **Note**: The original `YYModel` pod on CocoaPods trunk is owned by ibireme and will not receive updates. This fork is published as `YYModel2`. CocoaPods trunk becomes read-only on 2026-12-02.
@@ -297,7 +343,7 @@ NSArray *users = [NSArray yy_modelArrayWithClass:[User class] json:jsonArray];
 @end
 ```
 
-### Swift on master (unreleased): ordinary Codable + external rules
+### Swift API: ordinary Codable + external rules
 
 The main APIs are `YYJSONDecoder`, `YYJSONEncoder` and immutable `YYJSONRules`. No YY model protocol, property wrapper, macro or NSObject is required. Use `.native` for direct Foundation semantics; `.compatible` adds field-local conversions, aliases/KeyPaths, explicit defaults, required validation, typed hooks, dates, registered polymorphism and symmetric export. `YYModelCodable` remains optional convenience on the same engine.
 
