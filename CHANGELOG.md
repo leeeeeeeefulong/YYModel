@@ -5,7 +5,9 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased — 修复工程（2026-10-05）
 
-本节记录当前工作区，未提交或发布。迁移行为见
+本节记录的修复工程**已全部提交**，但尚未发布为新版本。当时的实测结果为：公开 API E2E
+555/555、Swift 单测 108/108、OC 契约 49/49（验证脚本已随仓库精简移除，该数字为当时的
+实测值）。迁移行为见
 [升级指南](docs/UPGRADE-COMPAT-GUIDE-20261004.md)。
 
 - **F-01/02/03B/06**：raw 冲突按精确键/UTF-8 确定；规则合成保留模型基底和先前注册；Int 字典规范拼写优先，所有输入值仍严格解码；hook 键查找使用实际 Foundation 映射。
@@ -19,6 +21,20 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - **P-03/04、A-02**：直接树导出和集中数值边界已完成；首版编码回归已修，Foundation策略、空容器、Unicode键转换、重复容器、super键策略与字典CodingKey对照通过。本机 Decimal 控制原已通过，不能称已复现旧平台精度问题。
 - **A-03**：历史公开 consumer 入库，严格冻结源码、SHA-256、命令及结果可重放；新增 CI 配置尚未远端执行。
 - **P-02/P-07/F-03A**：排除负数取整错误处方、不存在的 Set 匹配代码及字典数据键策略误报；保留行为控制。
+
+## Known Limitations
+
+These gaps are stated explicitly rather than left implicit:
+
+- **No old-OS runtime verification.** Runtime validation on iOS 14/15 was not performed —
+  the development environment only provides iOS 18.x and 26.x simulators. Platform-conditional
+  numerical behavior (integers beyond 2^53, `Decimal` round-trips, legacy `JSONDecoder`
+  paths) is covered by unit and contract tests only, not by a real old-OS run.
+- **No independent third-party sign-off.** All verification was executed by the authors of
+  the changes. Acceptance evidence is author-run, not independently audited.
+- **The public-API E2E harness is not shipped in this repository.** Its results are recorded
+  here as historical measurements (555 E2E / 108 Swift unit / 49 OC contract at the time of
+  writing) and cannot be re-run from a fresh checkout.
 
 ## 2.3.1.1 — Followup Review Fixes (R1–R8) (2026-10-05)
 
