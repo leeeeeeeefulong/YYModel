@@ -303,7 +303,10 @@ enum YYJSONValueDecoder {
             guard let text = value as? String, let url = URL(string: text), !text.isEmpty else { return nil }
             return url as? T
         }
-        if T.self == Date.self { return date(from: value) as? T }
+        if T.self == Date.self {
+            if let date = YYModelDates.shared.date(value, strategy: .automatic, report: report, codingPath: codingPath) { return date as? T }
+            return nil
+        }
         if T.self == Data.self {
             if let data = value as? Data { return data as? T }
             if let text = value as? String, let data = Data(base64Encoded: text) { return data as? T }
@@ -600,10 +603,6 @@ enum YYJSONValueDecoder {
             }
         }
         return nil
-    }
-
-    fileprivate static func date(from value: Any) -> Date? {
-        YYModelDates.shared.date(value, strategy: .automatic)
     }
 
     private static func isBoolean(_ number: NSNumber) -> Bool {

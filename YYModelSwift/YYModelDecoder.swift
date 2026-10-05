@@ -171,7 +171,8 @@ enum YYModelDecode {
                 } else { result = try source.singleValueContainer().decode(type) }
             } else {
                 let raw = try (source as? _YYDecoder)?.value ?? YYModelJSONValue(from: source).raw
-                guard let value = YYModelDates.shared.date(raw, strategy: policy.date) as? T else { throw DecodingError.dataCorrupted(.init(codingPath: source.codingPath, debugDescription: "Invalid date")) }
+                let report = source.userInfo[YYModelCoercionReport.key] as? YYModelCoercionReport
+                guard let value = YYModelDates.shared.date(raw, strategy: policy.date, report: report, codingPath: source.codingPath) as? T else { throw DecodingError.dataCorrupted(.init(codingPath: source.codingPath, debugDescription: "Invalid date")) }
                 result = value
             }
         } else if type == Data.self {

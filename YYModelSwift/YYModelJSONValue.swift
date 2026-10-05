@@ -249,7 +249,11 @@ final class YYModelDates: @unchecked Sendable {
             let f = DateFormatter(); f.locale = Locale(identifier: "en_US_POSIX"); f.timeZone = TimeZone(secondsFromGMT: 0); f.dateFormat = $0; f.isLenient = false; return f
         }
     }
-    func date(_ value: Any, strategy: YYModelDateStrategy) -> Date? {
+    /// If `report`/`codingPath` are supplied (P2-5) an automatic timestamp whose magnitude is
+    /// implausible as Unix seconds is still parsed the documented way (|ts|>1e11 → ms), and the
+    /// event is recorded as `implausible-date-magnitude`.
+    func date(_ value: Any, strategy: YYModelDateStrategy,
+              report: YYModelCoercionReport? = nil, codingPath: [CodingKey] = []) -> Date? {
         if let date = value as? Date { return date.timeIntervalSince1970.isFinite ? date : nil }
         var seconds: Double?
         if let number = value as? NSNumber, CFGetTypeID(number) != CFBooleanGetTypeID() { seconds = number.doubleValue }
@@ -259,6 +263,12 @@ final class YYModelDates: @unchecked Sendable {
             if strategy == .microsecondsSince1970 {
                 epoch = seconds / 1_000_000
             } else if strategy == .millisecondsSince1970 || (strategy == .automatic && abs(seconds) > 1e11) {
+                // Automatic-mode magnitude rule: recorded because a value this large is also
+                // often a microsecond timestamp, which automatic mode deliberately does not detect (C5).
+                if strategy == .automatic {
+                    report?.record(codingPath: codingPath, sourceCategory: "number", targetType: "Date",
+                                   reason: "implausible-date-magnitude")
+                }
                 epoch = seconds / 1000
             } else {
                 epoch = seconds
