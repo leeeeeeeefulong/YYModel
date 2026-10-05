@@ -318,6 +318,8 @@ let output = try YYJSONEncoder(mode: .compatible, rules: rules).encode(user)
 
 The no-argument `YYJSONDecoder()` retains legacy zero-fill and automatic-date behavior. Enhanced modes no longer retry an entire model after an arbitrary error. `.native` rejects YY rules instead of silently ignoring them. See [Swift usage and limits](docs/SWIFT-EXTERNAL-RULES.md), [OC migration](docs/OBJC-MIGRATION.md), and [current delivery](docs/DELIVERY-EXTERNAL-RULES-20261004.md), and [verified upgrade guide](docs/UPGRADE-COMPAT-GUIDE-20261004.md).
 
+> **Not a drop-in replacement for `JSONDecoder`.** In `.compatible`/`.legacy` mode, numeric strings are coerced (`"30"` → `30`), a non-zero numeric `Bool` (only `0`/`1`) and common string booleans are tolerated, integers still **throw on overflow** (`typeMismatch` at the offending codingPath — never silently rounded), and `Data` stays Base64 (C4). Automatic dates read Unix seconds and treat `|timestamp| > 1e11` as milliseconds (including negative timestamps); implausible-magnitude dates record a `"implausible-date-magnitude"` reason in `YYModelCoercionReport` (D1). These are deliberate contracts, not missing features — the full per-behavior table lives in the [Swift rules doc](docs/SWIFT-EXTERNAL-RULES.md).
+
 SPM products `YYModel` and `YYModelSwift` remain independent. CocoaPods provides `YYModel2/ObjC` and `YYModel2/Swift`; default includes both.
 
 ### Lossy arrays and loss reports

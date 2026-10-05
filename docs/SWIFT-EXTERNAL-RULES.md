@@ -2,6 +2,10 @@
 
 本接口随 2.2.0 引入、2.3.0 起为正式发布接口。安装 Swift 独立 SPM 产品 `YYModelSwift`，或 CocoaPods 的 `YYModel2/Swift`；无需链接 OC 产品。
 
+> **非 drop-in**：Swift 版对 Foundation `JSONDecoder` 不是 drop-in 替换——
+> 增强模式为容错引入默认行为差异（数字字符串、日期、缺失字段），见
+> [行为差异表](#与-foundation-jsondecoder-的行为差异非-drop-in)。
+
 ## 选择执行方式
 
 | 入口 | 执行器 | 缺失 / null 非 Optional | 日期默认 | 适用场景 |
@@ -106,6 +110,26 @@ let rules = try YYJSONRules()
 ```
 
 不需要手写分派 init/encode 或 YY 模型协议。payload 字段规则放在 payload 类型；根多态类型的字段/日期规则不可静默忽略。未知/歧义 variant、discriminator 与 payload 冲突报错。导出选中 payload 的字典会物化，这是该可选功能的实际成本。
+
+## 与 Foundation JSONDecoder 的行为差异（非 drop-in）
+
+Swift 版是 **「非 drop-in」替代**：日常类型规整的 Codable 数据，`.native` 模式的输出
+与 Foundation `JSONDecoder` 一致；但增强模式（`.compatible` / `.legacy`）为容错
+引入了下述故意差异，调用方需要按差异核对业务：
+
+| 差异 | Foundation / `.native` | `.compatible` / `.legacy` |
+|---|---|---|
+| 数字字符串（`"30"` → `30`） | 拒绝（typeMismatch） | 宽容转换；转蓝不合法时仍抛错 |
+| Bool 与数字（`2` → Bool） | 拒绝 | `.compatible` 拒绝非 0/1 数字 → Bool；`"true"/"false"/"yes"/"no"/"0"/"1"` 字符串宽容 |
+| 整数溢出（字符串/超出范围的数字） | 拒绝 | 拒绝，`typeMismatch(codingPath:)`，绝不静默舍入 |
+| `String` ↔ `Data` | `Data` 走 Base64（C4） | 同左：`String→Data` 保持 Base64；Base64 解码失败记入 `YYModelLossReport` 或抛 `dataCorrupted` |
+| 自动日期 | Foundation 默认 2001 基准 | `.automatic` 直接读 Unix 秒；`|timestamp| > 1e11` 视为毫秒（含负数）；其余文本/ISO 格式 |
+| 缺失 / null 非 Optional | 必须存在 | `.legacy` 补零；`.compatible` 必须提供默认，否则报错 |
+| 超合理量级时间戳 | 解析行为不变 | 结果不变，但该次解析会把
+  `reason: "implausible-date-magnitude"` 记入 `YYModelCoercionReport`（D1） |
+
+上述行为都对应「故意一致 / 故意不同」的拍板（详见 Swift 解码语义白皮书相关章节），
+不是缺失实现。README 顶部已注明「非 drop-in 替换」；升级前先对照本表核对字段语义。
 
 ## 兼容与限制
 

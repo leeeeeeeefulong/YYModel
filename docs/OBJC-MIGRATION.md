@@ -73,6 +73,11 @@ BOOL dynamic = (propertyInfo.type & YYEncodingTypePropertyDynamic) != 0;
 
 ## 保留的能力与限制
 
+- **从 OC 迁移到 Swift 版不是 drop-in**：Swift 版对 Foundation `JSONDecoder` 的相对差异
+  （数字字符串、Bool、Data/Base64、自动日期与 `1e11` 毫秒边界、缺失/null 语义、
+  D1 超合理量级时间戳记录）逐项列在
+  [Swift 与 Foundation 行为差异表](SWIFT-EXTERNAL-RULES.md#与-foundation-jsoncoder-行为的差异非-drop-in)。
+  OC 宽松数字字符串转换仍不是 Swift 严格数值 lexer 的同一契约。
 - UInt64 / NSDecimalNumber 已修正边界保留；OC 宽松数字字符串转换仍不是 Swift 严格数值 lexer 的同一契约。
 - 当前 master 的负数毫秒、零字符串、非有限日期修复保留；已发布 2.1.9 没有这些后续日期修复。自动秒/毫秒和月/日识别仍有歧义，业务应明确数据单位与格式。
 - NSSecureCoding 容器 allowlist 和 generic 类型支持保留。模型及成员需要支持 NSSecureCoding，并提供正确允许类；任意 id/异构自定义容器不能视为自动安全归档。
