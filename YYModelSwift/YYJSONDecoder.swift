@@ -602,69 +602,8 @@ enum YYJSONValueDecoder {
         return nil
     }
 
-    #if compiler(>=5.10)
-    fileprivate nonisolated(unsafe) static let isoFormatterWithFractionalSeconds: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return formatter
-    }()
-
-    fileprivate nonisolated(unsafe) static let isoFormatterStandard: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
-        return formatter
-    }()
-
-    fileprivate static let commonDateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        return formatter
-    }()
-    #else
-    fileprivate static let isoFormatterWithFractionalSeconds: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return formatter
-    }()
-
-    fileprivate static let isoFormatterStandard: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
-        return formatter
-    }()
-
-    fileprivate static let commonDateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        return formatter
-    }()
-    #endif
-
-    private static func date(fromTimestamp seconds: Double) -> Date? {
-        guard seconds.isFinite else { return nil }
-        let epoch = abs(seconds) > 1e11 ? seconds / 1000.0 : seconds
-        return Date(timeIntervalSince1970: epoch)
-    }
-
     fileprivate static func date(from value: Any) -> Date? {
-        if let date = value as? Date {
-            return date.timeIntervalSince1970.isFinite ? date : nil
-        }
-        if let number = value as? NSNumber, !isBoolean(number) {
-            return date(fromTimestamp: number.doubleValue)
-        }
-        if let text = value as? String {
-            let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-            if let seconds = TimeInterval(trimmed) { return date(fromTimestamp: seconds) }
-            if let d = isoFormatterWithFractionalSeconds.date(from: trimmed) { return d }
-            if let d = isoFormatterStandard.date(from: trimmed) { return d }
-            return commonDateFormatter.date(from: trimmed)
-        }
-        return nil
+        YYModelDates.shared.date(value, strategy: .automatic)
     }
 
     private static func isBoolean(_ number: NSNumber) -> Bool {
