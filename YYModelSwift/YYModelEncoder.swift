@@ -145,6 +145,49 @@ struct YYModelKeyedEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
     mutating func encodeNil(forKey key: Key) throws {
         guard var field = try destination(key) else { return }; try field.0.encodeNil(forKey: field.1)
     }
+    // Preserve concrete Foundation overloads, including recovery after a caught child error.
+    mutating func encode(_ value: Bool, forKey key: Key) throws {
+        guard var field = try destination(key) else { return }; try field.0.encode(value, forKey: field.1)
+    }
+    mutating func encode(_ value: String, forKey key: Key) throws {
+        guard var field = try destination(key) else { return }; try field.0.encode(value, forKey: field.1)
+    }
+    mutating func encode(_ value: Double, forKey key: Key) throws {
+        guard var field = try destination(key) else { return }; try field.0.encode(value, forKey: field.1)
+    }
+    mutating func encode(_ value: Float, forKey key: Key) throws {
+        guard var field = try destination(key) else { return }; try field.0.encode(value, forKey: field.1)
+    }
+    mutating func encode(_ value: Int, forKey key: Key) throws {
+        guard var field = try destination(key) else { return }; try field.0.encode(value, forKey: field.1)
+    }
+    mutating func encode(_ value: Int8, forKey key: Key) throws {
+        guard var field = try destination(key) else { return }; try field.0.encode(value, forKey: field.1)
+    }
+    mutating func encode(_ value: Int16, forKey key: Key) throws {
+        guard var field = try destination(key) else { return }; try field.0.encode(value, forKey: field.1)
+    }
+    mutating func encode(_ value: Int32, forKey key: Key) throws {
+        guard var field = try destination(key) else { return }; try field.0.encode(value, forKey: field.1)
+    }
+    mutating func encode(_ value: Int64, forKey key: Key) throws {
+        guard var field = try destination(key) else { return }; try field.0.encode(value, forKey: field.1)
+    }
+    mutating func encode(_ value: UInt, forKey key: Key) throws {
+        guard var field = try destination(key) else { return }; try field.0.encode(value, forKey: field.1)
+    }
+    mutating func encode(_ value: UInt8, forKey key: Key) throws {
+        guard var field = try destination(key) else { return }; try field.0.encode(value, forKey: field.1)
+    }
+    mutating func encode(_ value: UInt16, forKey key: Key) throws {
+        guard var field = try destination(key) else { return }; try field.0.encode(value, forKey: field.1)
+    }
+    mutating func encode(_ value: UInt32, forKey key: Key) throws {
+        guard var field = try destination(key) else { return }; try field.0.encode(value, forKey: field.1)
+    }
+    mutating func encode(_ value: UInt64, forKey key: Key) throws {
+        guard var field = try destination(key) else { return }; try field.0.encode(value, forKey: field.1)
+    }
     mutating func encode<T: Encodable>(_ value: T, forKey key: Key) throws {
         // 三态字段的 .absent 表示「键从未出现」，导出时也应完全省略该键，
         // 而不是写一个 null —— 否则接收方无法区分「没提到」与「要求清空」。
@@ -179,6 +222,20 @@ struct YYModelUnkeyedEncoder: UnkeyedEncodingContainer {
     var codingPath: [CodingKey] { base.codingPath }
     var count: Int { base.count }
     mutating func encodeNil() throws { try base.encodeNil() }
+    mutating func encode(_ value: Bool) throws { try base.encode(value) }
+    mutating func encode(_ value: String) throws { try base.encode(value) }
+    mutating func encode(_ value: Double) throws { try base.encode(value) }
+    mutating func encode(_ value: Float) throws { try base.encode(value) }
+    mutating func encode(_ value: Int) throws { try base.encode(value) }
+    mutating func encode(_ value: Int8) throws { try base.encode(value) }
+    mutating func encode(_ value: Int16) throws { try base.encode(value) }
+    mutating func encode(_ value: Int32) throws { try base.encode(value) }
+    mutating func encode(_ value: Int64) throws { try base.encode(value) }
+    mutating func encode(_ value: UInt) throws { try base.encode(value) }
+    mutating func encode(_ value: UInt8) throws { try base.encode(value) }
+    mutating func encode(_ value: UInt16) throws { try base.encode(value) }
+    mutating func encode(_ value: UInt32) throws { try base.encode(value) }
+    mutating func encode(_ value: UInt64) throws { try base.encode(value) }
     mutating func encode<T: Encodable>(_ value: T) throws {
         if YYModelDecode.isNativeValue(T.self) { try base.encode(value) }
         else { try base.encode(YYModelEncodingBox(value: value, date: date, skipHook: false)) }
@@ -194,7 +251,25 @@ struct YYModelSingleEncoder: SingleValueEncodingContainer {
     let date: YYModelDateStrategy
     var codingPath: [CodingKey] { base.codingPath }
     mutating func encodeNil() throws { var c = base.singleValueContainer(); try c.encodeNil() }
-    mutating func encode<T: Encodable>(_ value: T) throws { try YYModelEncode.value(value, to: base, date: date) }
+    mutating func encode(_ value: Bool) throws { var c = base.singleValueContainer(); try c.encode(value) }
+    mutating func encode(_ value: String) throws { var c = base.singleValueContainer(); try c.encode(value) }
+    mutating func encode(_ value: Double) throws { var c = base.singleValueContainer(); try c.encode(value) }
+    mutating func encode(_ value: Float) throws { var c = base.singleValueContainer(); try c.encode(value) }
+    mutating func encode(_ value: Int) throws { var c = base.singleValueContainer(); try c.encode(value) }
+    mutating func encode(_ value: Int8) throws { var c = base.singleValueContainer(); try c.encode(value) }
+    mutating func encode(_ value: Int16) throws { var c = base.singleValueContainer(); try c.encode(value) }
+    mutating func encode(_ value: Int32) throws { var c = base.singleValueContainer(); try c.encode(value) }
+    mutating func encode(_ value: Int64) throws { var c = base.singleValueContainer(); try c.encode(value) }
+    mutating func encode(_ value: UInt) throws { var c = base.singleValueContainer(); try c.encode(value) }
+    mutating func encode(_ value: UInt8) throws { var c = base.singleValueContainer(); try c.encode(value) }
+    mutating func encode(_ value: UInt16) throws { var c = base.singleValueContainer(); try c.encode(value) }
+    mutating func encode(_ value: UInt32) throws { var c = base.singleValueContainer(); try c.encode(value) }
+    mutating func encode(_ value: UInt64) throws { var c = base.singleValueContainer(); try c.encode(value) }
+    mutating func encode<T: Encodable>(_ value: T) throws {
+        // Let the base container own the child transaction and rollback on failure.
+        var c = base.singleValueContainer()
+        try c.encode(YYModelEncodingBox(value: value, date: date, skipHook: false))
+    }
 }
 
 // Container factories cannot throw. Excluded custom nested containers use an unattached sink.

@@ -216,36 +216,48 @@ enum YYModelTreeBoxer {
     }
 }
 
+// Every container from a referencing encoder shares its commit lifetime, including
+// descendants. The parent box does not retain this token, so there is no cycle.
+final class YYModelTreeReference {
+    let commit: () -> Void
+    init(commit: @escaping () -> Void) { self.commit = commit }
+    deinit { commit() }
+}
+
 final class YYModelTreeEncoder: Encoder {
     let box: YYModelTreeBox
     var codingPath: [CodingKey]
     let options: YYModelTreeOptions
     var userInfo: [CodingUserInfoKey: Any]
+    let reference: YYModelTreeReference?
 
     init(box: YYModelTreeBox = YYModelTreeBox(),
          codingPath: [CodingKey] = [],
          options: YYModelTreeOptions = YYModelTreeOptions(),
-         userInfo: [CodingUserInfoKey: Any] = [:]) {
+         userInfo: [CodingUserInfoKey: Any] = [:],
+         reference: YYModelTreeReference? = nil,
+         commitOnRelease: (() -> Void)? = nil) {
         self.box = box
         self.codingPath = codingPath
         self.options = options
         self.userInfo = userInfo
+        self.reference = commitOnRelease.map { YYModelTreeReference(commit: $0) } ?? reference
     }
 
     var value: YYModelJSONValue { box.materialize(emptyAsObject: false) }
 
     func container<Key: CodingKey>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> {
         box.startObject()
-        return KeyedEncodingContainer(YYModelTreeKeyedEncoder<Key>(box: box, codingPath: codingPath, options: options, userInfo: userInfo))
+        return KeyedEncodingContainer(YYModelTreeKeyedEncoder<Key>(box: box, codingPath: codingPath, options: options, userInfo: userInfo, reference: reference))
     }
 
     func unkeyedContainer() -> UnkeyedEncodingContainer {
         box.startArray()
-        return YYModelTreeUnkeyedEncoder(box: box, codingPath: codingPath, options: options, userInfo: userInfo)
+        return YYModelTreeUnkeyedEncoder(box: box, codingPath: codingPath, options: options, userInfo: userInfo, reference: reference)
     }
 
     func singleValueContainer() -> SingleValueEncodingContainer {
-        YYModelTreeSingleEncoder(box: box, codingPath: codingPath, options: options, userInfo: userInfo)
+        YYModelTreeSingleEncoder(box: box, codingPath: codingPath, options: options, userInfo: userInfo, reference: reference)
     }
 }
 
@@ -254,6 +266,7 @@ struct YYModelTreeKeyedEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
     var codingPath: [CodingKey]
     let options: YYModelTreeOptions
     var userInfo: [CodingUserInfoKey: Any]
+    var reference: YYModelTreeReference? = nil
 
     private func resolveKey(_ key: any CodingKey) -> String {
         switch options.keyEncodingStrategy {
@@ -297,8 +310,9 @@ struct YYModelTreeKeyedEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
     mutating func encode<T: Encodable>(_ value: T, forKey key: Key) throws {
         let physical = resolveKey(key)
         let childBox = YYModelTreeBox()
-        box.object?[physical] = childBox
+        // Commit only after success so a caught child failure cannot replace a valid field.
         try YYModelTreeBoxer.encode(value, into: childBox, at: codingPath + [key], options: options, userInfo: userInfo)
+        box.object?[physical] = childBox
     }
 
     mutating func nestedContainer<NestedKey: CodingKey>(keyedBy type: NestedKey.Type, forKey key: Key) -> KeyedEncodingContainer<NestedKey> {
@@ -306,7 +320,7 @@ struct YYModelTreeKeyedEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
         let childBox = box.object?[physical] ?? YYModelTreeBox()
         childBox.startObject()
         box.object?[physical] = childBox
-        return KeyedEncodingContainer(YYModelTreeKeyedEncoder<NestedKey>(box: childBox, codingPath: codingPath + [key], options: options, userInfo: userInfo))
+        return KeyedEncodingContainer(YYModelTreeKeyedEncoder<NestedKey>(box: childBox, codingPath: codingPath + [key], options: options, userInfo: userInfo, reference: reference))
     }
 
     mutating func nestedUnkeyedContainer(forKey key: Key) -> UnkeyedEncodingContainer {
@@ -314,20 +328,27 @@ struct YYModelTreeKeyedEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
         let childBox = box.object?[physical] ?? YYModelTreeBox()
         childBox.startArray()
         box.object?[physical] = childBox
-        return YYModelTreeUnkeyedEncoder(box: childBox, codingPath: codingPath + [key], options: options, userInfo: userInfo)
+        return YYModelTreeUnkeyedEncoder(box: childBox, codingPath: codingPath + [key], options: options, userInfo: userInfo, reference: reference)
     }
 
     mutating func superEncoder() -> Encoder {
+        let key = YYModelCodingKey("super")
+        let physical = resolveKey(key)
         let childBox = YYModelTreeBox()
-        box.object?[resolveKey(YYModelCodingKey("super"))] = childBox
-        return YYModelTreeEncoder(box: childBox, codingPath: codingPath + [YYModelCodingKey("super")], options: options, userInfo: userInfo)
+        let parentBox = box
+        let parentReference = reference
+        // Referencing encoders commit when released, matching Foundation's superEncoder.
+        return YYModelTreeEncoder(box: childBox, codingPath: codingPath + [key], options: options, userInfo: userInfo,
+                                  commitOnRelease: { withExtendedLifetime(parentReference) { parentBox.object?[physical] = childBox } })
     }
 
     mutating func superEncoder(forKey key: Key) -> Encoder {
         let physical = resolveKey(key)
         let childBox = YYModelTreeBox()
-        box.object?[physical] = childBox
-        return YYModelTreeEncoder(box: childBox, codingPath: codingPath + [key], options: options, userInfo: userInfo)
+        let parentBox = box
+        let parentReference = reference
+        return YYModelTreeEncoder(box: childBox, codingPath: codingPath + [key], options: options, userInfo: userInfo,
+                                  commitOnRelease: { withExtendedLifetime(parentReference) { parentBox.object?[physical] = childBox } })
     }
 }
 
@@ -344,6 +365,7 @@ struct YYModelTreeUnkeyedEncoder: UnkeyedEncodingContainer {
     var codingPath: [CodingKey]
     let options: YYModelTreeOptions
     var userInfo: [CodingUserInfoKey: Any]
+    var reference: YYModelTreeReference? = nil
 
     var count: Int { box.array?.count ?? 0 }
 
@@ -374,8 +396,9 @@ struct YYModelTreeUnkeyedEncoder: UnkeyedEncodingContainer {
     mutating func encode<T: Encodable>(_ value: T) throws {
         let index = count
         let childBox = YYModelTreeBox()
-        box.array?.append(childBox)
+        // Failed children must not consume an array position.
         try YYModelTreeBoxer.encode(value, into: childBox, at: codingPath + [YYModelTreeIndexKey(index)], options: options, userInfo: userInfo)
+        box.array?.append(childBox)
     }
 
     mutating func nestedContainer<NestedKey: CodingKey>(keyedBy type: NestedKey.Type) -> KeyedEncodingContainer<NestedKey> {
@@ -383,7 +406,7 @@ struct YYModelTreeUnkeyedEncoder: UnkeyedEncodingContainer {
         let childBox = YYModelTreeBox()
         childBox.startObject()
         box.array?.append(childBox)
-        return KeyedEncodingContainer(YYModelTreeKeyedEncoder<NestedKey>(box: childBox, codingPath: codingPath + [YYModelTreeIndexKey(index)], options: options, userInfo: userInfo))
+        return KeyedEncodingContainer(YYModelTreeKeyedEncoder<NestedKey>(box: childBox, codingPath: codingPath + [YYModelTreeIndexKey(index)], options: options, userInfo: userInfo, reference: reference))
     }
 
     mutating func nestedUnkeyedContainer() -> UnkeyedEncodingContainer {
@@ -391,14 +414,14 @@ struct YYModelTreeUnkeyedEncoder: UnkeyedEncodingContainer {
         let childBox = YYModelTreeBox()
         childBox.startArray()
         box.array?.append(childBox)
-        return YYModelTreeUnkeyedEncoder(box: childBox, codingPath: codingPath + [YYModelTreeIndexKey(index)], options: options, userInfo: userInfo)
+        return YYModelTreeUnkeyedEncoder(box: childBox, codingPath: codingPath + [YYModelTreeIndexKey(index)], options: options, userInfo: userInfo, reference: reference)
     }
 
     mutating func superEncoder() -> Encoder {
         let index = count
         let childBox = YYModelTreeBox()
         box.array?.append(childBox)
-        return YYModelTreeEncoder(box: childBox, codingPath: codingPath + [YYModelTreeIndexKey(index)], options: options, userInfo: userInfo)
+        return YYModelTreeEncoder(box: childBox, codingPath: codingPath + [YYModelTreeIndexKey(index)], options: options, userInfo: userInfo, reference: reference)
     }
 }
 
@@ -407,6 +430,7 @@ struct YYModelTreeSingleEncoder: SingleValueEncodingContainer {
     var codingPath: [CodingKey]
     let options: YYModelTreeOptions
     var userInfo: [CodingUserInfoKey: Any]
+    var reference: YYModelTreeReference? = nil
 
     mutating func encodeNil() throws { box.set(.null) }
     mutating func encode(_ value: Bool) throws { box.set(.bool(value)) }
@@ -429,7 +453,11 @@ struct YYModelTreeSingleEncoder: SingleValueEncodingContainer {
     mutating func encode(_ value: UInt64) throws { box.set(.unsigned(value)) }
 
     mutating func encode<T: Encodable>(_ value: T) throws {
-        try YYModelTreeBoxer.encode(value, into: box, at: codingPath, options: options, userInfo: userInfo)
+        let childBox = YYModelTreeBox()
+        try YYModelTreeBoxer.encode(value, into: childBox, at: codingPath, options: options, userInfo: userInfo)
+        box.value = childBox.value
+        box.object = childBox.object
+        box.array = childBox.array
     }
 }
 
@@ -468,8 +496,8 @@ extension Dictionary: YYModelTreeDictionary where Value: Encodable {
                 childKey = YYModelCodingKey(name)
             }
             let childBox = YYModelTreeBox()
-            box.object?[name] = childBox
             try YYModelTreeBoxer.encode(v, into: childBox, at: codingPath + [childKey], options: options, userInfo: userInfo)
+            box.object?[name] = childBox
         }
     }
 }

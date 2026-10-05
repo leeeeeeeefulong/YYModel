@@ -111,6 +111,8 @@ public extension YYModelConfiguration {
         let business = (value as? _YYAnyOptional)?._yy_unwrappedOrNull ?? value
         // R5：业务值原样保存；解码时 `typed as? T` 直接命中，零转换。
         typedDefaultValues[name] = business
+        // Replacement must not leave a stale snapshot when the new value cannot be encoded.
+        defaultValues.removeValue(forKey: name)
         // JSON 快照尽力而为（供 superDecoder 等 Decoder 消费入口）：
         // 直接可装箱的走精确路径，其余经 JSONEncoder 往返。
         if let direct = try? YYModelJSONValue(value).raw {

@@ -271,4 +271,22 @@ gh release create 2.3.2 \
 - ✅ Framework XCTest suite: 27/27 passed on iOS Simulator.
 - ✅ Podspec and SPM pins updated to 2.3.2." || true
 
+# 2.3.3
+gh release create 2.3.3 \
+  --repo "$REPO" \
+  --title "2.3.3 — Release E2E Remediation (R-01–R-07)" \
+  --notes "### Swift — YYModelSwift
+- **R-01 (S1)**: Tree encoders commit keyed/unkeyed/dictionary children only after successful encoding; a caught child failure can no longer overwrite a valid field or consume an array slot.
+- **R-02 (S1)**: Handwritten keyed/unkeyed/single containers forward 14 Foundation scalar overloads concretely, so post-catch scalar writes no longer read a stale draft.
+- **R-03 (S2)**: superEncoder reference containers share a commit token across the encoder and all descendants; the last holder's release commits, eliminating wrong-winner overwrites on the same key.
+- **R-04 (S2)**: Polymorphic root registration now rejects fallback/lossy/typedDefaults/missing field policies at rule construction; payload-side policies are unchanged.
+- **R-05 (S1)**: Replacing a typed default clears its stale JSON snapshot; container access without a snapshot throws \`typeMismatch\` instead of falling back to stale data or the live business instance.
+- **R-06 (S1)**: Single-value generic encoding runs through the base container's EncodingBox child transaction, isolating failed children (fixes an iOS 18.2 SIGTRAP).
+- **R-07 (S1)**: Native parsed-object entry validates JSON representability before serialization; Infinity/NaN/Date/NSObject now yield catchable \`DecodingError\` instead of \`NSInvalidArgumentException\`.
+
+### Verification Status
+- ✅ 454/454 public-consumer E2E rows on macOS 26.7 and iOS 18.2/26.5 simulators (strict Swift 6, optimizations, complete concurrency checking, warnings-as-errors).
+- ✅ SwiftPM delivery chain re-run on the release candidate: release-built consumers (136 weather + 9 mixed rows), \`swift test\` 108/108, \`pod lib lint\`, ObjC Demo 84/84.
+- ✅ Consumers, fixtures and runners tracked in-repo and gated by the CI \`release-e2e\` job; scope and known limitations documented in docs/RELEASE-READINESS-20261006.md." || true
+
 echo "✅ All releases published successfully!"

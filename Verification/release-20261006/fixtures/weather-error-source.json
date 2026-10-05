@@ -1,0 +1,7 @@
+{
+  "url": "https://api.open-meteo.com/v1/forecast?latitude=31.23&longitude=121.47&hourly=invalid_variable_for_validation",
+  "httpStatus": 400,
+  "fetchedAtUTC": "2026-10-05T20:05:00.042800+00:00",
+  "sha256": "d041cd3ab40302c0f483aa7dab98b22cfdc61e3b5aba9ee0a7350c104a3874bc",
+  "bytes": 241
+}

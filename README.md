@@ -9,7 +9,9 @@ High performance JSON model framework for iOS/macOS.
 [![License](https://img.shields.io/cocoapods/l/YYModel2.svg)](https://github.com/leeeeeeeefulong/YYModel/blob/master/LICENSE)
 [![Platform](https://img.shields.io/cocoapods/p/YYModel2.svg)](https://cocoapods.org/pods/YYModel2)
 
-Current release: **2.3.2** (`pod 'YYModel2', '2.3.2'`, SPM `from: "2.3.2"`).
+Current release: **2.3.3** (`pod 'YYModel2', '2.3.3'`, SPM `from: "2.3.3"`).
+
+[2026-10-06 release verification](docs/RELEASE-READINESS-20261006.md) records the weather E2E evidence, the R-01–R-07 encoder/decoder fixes shipped in 2.3.3, and the verified scope of this release.
 
 ---
 

@@ -125,6 +125,10 @@ public struct YYJSONDecoder: @unchecked Sendable {
         if let text = object as? String { return try decode(type, from: text) }
         if mode == .native {
             guard rules.isEmpty else { throw YYJSONRulesError.rule(.rulesRequireCompatibleMode, T.self, "YY rules require compatible mode") }
+            // JSONSerialization raises an uncaught Objective-C exception for invalid
+            // raw values. Validate first, then serialize the original object so native
+            // key/number/date semantics remain Foundation's.
+            _ = try yy_decodingJSONValue(at: []) { try YYModelJSONValue(object) }
             return try decode(type, from: JSONSerialization.data(withJSONObject: object, options: [.fragmentsAllowed]))
         }
         return try decodeRaw(type, from: object)

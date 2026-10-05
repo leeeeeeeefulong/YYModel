@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name         = 'YYModel2'
   s.summary      = 'High performance JSON model framework for iOS/macOS. Maintained fork of ibireme/YYModel.'
-  s.version      = '2.3.2'
+  s.version      = '2.3.3'
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.authors      = { 'ibireme' => 'ibireme@gmail.com', 'leeeeeeeefulong' => 'leeeeeeeefulong@github.com' }
   s.homepage     = 'https://github.com/leeeeeeeefulong/YYModel'

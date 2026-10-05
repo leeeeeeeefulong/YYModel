@@ -541,11 +541,19 @@ struct YYModelKeyedDecoder<Key: CodingKey>: KeyedDecodingContainerProtocol {
         switch resolver.resolve(key.stringValue) {
         case .present(let container, let fieldKey), .null(let container, let fieldKey):
             return YYModelDecoder(base: try container.superDecoder(forKey: fieldKey), policy: YYModelPolicy(date: date, missing: context.defaults.missing))
-        case .defaultVal(let typed, let json):
-            let value = json ?? typed
-            if let value {
-                return YYModelDecoder(base: context.rawDecoder(value, path: codingPath + [key], userInfo: userInfo), policy: YYModelPolicy(date: date, missing: context.defaults.missing))
+        case .defaultVal(_, let json):
+            // R-05: container access requires a JSON snapshot. A typed business
+            // value without one (e.g. replaced by an unencodable value) must be
+            // explicitly rejected here, never fall back to the stale snapshot
+            // (cleared at registration) nor to the live business instance.
+            // Throw typeMismatch to preserve the published container contract.
+            guard let json else {
+                throw DecodingError.typeMismatch(
+                    [String: Any].self,
+                    .init(codingPath: codingPath + [key],
+                          debugDescription: "Typed default has no JSON snapshot for container access"))
             }
+            return YYModelDecoder(base: context.rawDecoder(json, path: codingPath + [key], userInfo: userInfo), policy: YYModelPolicy(date: date, missing: context.defaults.missing))
         case .fallbackVal(let fallback):
             return YYModelDecoder(base: context.rawDecoder(fallback, path: codingPath + [key], userInfo: userInfo), policy: YYModelPolicy(date: date, missing: context.defaults.missing))
         case .invalidPath(let error):

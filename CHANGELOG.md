@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## 2.3.3 — Release E2E Remediation R-01–R-07 (2026-10-06)
+
+本节修复随 **2.3.3** 发布，问题记录、复现条件与证据见
+[发布核验报告](docs/RELEASE-READINESS-20261006.md)。全部修复在 macOS 26.7 与
+iOS 18.2/26.5 模拟器以严格 Swift 6（`-O`、完整并发检查、warnings-as-errors）
+通过 454/454 公开消费者 E2E；SwiftPM 交付链（release 构建消费者、`swift test`
+108/108、`pod lib lint`、ObjC Demo 84/84）随新候选复跑通过。
+
+- **R-01 (S1)**：树编码 keyed/unkeyed/dictionary 子容器先独立编码、成功后提交；子 Encodable 中途 throw 不再覆盖已成功键或消耗数组位置。
+- **R-02 (S1)**：compatible Data 手写 keyed/unkeyed/single 容器补齐 14 种 Foundation 标量具体重载；同一容器 catch 子编码失败后继续写标量不再读到草稿。
+- **R-03 (S2)**：superEncoder 引用容器引入编码器与全部后代共享的提交 token，最后持有者释放才提交，消除同 key「错误胜者」。
+- **R-04 (S2)**：多态根注册 fallback/lossy/typedDefaults/missing 字段策略在规则构造时显式拒绝；payload 侧策略行为不变。
+- **R-05 (S1)**：typed default 被替换为不可 JSON 编码的业务值时同步清除旧 JSON 快照；容器入口无快照显式抛 `typeMismatch`，不再回退旧快照或业务实例。
+- **R-06 (S1)**：compatible Data 单值容器泛型入口改经 base 容器 EncodingBox 子事务执行，失败子节点隔离回滚，消除 iOS 18.2 SIGTRAP。
+- **R-07 (S1)**：native 已解析对象入口在 `JSONSerialization` 前验证 JSON 可表示性，Infinity/NaN/Date/NSObject 返回可捕获 `DecodingError`，不再触发 `NSInvalidArgumentException`。
+
+### Known Limitations
+
+- **Foundation catch 后继续编码**：部分环境（macOS 26/iOS 26 的部分泛型与 single 容器、iOS 18.2 行为不同）失败恢复会保留草稿；业务 Encodable 应让错误向上传播，勿在同一容器 catch 后继续泛型编码。
+- **legacy 缺失数据占位**：legacy 管线可将缺失/null 数值填零；需要严谨数据校验的业务应使用 compatible 或 native 并保留业务校验，不得把占位值当作有效数据展示。
+- **未验证范围**：真机与旧 OS、tvOS/watchOS、新 E2E 的 Float 二次舍入/Decimal/Int128/UInt128 等数值项、日期日历极值、大负载/并发 SLA 不在承诺内。
+
 ## 2.3.2 — 修复工程（2026-10-06）
 
 本节记录的修复工程已随 **2.3.2** 发布。当时的实测结果为：公开 API E2E 555/555、

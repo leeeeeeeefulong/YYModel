@@ -1,0 +1,33 @@
+{
+  "provider": "Open-Meteo",
+  "providerURL": "https://open-meteo.com/",
+  "documentation": "https://open-meteo.com/en/docs",
+  "license": "CC BY 4.0",
+  "attribution": "Weather data by Open-Meteo (https://open-meteo.com/)",
+  "fetchedAtUTC": "2026-10-05T20:04:14.486992+00:00",
+  "url": "https://api.open-meteo.com/v1/forecast?latitude=31.23%2C40.71%2C35.68&longitude=121.47%2C-74.01%2C139.69&current=temperature_2m%2Crelative_humidity_2m%2Cis_day%2Cprecipitation%2Cwind_speed_10m&hourly=temperature_2m%2Crelative_humidity_2m%2Cprecipitation%2Cwind_speed_10m&daily=temperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum&forecast_days=3&timezone=auto",
+  "httpStatus": 200,
+  "headers": {
+    "Content-Type": "application/json; charset=utf-8",
+    "Date": "Mon, 05 Oct 2026 20:04:14 GMT",
+    "ETag": null,
+    "Last-Modified": null
+  },
+  "sha256": "30fa38881a0f8c566f63e00f11f2d767108018c19c7b101cfd6c213b189a0920",
+  "bytes": 10878,
+  "cities": [
+    "Shanghai",
+    "New York",
+    "Tokyo"
+  ],
+  "hourlyRows": [
+    72,
+    72,
+    72
+  ],
+  "dailyRows": [
+    3,
+    3,
+    3
+  ]
+}

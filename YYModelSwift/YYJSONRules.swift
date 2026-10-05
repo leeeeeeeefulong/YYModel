@@ -117,7 +117,9 @@ struct YYJSONTypeRule {
     }
     func validatePolymorphic(for type: Any.Type) throws {
         guard policy.mapper.isEmpty, policy.blacklist.isEmpty, policy.whitelist == nil,
-              policy.required.isEmpty, policy.defaults.isEmpty, policy.fieldDates.isEmpty,
+              policy.required.isEmpty, policy.defaults.isEmpty, policy.typedDefaults.isEmpty,
+              policy.fallbacks.isEmpty, policy.lossy.isEmpty, policy.missing == .inherit,
+              policy.fieldDates.isEmpty,
               inheritsDate || policy.date == .native || policy.date == .automatic else {
             throw YYJSONRulesError.rule(.polymorphicRootPolicy, type, "Declare polymorphic field/date policies on payload types")
         }
