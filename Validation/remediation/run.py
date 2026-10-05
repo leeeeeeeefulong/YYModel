@@ -33,6 +33,14 @@ if args.simulator:
         raise RuntimeError('The requested simulator must be available and booted')
     receipt['simulator'] = {'runtime': matches[0][0], 'device': matches[0][1]}
 
+def error_fields_match(row, expected):
+    """C12: when an expectation pins errorType/errorPath/errorKey, the observed row must
+    match exactly. Absent pins fall back to the historical lenient 'any error' check."""
+    for field in ('errorType', 'errorPath', 'errorKey'):
+        if field in expected and row.get(field) != expected[field]:
+            return False
+    return True
+
 def freeze(path, relative):
     data = path.read_bytes()
     target = out / 'source' / relative
@@ -152,8 +160,13 @@ for consumer, extra in [('BridgePathsConsumer', []), ('BridgeConsumer', []),
             actual, expected_result = row.get('result'), old.get('result')
             if isinstance(actual, str) and isinstance(expected_result, str) and actual.startswith('{') and expected_result.startswith('{'):
                 actual, expected_result = json.loads(actual), json.loads(expected_result)
-            passed = (actual == expected_result and 'error' not in row
-                      if 'result' in old else 'error' in row)
+            if 'result' in old:
+                # C12: an expectation may additionally assert the structured error fields.
+                passed = actual == expected_result and 'error' not in row and error_fields_match(row, old)
+            else:
+                # Historical "rejected input" rows still pass on any error unless the
+                # baseline pinned errorType/errorPath (then those must match exactly).
+                passed = 'error' in row and error_fields_match(row, old)
             checks.append((row['name'], passed))
         checks.append(('complete-observation-set', {r['name'] for r in values} == set(previous)))
     if not checks:
