@@ -24,6 +24,13 @@
 @property(nonatomic,copy) NSString *name;
 @end
 @implementation ContractMixed @end
+@interface ContractFloating : NSObject
+@property(nonatomic) double value;
+@end
+@implementation ContractFloating
+- (NSUInteger)hash { return [self yy_modelHash]; }
+- (BOOL)isEqual:(id)object { return [self yy_modelIsEqual:object]; }
+@end
 
 @interface ContractMapperBase : NSObject
 @property(nonatomic,copy) NSString *name;
@@ -185,6 +192,22 @@ int main(int argc, const char *argv[]) { @autoreleasepool {
     Check(checks,@"mixed:pointerStillIgnored",@([m1 isEqual:m2]),@YES);
     m2.name = @"different";
     Check(checks,@"mixed:valueStillCompared",@([m1 isEqual:m2]),@NO);
+
+    // 2.3.1: non-finite floats keep the original per-value equality/hash contract
+    // instead of merging into one nil via the JSON-export filter.
+    ContractFloating *nan = [ContractFloating new]; nan.value = NAN;
+    ContractFloating *pos = [ContractFloating new]; pos.value = INFINITY;
+    ContractFloating *neg = [ContractFloating new]; neg.value = -INFINITY;
+    ContractFloating *finite = [ContractFloating new]; finite.value = 7;
+    ContractFloating *same = [ContractFloating new]; same.value = 7;
+    Check(checks,@"nonfinite:nanVsInfinity",@([nan isEqual:pos]),@NO);
+    Check(checks,@"nonfinite:infinities",@([pos isEqual:neg]),@NO);
+    Check(checks,@"nonfinite:setCount",@([NSSet setWithArray:@[nan,pos,neg]].count),@3);
+    Check(checks,@"nonfinite:finiteEqual",@([finite isEqual:same]),@YES);
+    Check(checks,@"nonfinite:nanVsFinite",@([nan isEqual:finite]),@NO);
+    // The JSON-export filter semantic is unchanged: a NaN property is omitted, not written.
+    nan.value = NAN;
+    Check(checks,@"nonfinite:jsonExportOmitsNaN",[nan yy_modelToJSONObject],@{});
 
     NSDictionary *input = @{@"name":@"normal",@"legacy":@"ancestor",@"other":@"tail",@"renamed":@"winner"};
     ContractMapperChild *plain = [ContractMapperChild yy_modelWithDictionary:input];

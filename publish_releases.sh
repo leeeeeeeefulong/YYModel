@@ -228,4 +228,25 @@ gh release create 2.3.0 \
 - ✅ Swift-reference scan over the ObjC product: zero matches.
 - ✅ Deployment floor maintained at iOS 11.0 / macOS 10.13." || true
 
+# 2.3.1
+gh release create 2.3.1 \
+  --repo "$REPO" \
+  --title "2.3.1 — Independent Review Fixes" \
+  --notes "### Swift — YYModelSwift
+- **(F1) Hook input precision**: \`willTransform\` input snapshots keep exact numeric tokens (\`9007199254740993.0\` no longer rounds to binary64); physical keys preserved; nested hooks share the fix.
+- **(F2) Field dates in nested containers**: \`nestedContainer\` / \`nestedUnkeyedContainer\` / keyed \`superDecoder\`/\`superEncoder\` resolve \`fieldDateStrategies[key]\` like direct decoding.
+- **(F3) Defaults in nested containers**: keyed \`superDecoder(forKey:)\` and nested accessors fall back to registered \`defaultValues\`.
+- **(F4) Strict missing-vs-null**: \`.compatible\` \`decodeNil(forKey:)\` on absent, non-defaulted keys throws \`keyNotFound\` like Foundation; legacy zero-fill unchanged.
+
+### Objective-C
+- **(E1) Non-finite equality/hash**: NaN / +Inf / −Inf models compare and hash as distinct values, matching the ibireme original (NSSet keeps 3). JSON export, description, and coding keep the documented non-finite filter.
+
+### Distribution
+- **(F5) Swift language modes**: \`swift_versions = ['5.0', '6.0']\` at the podspec root — valid compiler language modes only; CocoaPods clients constraining Swift 5 select 5.0 again. Swift 5.9+ toolchain requirement stays a documented comment.
+
+### Verification Status
+- ✅ Review probes F1–F4 (Swift consumer) and E1 (ObjC consumer vs original) all fixed on macOS and iOS 26.5 simulator.
+- ✅ CocoaPods 1.17 analyzer: \`< 6.0\` → 5.0, \`5.0\` → 5.0, \`6.0\` → 6.0; both language modes compile.
+- ✅ ObjC contract E2E, Demo suite, original XCTest, Swift tests, and external-rules E2E all green." || true
+
 echo "✅ All releases published successfully!"

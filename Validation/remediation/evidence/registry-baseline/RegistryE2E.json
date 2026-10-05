@@ -1,0 +1,198 @@
+[
+  {
+    "actual" : "9007199254740993",
+    "expected" : "9007199254740993",
+    "id" : "P-01",
+    "passed" : true,
+    "scenario" : "p01_large_integer_control"
+  },
+  {
+    "actual" : "1",
+    "expected" : "1",
+    "id" : "P-02",
+    "passed" : true,
+    "scenario" : "p02_pos_decimal_trunc_data"
+  },
+  {
+    "actual" : "-1",
+    "expected" : "-1",
+    "id" : "P-02",
+    "passed" : true,
+    "scenario" : "p02_neg_decimal_trunc_data"
+  },
+  {
+    "actual" : "1",
+    "expected" : "1",
+    "id" : "P-02",
+    "passed" : true,
+    "scenario" : "p02_pos_decimal_trunc_nsnumber"
+  },
+  {
+    "actual" : "-1",
+    "expected" : "-1",
+    "id" : "P-02",
+    "passed" : true,
+    "scenario" : "p02_neg_decimal_trunc_nsnumber"
+  },
+  {
+    "actual" : "1",
+    "expected" : "1",
+    "id" : "P-02",
+    "passed" : true,
+    "scenario" : "p02_pos_decimal_trunc_decimalnumber"
+  },
+  {
+    "actual" : "-1",
+    "expected" : "-1",
+    "id" : "P-02",
+    "passed" : true,
+    "scenario" : "p02_neg_decimal_trunc_decimalnumber"
+  },
+  {
+    "actual" : "1.000000000000000031251",
+    "expected" : "1.000000000000000031251",
+    "id" : "P-03",
+    "passed" : true,
+    "scenario" : "p03_decimal_export_literal"
+  },
+  {
+    "actual" : "1.000000000000000031251",
+    "expected" : "1.000000000000000031251",
+    "id" : "P-04",
+    "passed" : true,
+    "scenario" : "p04_custom_strategy_decimal"
+  },
+  {
+    "actual" : "1065353217",
+    "expected" : "1065353217",
+    "id" : "P-06",
+    "passed" : true,
+    "scenario" : "p06_float_text_bitpattern"
+  },
+  {
+    "actual" : "A",
+    "expected" : "B",
+    "id" : "F-01",
+    "passed" : false,
+    "scenario" : "f01_raw_key_conflict_exact_first"
+  },
+  {
+    "actual" : "error: DecodingError.keyNotFound: Key 'id' not found in keyed decoding container. Debug description: Missing property; supply an explicit default",
+    "expected" : "id=7,name=ok",
+    "id" : "F-02",
+    "passed" : false,
+    "scenario" : "f02_model_external_rule_merge"
+  },
+  {
+    "actual" : "allowed_missing_id(id=0)",
+    "expected" : "rejected_missing_id",
+    "id" : "F-02",
+    "passed" : false,
+    "scenario" : "f02_duplicate_external_rule_merge"
+  },
+  {
+    "actual" : "snake_case",
+    "expected" : "snake_case",
+    "id" : "F-03",
+    "passed" : true,
+    "scenario" : "f03_data_keys_snake_case_preserved"
+  },
+  {
+    "actual" : "a",
+    "expected" : "b",
+    "id" : "F-03",
+    "passed" : false,
+    "scenario" : "f03_int_key_dict_conflict_exact_winner"
+  },
+  {
+    "actual" : "error: DecodingError.keyNotFound: Key 'x' not found in keyed decoding container. Debug description: Missing container",
+    "expected" : "superDecoder_accessible",
+    "id" : "F-04",
+    "passed" : false,
+    "scenario" : "f04_fallback_superdecoder_container"
+  },
+  {
+    "actual" : "zeroFilled=0",
+    "expected" : "typeMismatch_thrown",
+    "id" : "F-05",
+    "passed" : false,
+    "scenario" : "f05_path_shape_error_swallowed"
+  },
+  {
+    "actual" : "decoded=1,hook=2",
+    "expected" : "decoded=1,hook=1",
+    "id" : "F-06",
+    "passed" : false,
+    "scenario" : "f06_hook_snapshot_subtree_divergence"
+  },
+  {
+    "actual" : "error: DecodingError.valueNotFound: Expected value of type YYModelPresence<String> but found null instead. Path: items[0]. Debug description: Null value",
+    "expected" : ".null",
+    "id" : "F-07",
+    "passed" : false,
+    "scenario" : "f07_presence_null_array"
+  },
+  {
+    "actual" : "error: DecodingError.valueNotFound: Expected value of type YYModelPresence<Int> but found null instead. Path: map.k. Debug description: Null value",
+    "expected" : ".null",
+    "id" : "F-07",
+    "passed" : false,
+    "scenario" : "f07_presence_null_dict"
+  },
+  {
+    "actual" : "error: DecodingError.valueNotFound: Expected value of type F07SingleModel but found null instead. Debug description: Null value",
+    "expected" : ".null",
+    "id" : "F-07",
+    "passed" : false,
+    "scenario" : "f07_presence_null_single"
+  },
+  {
+    "actual" : "999",
+    "expected" : "1,2",
+    "id" : "F-08",
+    "passed" : false,
+    "scenario" : "f08_lossy_fallback_priority_inversion"
+  },
+  {
+    "actual" : "error: DecodingError.typeMismatch: expected value of type Array<Any>. Path: items. Debug description: Expected to decode Array<Any> but found a string instead.",
+    "expected" : "loss_recorded",
+    "id" : "F-08",
+    "passed" : false,
+    "scenario" : "f08_lossy_wrong_container_type"
+  },
+  {
+    "actual" : "error: DecodingError.typeMismatch: expected value of type Dictionary<String, Any>. Path: super. Debug description: expected object",
+    "expected" : "title=Manager,super=VIP",
+    "id" : "F-09",
+    "passed" : false,
+    "scenario" : "f09_business_super_key_hijack"
+  },
+  {
+    "actual" : "otherError: Unknown model discriminator: 1",
+    "expected" : "typeMismatch",
+    "id" : "F-10",
+    "passed" : false,
+    "scenario" : "f10_polymorphic_number_discriminator"
+  },
+  {
+    "actual" : "Unknown model discriminator: ",
+    "expected" : "Missing model discriminator",
+    "id" : "F-10",
+    "passed" : false,
+    "scenario" : "f10_polymorphic_null_discriminator"
+  },
+  {
+    "actual" : "decodeNil=true,decode=absent",
+    "expected" : "decodeNil=false,decode=absent",
+    "id" : "F-11",
+    "passed" : false,
+    "scenario" : "f11b_zerofill_decodenil_presence_conflict"
+  },
+  {
+    "actual" : "alias_name,prop",
+    "expected" : "prop",
+    "id" : "F-11",
+    "passed" : false,
+    "scenario" : "f11f_allkeys_leaking_physical_aliases"
+  }
+]

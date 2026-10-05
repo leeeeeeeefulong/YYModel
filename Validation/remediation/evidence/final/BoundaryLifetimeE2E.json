@@ -1,0 +1,14 @@
+[
+  {
+    "actual" : "4607182418800017409,4607182418800017409",
+    "expected" : "4607182418800017409,4607182418800017409",
+    "passed" : true,
+    "scenario" : "cached-hook-number-cross-invocation-false"
+  },
+  {
+    "actual" : "4607182418800017409,4607182418800017409",
+    "expected" : "4607182418800017409,4607182418800017409",
+    "passed" : true,
+    "scenario" : "cached-hook-number-cross-invocation-true"
+  }
+]

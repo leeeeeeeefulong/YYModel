@@ -1,0 +1,17 @@
+perf-isolation: release -O, best-of-9, 100 warmup, 3000 iterations
+
+[A] native mode vs official  (R-2: must be <= 1.10x)
+  Tiny    (2 fields) official 0.00148 | yy 0.00201 | ratio 1.36x | +0.267 us/field
+  Mid     (14 fields) official 0.00682 | yy 0.00748 | ratio 1.10x | +0.047 us/field
+  Payload (70 fields) official 0.03228 | yy 0.03302 | ratio 1.02x | +0.011 us/field
+
+[B] compatible mode, EMPTY rules  (R-2: target <= 3.00x)
+  Tiny    (2 fields) official 0.00140 | yy 0.00779 | ratio 5.56x | +3.196 us/field
+  Mid     (14 fields) official 0.00682 | yy 0.02598 | ratio 3.81x | +1.369 us/field
+  Payload (70 fields) official 0.03226 | yy 0.12995 | ratio 4.03x | +1.395 us/field
+
+[C] compatible mode, WITH rules  (A2.5: rules overhead must be <= 1.10x of empty)
+  Payload  empty 0.12921 | withRules 0.13976 | rules overhead 1.082x
+
+[D] legacy mode, EMPTY rules  (informational: default entry point)
+  Payload (70 fields) official 0.03202 | yy 0.12873 | ratio 4.02x | +1.382 us/field

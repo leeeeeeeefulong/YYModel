@@ -1,0 +1,20 @@
+building YYModelSwift (-O) ...
+building benchmark ...
+
+perf-isolation: release -O, best-of-9, 100 warmup, 3000 iterations
+
+[A] native mode vs official  (R-2: must be <= 1.10x)
+  Tiny    (2 fields) official 0.00170 | yy 0.00209 | ratio 1.23x | +0.194 us/field
+  Mid     (14 fields) official 0.00674 | yy 0.00753 | ratio 1.12x | +0.057 us/field
+  Payload (70 fields) official 0.03222 | yy 0.03319 | ratio 1.03x | +0.014 us/field
+
+[B] compatible mode, EMPTY rules  (R-2: target <= 3.00x)
+  Tiny    (2 fields) official 0.00141 | yy 0.00735 | ratio 5.22x | +2.970 us/field
+  Mid     (14 fields) official 0.00670 | yy 0.02532 | ratio 3.78x | +1.330 us/field
+  Payload (70 fields) official 0.03235 | yy 0.12317 | ratio 3.81x | +1.297 us/field
+
+[C] compatible mode, WITH rules  (A2.5: rules overhead must be <= 1.10x of empty)
+  Payload  empty 0.12222 | withRules 0.13284 | rules overhead 1.087x
+
+[D] legacy mode, EMPTY rules  (informational: default entry point)
+  Payload (70 fields) official 0.03253 | yy 0.12329 | ratio 3.79x | +1.297 us/field

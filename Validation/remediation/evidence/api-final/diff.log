@@ -1,0 +1,25 @@
+
+/* Generic Signature Changes */
+
+/* RawRepresentable Changes */
+
+/* Removed Decls */
+
+/* Moved Decls */
+
+/* Renamed Decls */
+
+/* Type Changes */
+
+/* Decl Attribute changes */
+
+/* Fixed-layout Type Changes */
+EnumElement YYModelDateStrategy.microsecondsSince1970 has been added as a new enum case
+
+/* Protocol Conformance Change */
+
+/* Protocol Requirement Change */
+
+/* Class Inheritance Change */
+
+/* Others */

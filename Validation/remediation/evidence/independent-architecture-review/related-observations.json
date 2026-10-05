@@ -1,0 +1,23 @@
+[
+  {
+    "Foundation" : 1,
+    "hookValue" : 2,
+    "passed" : false,
+    "scenario" : "array-index-parent-collision",
+    "value" : 1
+  },
+  {
+    "Foundation" : 1,
+    "hookValue" : 2,
+    "passed" : false,
+    "scenario" : "renamed-dictionary-parent-collision",
+    "value" : 1
+  },
+  {
+    "Foundation" : 1,
+    "hookValue" : 2,
+    "passed" : false,
+    "scenario" : "snake-parent-collision",
+    "value" : 1
+  }
+]

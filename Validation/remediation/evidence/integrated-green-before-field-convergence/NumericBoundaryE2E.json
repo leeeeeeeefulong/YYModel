@@ -1,0 +1,326 @@
+[
+  {
+    "actual" : "9007199254740991",
+    "expected" : "9007199254740991",
+    "passed" : true,
+    "scenario" : "signed-9007199254740991-hook-false-raw-false"
+  },
+  {
+    "actual" : "9007199254740991",
+    "expected" : "9007199254740991",
+    "passed" : true,
+    "scenario" : "signed-9007199254740991-hook-false-raw-true"
+  },
+  {
+    "actual" : "9007199254740993",
+    "expected" : "9007199254740993",
+    "passed" : true,
+    "scenario" : "signed-9007199254740993-hook-false-raw-false"
+  },
+  {
+    "actual" : "9007199254740993",
+    "expected" : "9007199254740993",
+    "passed" : true,
+    "scenario" : "signed-9007199254740993-hook-false-raw-true"
+  },
+  {
+    "actual" : "-9007199254740993",
+    "expected" : "-9007199254740993",
+    "passed" : true,
+    "scenario" : "signed--9007199254740993-hook-false-raw-false"
+  },
+  {
+    "actual" : "-9007199254740993",
+    "expected" : "-9007199254740993",
+    "passed" : true,
+    "scenario" : "signed--9007199254740993-hook-false-raw-true"
+  },
+  {
+    "actual" : "9223372036854775807",
+    "expected" : "9223372036854775807",
+    "passed" : true,
+    "scenario" : "signed-9223372036854775807-hook-false-raw-false"
+  },
+  {
+    "actual" : "9223372036854775807",
+    "expected" : "9223372036854775807",
+    "passed" : true,
+    "scenario" : "signed-9223372036854775807-hook-false-raw-true"
+  },
+  {
+    "actual" : "-9223372036854775808",
+    "expected" : "-9223372036854775808",
+    "passed" : true,
+    "scenario" : "signed--9223372036854775808-hook-false-raw-false"
+  },
+  {
+    "actual" : "-9223372036854775808",
+    "expected" : "-9223372036854775808",
+    "passed" : true,
+    "scenario" : "signed--9223372036854775808-hook-false-raw-true"
+  },
+  {
+    "actual" : "9007199254740993",
+    "expected" : "9007199254740993",
+    "passed" : true,
+    "scenario" : "unsigned-9007199254740993-hook-false-raw-false"
+  },
+  {
+    "actual" : "9007199254740993",
+    "expected" : "9007199254740993",
+    "passed" : true,
+    "scenario" : "unsigned-9007199254740993-hook-false-raw-true"
+  },
+  {
+    "actual" : "9223372036854775808",
+    "expected" : "9223372036854775808",
+    "passed" : true,
+    "scenario" : "unsigned-9223372036854775808-hook-false-raw-false"
+  },
+  {
+    "actual" : "9223372036854775808",
+    "expected" : "9223372036854775808",
+    "passed" : true,
+    "scenario" : "unsigned-9223372036854775808-hook-false-raw-true"
+  },
+  {
+    "actual" : "18446744073709551615",
+    "expected" : "18446744073709551615",
+    "passed" : true,
+    "scenario" : "unsigned-18446744073709551615-hook-false-raw-false"
+  },
+  {
+    "actual" : "18446744073709551615",
+    "expected" : "18446744073709551615",
+    "passed" : true,
+    "scenario" : "unsigned-18446744073709551615-hook-false-raw-true"
+  },
+  {
+    "actual" : "9007199254740993",
+    "expected" : "9007199254740993",
+    "passed" : true,
+    "scenario" : "floating-integer-9007199254740993.0-hook-false"
+  },
+  {
+    "actual" : "9007199254740993",
+    "expected" : "9007199254740993",
+    "passed" : true,
+    "scenario" : "floating-integer-9.007199254740993e15-hook-false"
+  },
+  {
+    "actual" : "1",
+    "expected" : "1",
+    "passed" : true,
+    "scenario" : "float-boundary-1.401298464324817e-45-hook-false"
+  },
+  {
+    "actual" : "2147483649",
+    "expected" : "2147483649",
+    "passed" : true,
+    "scenario" : "float-boundary--1.401298464324817e-45-hook-false"
+  },
+  {
+    "actual" : "8388608",
+    "expected" : "8388608",
+    "passed" : true,
+    "scenario" : "float-boundary-1.1754943508222875e-38-hook-false"
+  },
+  {
+    "actual" : "2139095039",
+    "expected" : "2139095039",
+    "passed" : true,
+    "scenario" : "float-boundary-3.4028234663852886e38-hook-false"
+  },
+  {
+    "actual" : "1065353217",
+    "expected" : "1065353217",
+    "passed" : true,
+    "scenario" : "float-boundary-1.0000000596046448-hook-false"
+  },
+  {
+    "actual" : "1",
+    "expected" : "1",
+    "passed" : true,
+    "scenario" : "double-boundary-4.9406564584124654e-324-hook-false"
+  },
+  {
+    "actual" : "9223372036854775809",
+    "expected" : "9223372036854775809",
+    "passed" : true,
+    "scenario" : "double-boundary--4.9406564584124654e-324-hook-false"
+  },
+  {
+    "actual" : "4503599627370496",
+    "expected" : "4503599627370496",
+    "passed" : true,
+    "scenario" : "double-boundary-2.2250738585072014e-308-hook-false"
+  },
+  {
+    "actual" : "9218868437227405311",
+    "expected" : "9218868437227405311",
+    "passed" : true,
+    "scenario" : "double-boundary-1.7976931348623157e308-hook-false"
+  },
+  {
+    "actual" : "9007199254740991",
+    "expected" : "9007199254740991",
+    "passed" : true,
+    "scenario" : "signed-9007199254740991-hook-true-raw-false"
+  },
+  {
+    "actual" : "9007199254740991",
+    "expected" : "9007199254740991",
+    "passed" : true,
+    "scenario" : "signed-9007199254740991-hook-true-raw-true"
+  },
+  {
+    "actual" : "9007199254740993",
+    "expected" : "9007199254740993",
+    "passed" : true,
+    "scenario" : "signed-9007199254740993-hook-true-raw-false"
+  },
+  {
+    "actual" : "9007199254740993",
+    "expected" : "9007199254740993",
+    "passed" : true,
+    "scenario" : "signed-9007199254740993-hook-true-raw-true"
+  },
+  {
+    "actual" : "-9007199254740993",
+    "expected" : "-9007199254740993",
+    "passed" : true,
+    "scenario" : "signed--9007199254740993-hook-true-raw-false"
+  },
+  {
+    "actual" : "-9007199254740993",
+    "expected" : "-9007199254740993",
+    "passed" : true,
+    "scenario" : "signed--9007199254740993-hook-true-raw-true"
+  },
+  {
+    "actual" : "9223372036854775807",
+    "expected" : "9223372036854775807",
+    "passed" : true,
+    "scenario" : "signed-9223372036854775807-hook-true-raw-false"
+  },
+  {
+    "actual" : "9223372036854775807",
+    "expected" : "9223372036854775807",
+    "passed" : true,
+    "scenario" : "signed-9223372036854775807-hook-true-raw-true"
+  },
+  {
+    "actual" : "-9223372036854775808",
+    "expected" : "-9223372036854775808",
+    "passed" : true,
+    "scenario" : "signed--9223372036854775808-hook-true-raw-false"
+  },
+  {
+    "actual" : "-9223372036854775808",
+    "expected" : "-9223372036854775808",
+    "passed" : true,
+    "scenario" : "signed--9223372036854775808-hook-true-raw-true"
+  },
+  {
+    "actual" : "9007199254740993",
+    "expected" : "9007199254740993",
+    "passed" : true,
+    "scenario" : "unsigned-9007199254740993-hook-true-raw-false"
+  },
+  {
+    "actual" : "9007199254740993",
+    "expected" : "9007199254740993",
+    "passed" : true,
+    "scenario" : "unsigned-9007199254740993-hook-true-raw-true"
+  },
+  {
+    "actual" : "9223372036854775808",
+    "expected" : "9223372036854775808",
+    "passed" : true,
+    "scenario" : "unsigned-9223372036854775808-hook-true-raw-false"
+  },
+  {
+    "actual" : "9223372036854775808",
+    "expected" : "9223372036854775808",
+    "passed" : true,
+    "scenario" : "unsigned-9223372036854775808-hook-true-raw-true"
+  },
+  {
+    "actual" : "18446744073709551615",
+    "expected" : "18446744073709551615",
+    "passed" : true,
+    "scenario" : "unsigned-18446744073709551615-hook-true-raw-false"
+  },
+  {
+    "actual" : "18446744073709551615",
+    "expected" : "18446744073709551615",
+    "passed" : true,
+    "scenario" : "unsigned-18446744073709551615-hook-true-raw-true"
+  },
+  {
+    "actual" : "9007199254740993",
+    "expected" : "9007199254740993",
+    "passed" : true,
+    "scenario" : "floating-integer-9007199254740993.0-hook-true"
+  },
+  {
+    "actual" : "9007199254740993",
+    "expected" : "9007199254740993",
+    "passed" : true,
+    "scenario" : "floating-integer-9.007199254740993e15-hook-true"
+  },
+  {
+    "actual" : "1",
+    "expected" : "1",
+    "passed" : true,
+    "scenario" : "float-boundary-1.401298464324817e-45-hook-true"
+  },
+  {
+    "actual" : "2147483649",
+    "expected" : "2147483649",
+    "passed" : true,
+    "scenario" : "float-boundary--1.401298464324817e-45-hook-true"
+  },
+  {
+    "actual" : "8388608",
+    "expected" : "8388608",
+    "passed" : true,
+    "scenario" : "float-boundary-1.1754943508222875e-38-hook-true"
+  },
+  {
+    "actual" : "2139095039",
+    "expected" : "2139095039",
+    "passed" : true,
+    "scenario" : "float-boundary-3.4028234663852886e38-hook-true"
+  },
+  {
+    "actual" : "1065353217",
+    "expected" : "1065353217",
+    "passed" : true,
+    "scenario" : "float-boundary-1.0000000596046448-hook-true"
+  },
+  {
+    "actual" : "1",
+    "expected" : "1",
+    "passed" : true,
+    "scenario" : "double-boundary-4.9406564584124654e-324-hook-true"
+  },
+  {
+    "actual" : "9223372036854775809",
+    "expected" : "9223372036854775809",
+    "passed" : true,
+    "scenario" : "double-boundary--4.9406564584124654e-324-hook-true"
+  },
+  {
+    "actual" : "4503599627370496",
+    "expected" : "4503599627370496",
+    "passed" : true,
+    "scenario" : "double-boundary-2.2250738585072014e-308-hook-true"
+  },
+  {
+    "actual" : "9218868437227405311",
+    "expected" : "9218868437227405311",
+    "passed" : true,
+    "scenario" : "double-boundary-1.7976931348623157e308-hook-true"
+  }
+]

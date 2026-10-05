@@ -1,0 +1,88 @@
+{
+  "passed": true,
+  "baseline": "evidence/perf-baseline.log",
+  "baselineSha256": "fb8f9f70469e1d8c6a7c79ac1a62b66d1efcd0c03abb9a6376e908cae80afbe8",
+  "benchmarkReceiptSha256": "cc490aea3874208929c7d9ce54bc007745d8adca1bbaa338833a427439ea9a93",
+  "checks": [
+    {
+      "mode": "native",
+      "model": "Tiny",
+      "baselineMs": 0.00209,
+      "baselineRatio": 1.23,
+      "finalMs": 0.00169,
+      "finalRatio": 0.98,
+      "absoluteChangePercent": -19.138755980861234,
+      "maxMs": 0.002299,
+      "maxRatio": 1.353,
+      "passed": true
+    },
+    {
+      "mode": "native",
+      "model": "Mid",
+      "baselineMs": 0.00753,
+      "baselineRatio": 1.12,
+      "finalMs": 0.00695,
+      "finalRatio": 1.04,
+      "absoluteChangePercent": -7.70252324037185,
+      "maxMs": 0.008283,
+      "maxRatio": 1.2320000000000002,
+      "passed": true
+    },
+    {
+      "mode": "native",
+      "model": "Payload",
+      "baselineMs": 0.03319,
+      "baselineRatio": 1.03,
+      "finalMs": 0.03209,
+      "finalRatio": 1.01,
+      "absoluteChangePercent": -3.314251280506164,
+      "maxMs": 0.036509,
+      "maxRatio": 1.1330000000000002,
+      "passed": true
+    },
+    {
+      "mode": "compatible",
+      "model": "Tiny",
+      "baselineMs": 0.00735,
+      "baselineRatio": 5.22,
+      "finalMs": 0.0072,
+      "finalRatio": 5.08,
+      "absoluteChangePercent": -2.0408163265306145,
+      "maxMs": 0.008085,
+      "maxRatio": 5.742,
+      "passed": true
+    },
+    {
+      "mode": "compatible",
+      "model": "Mid",
+      "baselineMs": 0.02532,
+      "baselineRatio": 3.78,
+      "finalMs": 0.02538,
+      "finalRatio": 3.8,
+      "absoluteChangePercent": 0.23696682464455776,
+      "maxMs": 0.027852000000000002,
+      "maxRatio": 4.158,
+      "passed": true
+    },
+    {
+      "mode": "compatible",
+      "model": "Payload",
+      "baselineMs": 0.12317,
+      "baselineRatio": 3.81,
+      "finalMs": 0.12815,
+      "finalRatio": 4.06,
+      "absoluteChangePercent": 4.043192335796042,
+      "maxMs": 0.13548700000000002,
+      "maxRatio": 4.191000000000001,
+      "passed": true
+    },
+    {
+      "name": "rulesOverhead",
+      "ratio": 1.09,
+      "maxRatio": 1.1,
+      "passed": true
+    }
+  ],
+  "longTermCompatible3xGoalMet": false,
+  "notes": "Same-toolchain baseline. Best of 9 timing with no parallel compilers/consumers; microbenchmarks vary. Native also remains <=1.10x official. No claim of a <=3x compatible result."
+}

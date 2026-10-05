@@ -1,0 +1,62 @@
+[
+  {
+    "actual" : "1000.5",
+    "expected" : "1000.5",
+    "passed" : true,
+    "scenario" : "date-explicit-microseconds-decode"
+  },
+  {
+    "actual" : "1000.25",
+    "expected" : "1000.25",
+    "passed" : true,
+    "scenario" : "date-microseconds-dictionary"
+  },
+  {
+    "actual" : "1000.125",
+    "expected" : "1000.125",
+    "passed" : true,
+    "scenario" : "date-microseconds-field-dates"
+  },
+  {
+    "actual" : "-2.5",
+    "expected" : "-2.5",
+    "passed" : true,
+    "scenario" : "date-microseconds-negative"
+  },
+  {
+    "actual" : "true",
+    "expected" : "true",
+    "passed" : true,
+    "scenario" : "date-microseconds-encode-roundtrip"
+  },
+  {
+    "actual" : "1700000000",
+    "expected" : "1700000000",
+    "passed" : true,
+    "scenario" : "date-automatic-heuristic-unchanged"
+  },
+  {
+    "actual" : "0",
+    "expected" : "0",
+    "passed" : true,
+    "scenario" : "coercion-default-off"
+  },
+  {
+    "actual" : "number:Bool,string:Int",
+    "expected" : "number:Bool,string:Int",
+    "passed" : true,
+    "scenario" : "coercion-report-records"
+  },
+  {
+    "actual" : "float-truncated-to-integer:3",
+    "expected" : "float-truncated-to-integer:3",
+    "passed" : true,
+    "scenario" : "coercion-truncation-record"
+  },
+  {
+    "actual" : "true",
+    "expected" : "true",
+    "passed" : true,
+    "scenario" : "coercion-report-isolation-and-concurrency"
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "reviewedSnapshot": "/tmp/yymodel-remediation-integrated-20261005-8",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "sources": {
+    "/tmp/yymodel-remediation-integrated-20261005-8/libYYModelSwift.dylib": "cf67a9e06487b01d1990e07ad555bedc0e126c2e1812d06a2f75cec884a7de45",
+    "/tmp/yymodel-remediation-integrated-20261005-8/YYModelSwift.swiftmodule": "4ef42c9ea7e7c966ec60a9e2ee93970be08e5dbd8abf5fc9a64aeabc179d466f",
+    "/tmp/yymodel-remediation-integrated-20261005-8/source/YYModelSwift/YYModelTreeEncoder.swift": "0774c856a8b032fbe4fbdf6121c6febecc738afa5b6d5612938d97c22f7f3088",
+    "/tmp/yymodel-independent-tree-review-20261005/HookConsumer.swift": "876fa8a58cdce099ce845b61f688d9d1287c903f73b6824444f6fe0588eb2538"
+  },
+  "consumerCases": 35,
+  "foundationMismatches": 17,
+  "limitations": [
+    "Current installed macOS/Foundation only; no old-platform claim.",
+    "Read-only workspace review; files written only under /tmp.",
+    "Mismatch counts include paired native JSONObject and compatible hook routes, not distinct bugs."
+  ]
+}

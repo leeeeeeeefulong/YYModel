@@ -1,3 +1,9 @@
+> ⚠️ **本报告已过时（2026-10-05 标注）**
+> 审核对象是 **2.2.0 (`3fe64ec`)**。其中 **F1（`isSwiftDynamic`）与 F5（`Bridge/` 草稿）
+> 已在 2.3.0 修复**，其余结论也可能已被后续版本取代。
+> **当前有效的审核报告是 [CODE-REVIEW-IDIOMATIC-20261005-WORKTREE](CODE-REVIEW-IDIOMATIC-20261005-WORKTREE.md)**；
+> 当前状态见 [docs/README.md](README.md)。本文件仅作历史记录保留。
+
 # YYModel 双版本独立复核报告
 
 复核日期：2026-10-05

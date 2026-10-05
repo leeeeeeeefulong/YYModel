@@ -1,0 +1,107 @@
+[
+  {
+    "actual" : "4607182418800017409",
+    "expected" : "4607182418800017409",
+    "id" : "K-04",
+    "passed" : true,
+    "scenario" : "int-dictionary-renamed-model-false"
+  },
+  {
+    "actual" : "value.value",
+    "expected" : "value.value",
+    "id" : "K-03",
+    "passed" : true,
+    "scenario" : "same-name-error-path-false"
+  },
+  {
+    "actual" : "4607182418800017409",
+    "expected" : "4607182418800017409",
+    "id" : "K-01",
+    "passed" : true,
+    "scenario" : "super-physical-node-false"
+  },
+  {
+    "actual" : "2",
+    "expected" : "2",
+    "id" : "K-03",
+    "passed" : true,
+    "scenario" : "model-init-once-false"
+  },
+  {
+    "actual" : "4607182418800017409",
+    "expected" : "4607182418800017409",
+    "id" : "F-03",
+    "passed" : true,
+    "scenario" : "int-key-canonical-false-false"
+  },
+  {
+    "actual" : "4611686018427387904",
+    "expected" : "4607182418800017409",
+    "id" : "F-03",
+    "passed" : false,
+    "scenario" : "int-key-canonical-false-true"
+  },
+  {
+    "actual" : "4607182418800017409",
+    "expected" : "4607182418800017409",
+    "id" : "K-04",
+    "passed" : true,
+    "scenario" : "int-dictionary-renamed-model-true"
+  },
+  {
+    "actual" : "value",
+    "expected" : "value.value",
+    "id" : "K-03",
+    "passed" : false,
+    "scenario" : "same-name-error-path-true"
+  },
+  {
+    "actual" : "4607182418800017408",
+    "expected" : "4607182418800017409",
+    "id" : "K-01",
+    "passed" : false,
+    "scenario" : "super-physical-node-true"
+  },
+  {
+    "actual" : "2",
+    "expected" : "2",
+    "id" : "K-03",
+    "passed" : true,
+    "scenario" : "model-init-once-true"
+  },
+  {
+    "actual" : "4607182418800017409",
+    "expected" : "4607182418800017409",
+    "id" : "F-03",
+    "passed" : true,
+    "scenario" : "int-key-canonical-true-false"
+  },
+  {
+    "actual" : "4607182418800017409",
+    "expected" : "4607182418800017409",
+    "id" : "F-03",
+    "passed" : true,
+    "scenario" : "int-key-canonical-true-true"
+  },
+  {
+    "actual" : "source=2,model=2",
+    "expected" : "source=1,model=2",
+    "id" : "F-11d",
+    "passed" : false,
+    "scenario" : "mutable-hook-input-isolated"
+  },
+  {
+    "actual" : "rejected",
+    "expected" : "rejected",
+    "id" : "F-11c",
+    "passed" : true,
+    "scenario" : "nested-export-collision-rejected"
+  },
+  {
+    "actual" : "0",
+    "expected" : "0",
+    "id" : "F-11e",
+    "passed" : true,
+    "scenario" : "dictionary-date-context-parallel"
+  }
+]

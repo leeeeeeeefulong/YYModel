@@ -1,0 +1,32 @@
+[
+  {
+    "actual" : "1,1",
+    "expected" : "1,1",
+    "passed" : true,
+    "scenario" : "renamed-parent-hook-collision"
+  },
+  {
+    "actual" : "1,1",
+    "expected" : "1,1",
+    "passed" : true,
+    "scenario" : "array-parent-hook-collision"
+  },
+  {
+    "actual" : "1,1",
+    "expected" : "1,1",
+    "passed" : true,
+    "scenario" : "dictionary-parent-hook-collision"
+  },
+  {
+    "actual" : "1,1",
+    "expected" : "1,1",
+    "passed" : true,
+    "scenario" : "null-losing-child-hook-collision"
+  },
+  {
+    "actual" : "1,1",
+    "expected" : "1,1",
+    "passed" : true,
+    "scenario" : "snake-parent-hook-collision"
+  }
+]

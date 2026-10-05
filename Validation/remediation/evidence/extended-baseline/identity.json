@@ -1,0 +1,6 @@
+{
+  "libraryReceipt": "../numeric-green2/receipt.json",
+  "consumer": "Validation/remediation/ExtendedE2E.swift",
+  "consumerSHA256": "3378aed1574cac7f4738159b79447adc9e10e1dccb8a2cfe653aef7ba58e4f07",
+  "scope": "compiled against immutable numeric-green2 dynamic library, before expanded repairs"
+}

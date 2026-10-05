@@ -175,7 +175,7 @@ struct NumberModel<T: Codable>: YYModelCodable { var value:T }
         checks["RequiredOptional"] = RequiredOptional.yy_model(with:[:]) == nil && RequiredOptional.yy_model(with:["age":NSNull()]) == nil && RequiredOptional.yy_model(with:["age":"18"])?.age == 18
         checks["MalformedInteger"] = Profile.yy_model(with:input.merging(["id":"123abc"]) {_,v in v}) == nil
         checks["OutOfRangeInteger"] = Profile.yy_model(with:input.merging(["id":"18446744073709551616.0"]) {_,v in v}) == nil
-        checks["NonObjectKeyPath"] = Profile.yy_model(with:input.merging(["company":7]) {_,v in v})?.companyName == ""
+        checks["NonObjectKeyPath"] = Profile.yy_model(with:input.merging(["company":7]) {_,v in v}) == nil
         let family = Family.yy_model(with:["children":[input,input],"byName":["a":input],"favorite":input])
         checks["NestedModels"] = family?.children.count == 2 && family?.byName["a"]?.id == UInt64.max && family?.favorite?.companyName == "YY"
         checks["NestedRejection"] = Family.yy_model(with:["children":[input, input.merging(["id":"0"]) {_,v in v}],"byName":[:]]) == nil

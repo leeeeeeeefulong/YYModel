@@ -1,0 +1,16 @@
+{
+  "runtime": "macOS",
+  "simulator": null,
+  "host": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "sourceHashes": {
+    "NSObject+YYModel.h": "26225f5b0d362bb3d5e9c78a49572703f9a0b148e18f0e9040fbd6ac6246bed4",
+    "NSObject+YYModel.m": "4682757af95eb400d30da4327c03a31cf449ef89f89732e4cee9d09e06ff5ef2",
+    "YYClassInfo.h": "153234ca46c26044d148bb4f721a9a6b6cd90d8d2ca989b824a512ffcb15d5ab",
+    "YYClassInfo.m": "481b211dcd925ade5933d5447c28bdc97e417ec3c67ebe8732d842bde74370c9",
+    "YYModel.h": "d7a2281ce363542dcac56eba01657a3f1f305ed925687bc1d735d99ac9c4b072"
+  },
+  "harnessHashes": {
+    "ObjCContractE2E.m": "58620bb627c84193b42327c91a7c11c6a0c49867c7fdd1b0ccd6f575a49deb39",
+    "run_objc_contract.py": "4bceed97eb857041e75965bac11b94e73c8ad76eca6321060e6bc9521cfc7c0b"
+  }
+}

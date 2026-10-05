@@ -1,0 +1,72 @@
+[
+  {
+    "actual" : "1.000000000000000031251",
+    "expected" : "1.000000000000000031251",
+    "id" : "P-03",
+    "passed" : true,
+    "scenario" : "decimal-object-export"
+  },
+  {
+    "actual" : "1.000000000000000031251",
+    "expected" : "1.000000000000000031251",
+    "id" : "P-03",
+    "passed" : true,
+    "scenario" : "decimal-encoder-object"
+  },
+  {
+    "actual" : "1.000000000000000031251",
+    "expected" : "1.000000000000000031251",
+    "id" : "P-04",
+    "passed" : true,
+    "scenario" : "bridge-decimal-hook-false"
+  },
+  {
+    "actual" : "1.000000000000000031251",
+    "expected" : "1.000000000000000031251",
+    "id" : "P-04",
+    "passed" : true,
+    "scenario" : "bridge-decimal-hook-true"
+  },
+  {
+    "actual" : "1065353217",
+    "expected" : "1065353217",
+    "id" : "P-06",
+    "passed" : true,
+    "scenario" : "float-1.0000000596046448-hook-false"
+  },
+  {
+    "actual" : "1065353216",
+    "expected" : "1065353217",
+    "id" : "P-06",
+    "passed" : false,
+    "scenario" : "float-1.0000000596046448-hook-true"
+  },
+  {
+    "actual" : "1065353217",
+    "expected" : "1065353217",
+    "id" : "P-06",
+    "passed" : true,
+    "scenario" : "float-1.000000059604644775390625000000000000000000000000000001-hook-false"
+  },
+  {
+    "actual" : "1065353216",
+    "expected" : "1065353217",
+    "id" : "P-06",
+    "passed" : false,
+    "scenario" : "float-1.000000059604644775390625000000000000000000000000000001-hook-true"
+  },
+  {
+    "actual" : "3212836865",
+    "expected" : "3212836865",
+    "id" : "P-06",
+    "passed" : true,
+    "scenario" : "float--1.0000000596046448-hook-false"
+  },
+  {
+    "actual" : "3212836864",
+    "expected" : "3212836865",
+    "id" : "P-06",
+    "passed" : false,
+    "scenario" : "float--1.0000000596046448-hook-true"
+  }
+]

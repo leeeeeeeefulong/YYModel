@@ -1,0 +1,212 @@
+[
+  {
+    "actual" : "{\"payload\":{\"second\":2}}",
+    "expected" : "{\"payload\":{\"first\":1,\"second\":2}}",
+    "passed" : false,
+    "scenario" : "repeated-keyed"
+  },
+  {
+    "actual" : "{\"payload\":{\"second\":2}}",
+    "expected" : "{\"payload\":{\"first\":1,\"second\":2}}",
+    "passed" : false,
+    "scenario" : "repeated-keyed-hook"
+  },
+  {
+    "actual" : "{\"payload\":[2]}",
+    "expected" : "{\"payload\":[1,2]}",
+    "passed" : false,
+    "scenario" : "repeated-unkeyed"
+  },
+  {
+    "actual" : "{\"payload\":[2]}",
+    "expected" : "{\"payload\":[1,2]}",
+    "passed" : false,
+    "scenario" : "repeated-unkeyed-hook"
+  },
+  {
+    "actual" : "{\"super\":{\"XbaseValue\":3}}",
+    "expected" : "{\"Xsuper\":{\"XbaseValue\":3}}",
+    "passed" : false,
+    "scenario" : "super-custom"
+  },
+  {
+    "actual" : "{\"super\":{\"XbaseValue\":3}}",
+    "expected" : "{\"Xsuper\":{\"XbaseValue\":3}}",
+    "passed" : false,
+    "scenario" : "super-custom-hook"
+  },
+  {
+    "actual" : "{\"key7\":\"key7|nil\"}",
+    "expected" : "{\"key7\":\"key7|7\"}",
+    "passed" : false,
+    "scenario" : "representable-int-metadata"
+  },
+  {
+    "actual" : "{\"hello_world\":1}",
+    "expected" : "{\"hello_world\":1}",
+    "passed" : true,
+    "scenario" : "snake-helloWorld"
+  },
+  {
+    "actual" : "{\"hello_world\":1}",
+    "expected" : "{\"hello_world\":1}",
+    "passed" : true,
+    "scenario" : "snake-helloWorld-hook"
+  },
+  {
+    "actual" : "{\"url_value\":1}",
+    "expected" : "{\"u_rl_value\":1}",
+    "passed" : false,
+    "scenario" : "snake-URLValue"
+  },
+  {
+    "actual" : "{\"url_value\":1}",
+    "expected" : "{\"u_rl_value\":1}",
+    "passed" : false,
+    "scenario" : "snake-URLValue-hook"
+  },
+  {
+    "actual" : "{\"my_url_value\":1}",
+    "expected" : "{\"my_url_value\":1}",
+    "passed" : true,
+    "scenario" : "snake-myURLValue"
+  },
+  {
+    "actual" : "{\"my_url_value\":1}",
+    "expected" : "{\"my_url_value\":1}",
+    "passed" : true,
+    "scenario" : "snake-myURLValue-hook"
+  },
+  {
+    "actual" : "{\"a1_b\":1}",
+    "expected" : "{\"a1_b\":1}",
+    "passed" : true,
+    "scenario" : "snake-a1B"
+  },
+  {
+    "actual" : "{\"a1_b\":1}",
+    "expected" : "{\"a1_b\":1}",
+    "passed" : true,
+    "scenario" : "snake-a1B-hook"
+  },
+  {
+    "actual" : "{\"a12_bc\":1}",
+    "expected" : "{\"a12_bc\":1}",
+    "passed" : true,
+    "scenario" : "snake-a12BC"
+  },
+  {
+    "actual" : "{\"a12_bc\":1}",
+    "expected" : "{\"a12_bc\":1}",
+    "passed" : true,
+    "scenario" : "snake-a12BC-hook"
+  },
+  {
+    "actual" : "{\"fooǅ_bar\":1}",
+    "expected" : "{\"foo_ǆ_bar\":1}",
+    "passed" : false,
+    "scenario" : "snake-fooǅBar"
+  },
+  {
+    "actual" : "{\"fooǅ_bar\":1}",
+    "expected" : "{\"foo_ǆ_bar\":1}",
+    "passed" : false,
+    "scenario" : "snake-fooǅBar-hook"
+  },
+  {
+    "actual" : "{\"foo_ⅲ_bar\":1}",
+    "expected" : "{\"fooⅲ_bar\":1}",
+    "passed" : false,
+    "scenario" : "snake-fooⅢBar"
+  },
+  {
+    "actual" : "{\"foo_ⅲ_bar\":1}",
+    "expected" : "{\"fooⅲ_bar\":1}",
+    "passed" : false,
+    "scenario" : "snake-fooⅢBar-hook"
+  },
+  {
+    "actual" : "{\"foo_i̇_bar\":1}",
+    "expected" : "{\"foo_i̇_bar\":1}",
+    "passed" : true,
+    "scenario" : "snake-fooİBar"
+  },
+  {
+    "actual" : "{\"foo_i̇_bar\":1}",
+    "expected" : "{\"foo_i̇_bar\":1}",
+    "passed" : true,
+    "scenario" : "snake-fooİBar-hook"
+  },
+  {
+    "actual" : "{\"foo_ä_bär\":1}",
+    "expected" : "{\"foo_ä_bär\":1}",
+    "passed" : true,
+    "scenario" : "snake-fooÄBär"
+  },
+  {
+    "actual" : "{\"foo_ä_bär\":1}",
+    "expected" : "{\"foo_ä_bär\":1}",
+    "passed" : true,
+    "scenario" : "snake-fooÄBär-hook"
+  },
+  {
+    "actual" : "{\"a_ⓐb\":1}",
+    "expected" : "{\"aⓐ_b\":1}",
+    "passed" : false,
+    "scenario" : "snake-aⒶB"
+  },
+  {
+    "actual" : "{\"a_ⓐb\":1}",
+    "expected" : "{\"aⓐ_b\":1}",
+    "passed" : false,
+    "scenario" : "snake-aⒶB-hook"
+  },
+  {
+    "actual" : "{\"👩‍💻_abc_value\":1}",
+    "expected" : "{\"👩‍💻_abc_value\":1}",
+    "passed" : true,
+    "scenario" : "snake-👩‍💻ABCValue"
+  },
+  {
+    "actual" : "{\"👩‍💻_abc_value\":1}",
+    "expected" : "{\"👩‍💻_abc_value\":1}",
+    "passed" : true,
+    "scenario" : "snake-👩‍💻ABCValue-hook"
+  },
+  {
+    "actual" : "{\"á_bc_value\":1}",
+    "expected" : "{\"á_bc_value\":1}",
+    "passed" : true,
+    "scenario" : "snake-áBCValue"
+  },
+  {
+    "actual" : "{\"á_bc_value\":1}",
+    "expected" : "{\"á_bc_value\":1}",
+    "passed" : true,
+    "scenario" : "snake-áBCValue-hook"
+  },
+  {
+    "actual" : "{\"a_bc_value\":1}",
+    "expected" : "{\"a__bc_value\":1}",
+    "passed" : false,
+    "scenario" : "snake-A_BCValue"
+  },
+  {
+    "actual" : "{\"a_bc_value\":1}",
+    "expected" : "{\"a__bc_value\":1}",
+    "passed" : false,
+    "scenario" : "snake-A_BCValue-hook"
+  },
+  {
+    "actual" : "{\"ab12_cd34_ef\":1}",
+    "expected" : "{\"ab12_cd34_ef\":1}",
+    "passed" : true,
+    "scenario" : "snake-ab12CD34Ef"
+  },
+  {
+    "actual" : "{\"ab12_cd34_ef\":1}",
+    "expected" : "{\"ab12_cd34_ef\":1}",
+    "passed" : true,
+    "scenario" : "snake-ab12CD34Ef-hook"
+  }
+]

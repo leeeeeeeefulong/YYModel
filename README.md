@@ -11,7 +11,7 @@ High performance JSON model framework for iOS/macOS.
 
 [2.1.9 中文交付说明与完整性能数据](docs/DELIVERY-2.1.9-zh.md) · [公开验证回执](Validation/receipts/delivery-2.1.9-20261004.json) · [192 路径 CSV](Validation/receipts/delivery-2.1.9-measurements.csv)
 
-Current release: **2.3.0** (`pod 'YYModel2', '2.3.0'`, SPM `from: "2.3.0"`).
+Current release: **2.3.1** (`pod 'YYModel2', '2.3.1'`, SPM `from: "2.3.1"`).
 
 ---
 
@@ -409,3 +409,14 @@ YYModel is available under the MIT license. See the LICENSE file for more info.
 
 Original YYModel by [ibireme](https://github.com/ibireme).
 Modern iOS compatibility patches by [leeeeeeeefulong](https://github.com/leeeeeeeefulong).
+
+### 2026-10-05 remediation worktree
+
+Unreleased fixes and repeatable public API E2E evidence are tracked in
+[the remediation status](Validation/remediation/STATUS.md). Run
+`python3 Validation/remediation/run.py --output /tmp/yymodel-acceptance-new`
+with a new output directory to freeze sources, compile independent consumers and
+retain hashes, commands and assertions. Migration behavior and new date/number
+routing/diagnostic APIs are documented in the
+[upgrade guide](docs/UPGRADE-COMPAT-GUIDE-20261004.md). Actual old OS runtime acceptance
+and independent release signatures are still pending.

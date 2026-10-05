@@ -1,0 +1,3 @@
+route=foundation error=Expected rule object
+route=integerTokens error=Expected rule object
+Foundation value=1

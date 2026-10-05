@@ -1,0 +1,6 @@
+route=foundation value=1 hook=2 json={"parent_raw":{"child_raw":{"value":1},"child":{"value":2}}}
+route=integerTokens value=2 hook=2 json={"parent_raw":{"child_raw":{"value":1},"child":{"value":2}}}
+Foundation value=1
+route=foundation value=2 hook=2 json={"parent_raw":{"child":{"value":2},"child_raw":{"value":1}}}
+route=integerTokens value=2 hook=2 json={"parent_raw":{"child":{"value":2},"child_raw":{"value":1}}}
+Foundation value=2

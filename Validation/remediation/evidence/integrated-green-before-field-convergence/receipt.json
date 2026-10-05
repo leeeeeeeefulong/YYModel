@@ -1,0 +1,2397 @@
+{
+  "sources": {
+    "YYModelSwift/YYJSONDecoder.swift": "dffdbc9ad4e8d41b0886de1d5d3ee308385ab6165ff96e5c52faab0dd62525a6",
+    "YYModelSwift/YYJSONEncoder.swift": "0d25b44a1d1b325dd787d3b149de6d481a544c9d79405b9644afef50bb17b7b9",
+    "YYModelSwift/YYJSONEntryPoints.swift": "fcf6f217e572eb2ed4a5e6c7c86fe138a8bcf5e412fc79843062162239fe7596",
+    "YYModelSwift/YYJSONRules.swift": "9ff796258ad68caa1b5b9eb8fbb668dba5538501a4e6cdbfc2093aea49338427",
+    "YYModelSwift/YYModelCodable.swift": "fb91be15d36ee2d51e422d4aead087548f8180cf14417ee4d759bd4b2944bc3e",
+    "YYModelSwift/YYModelDecoder.swift": "31c05a239d38fbfc2ddb9981a4e8b3188162f4ea7a8338b0554c6eb043bf0a2d",
+    "YYModelSwift/YYModelDictionary.swift": "779ddf26cc7f8ae265e74472bd4b9accd78f597860d48b98f0de65c7eb5d75e2",
+    "YYModelSwift/YYModelEncoder.swift": "cf990ab5a7bc5a4acd01b0381ed14cf4318a6e10ae946677ede1b888050aa2df",
+    "YYModelSwift/YYModelJSONValue.swift": "32988b2e595f08d54c00387b0820925758e85e4029d2128114f113f6f849279b",
+    "YYModelSwift/YYModelKeyPath.swift": "faf0f14b016ef2356ea8770f4ad63e78140787528deaa1cc3db59d346acc0fb2",
+    "YYModelSwift/YYModelLossy.swift": "f9142100d38ed90affbea07370409e98cdee3f4446e1f29ba7f1770980c623e7",
+    "YYModelSwift/YYModelNativeBridge.swift": "3ae0feb7ac1f4658f52e3fbe6f2c8009879cb378c09026404601c9ac3de26e5a",
+    "YYModelSwift/YYModelPlatformConformances.swift": "8171308a0d4e7c0d430dc9b668c1675e1b7b6adc5996dd728e9ebbc94660160f",
+    "YYModelSwift/YYModelPolymorphic.swift": "b813f693d8fb0fca67ea8d3ed3b71ab1e477506ce865efc7718f0e09e07c7a6e",
+    "YYModelSwift/YYModelPresence.swift": "c37f058e58c047c7c69bd6872030f40f142849059405826758fb8a0b73996b73",
+    "YYModelSwift/YYModelScalarDecoding.swift": "063c22a8b12fd8a1602db7f3ff74e7e682532214a135c385934a8c78a4291882",
+    "YYModelSwift/YYModelWithConfiguration.swift": "0161a8396dd0b7cd936e67b401bd8f8f34286fad324faac285dc71b0065eebde",
+    "Validation/remediation/BridgeConsumer.swift": "557595c000046c4afef3432bbd72c68724be2e0a50892d5a5d5dd71615afee3e",
+    "Validation/remediation/BridgePathsConsumer.swift": "57a49bc364c8a7df7d6e07d5e302f07306c1d9b9930f9d313c66302cf05ce2ec",
+    "Validation/remediation/CompositionConsumer.swift": "886612f2a3751560acf3dd9e185bc9a7d39ef10e24cb3006ae47e501416afa55",
+    "Validation/remediation/DesignConsumer.swift": "606dfffacb13b267415492b6d45585c798c2a72ddfe3f4fe1975e2a5eb74ffe2",
+    "Validation/remediation/DoubleStressConsumer.swift": "70e38485cb9aa50ac633fa3f0bed7c00f440cfe6bc81b35df05890786834d127",
+    "Validation/remediation/ExtendedE2E.swift": "763b2d9f27eb6ffab8e413cdf7f74bcab4434818fae3a0a2d367a165592f7713",
+    "Validation/remediation/ExternalRulesE2E.swift": "5a4f6ce4f1ff77bdf3918a16490ac49cf9f77e3653e31a643eb1e8989c9b682b",
+    "Validation/remediation/FastPathConsumer.swift": "a4b13dc599e8864c39c52beec2bcc9cd5215ab41e64db25331faadd15c4a00ba",
+    "Validation/remediation/KeymapCollectionsE2E.swift": "b1a40f59122ce02a783c176360be1d13c1e2c0a30a4a1ef0427534d56d3b0e8a",
+    "Validation/remediation/NewConsumer.swift": "fe1b97b2cc8a4c9831111d4454cca0af47c8f1f5120b808eee72aa1b10fc0092",
+    "Validation/remediation/NumericBoundaryE2E.swift": "ba7f85ef804ab98dca0ee32d16abedf5c408b0a9115395e72909ecd235e411f9",
+    "Validation/remediation/NumericE2E.swift": "36eda3f0f71a63c1005c6a94c1a8502b2227ed48620807abd060174682e945f6",
+    "Validation/remediation/RegistryE2E.swift": "ee5bed40145fe958ee14656dddc149d1195b222c0f1ed8f073494eba00177882",
+    "Validation/remediation/run.py": "7ced102f7c944f561414fa9c24ab0e0f87c0565ea5404241965f8f0c09965d12",
+    "Validation/remediation/expectations/DesignConsumer.json": "0f42c20bfd747ca1e28d5142d2c502e84efab9cf228e8ab6ed92432f62676995",
+    "Validation/remediation/expectations/FastPathConsumer.json": "e91c579722d861ee92e777ff3c84d2bf4bdbc6899a0e43952d16d2a57ad4644f",
+    "Validation/remediation/expectations/NewConsumer.json": "df3f0f3355813810a97f5a6ba60bb93e5dadbe816d8a012b2b03587efd87cc80"
+  },
+  "startedAt": "2026-10-05T10:18:37.413469+00:00",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "commands": [
+    {
+      "command": [
+        "swiftc",
+        "--version"
+      ],
+      "exitCode": 0,
+      "log": "command-00.log"
+    },
+    {
+      "command": [
+        "swiftc",
+        "-O",
+        "-parse-as-library",
+        "-swift-version",
+        "6",
+        "-strict-concurrency=complete",
+        "-warnings-as-errors",
+        "-emit-library",
+        "-emit-module",
+        "-module-name",
+        "YYModelSwift",
+        "-emit-module-path",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/YYModelSwift.swiftmodule",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYJSONDecoder.swift",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYJSONEncoder.swift",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYJSONEntryPoints.swift",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYJSONRules.swift",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYModelCodable.swift",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYModelDecoder.swift",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYModelDictionary.swift",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYModelEncoder.swift",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYModelJSONValue.swift",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYModelKeyPath.swift",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYModelLossy.swift",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYModelNativeBridge.swift",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYModelPlatformConformances.swift",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYModelPolymorphic.swift",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYModelPresence.swift",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYModelScalarDecoding.swift",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/YYModelSwift/YYModelWithConfiguration.swift",
+        "-o",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/libYYModelSwift.dylib"
+      ],
+      "exitCode": 0,
+      "log": "command-01.log"
+    },
+    {
+      "command": [
+        "swiftc",
+        "-O",
+        "-parse-as-library",
+        "-swift-version",
+        "6",
+        "-strict-concurrency=complete",
+        "-warnings-as-errors",
+        "-I",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-L",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-lYYModelSwift",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/Validation/remediation/KeymapCollectionsE2E.swift",
+        "-o",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/KeymapCollectionsE2E"
+      ],
+      "exitCode": 0,
+      "log": "command-02.log"
+    },
+    {
+      "command": [
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/KeymapCollectionsE2E",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/observations.json"
+      ],
+      "exitCode": 0,
+      "log": "command-03.log"
+    },
+    {
+      "command": [
+        "swiftc",
+        "-O",
+        "-parse-as-library",
+        "-swift-version",
+        "6",
+        "-strict-concurrency=complete",
+        "-warnings-as-errors",
+        "-I",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-L",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-lYYModelSwift",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/Validation/remediation/NumericE2E.swift",
+        "-o",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/NumericE2E"
+      ],
+      "exitCode": 0,
+      "log": "command-04.log"
+    },
+    {
+      "command": [
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/NumericE2E",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/NumericE2E.json"
+      ],
+      "exitCode": 0,
+      "log": "command-05.log"
+    },
+    {
+      "command": [
+        "swiftc",
+        "-O",
+        "-parse-as-library",
+        "-swift-version",
+        "6",
+        "-strict-concurrency=complete",
+        "-warnings-as-errors",
+        "-I",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-L",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-lYYModelSwift",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/Validation/remediation/NumericBoundaryE2E.swift",
+        "-o",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/NumericBoundaryE2E"
+      ],
+      "exitCode": 0,
+      "log": "command-06.log"
+    },
+    {
+      "command": [
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/NumericBoundaryE2E",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/NumericBoundaryE2E.json"
+      ],
+      "exitCode": 0,
+      "log": "command-07.log"
+    },
+    {
+      "command": [
+        "swiftc",
+        "-O",
+        "-parse-as-library",
+        "-swift-version",
+        "6",
+        "-strict-concurrency=complete",
+        "-warnings-as-errors",
+        "-I",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-L",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-lYYModelSwift",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/Validation/remediation/RegistryE2E.swift",
+        "-o",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/RegistryE2E"
+      ],
+      "exitCode": 0,
+      "log": "command-08.log"
+    },
+    {
+      "command": [
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/RegistryE2E",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/RegistryE2E.json"
+      ],
+      "exitCode": 0,
+      "log": "command-09.log"
+    },
+    {
+      "command": [
+        "swiftc",
+        "-O",
+        "-parse-as-library",
+        "-swift-version",
+        "6",
+        "-strict-concurrency=complete",
+        "-warnings-as-errors",
+        "-I",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-L",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-lYYModelSwift",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/Validation/remediation/ExtendedE2E.swift",
+        "-o",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/ExtendedE2E"
+      ],
+      "exitCode": 0,
+      "log": "command-10.log"
+    },
+    {
+      "command": [
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/ExtendedE2E",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/ExtendedE2E.json"
+      ],
+      "exitCode": 0,
+      "log": "command-11.log"
+    },
+    {
+      "command": [
+        "swiftc",
+        "-O",
+        "-parse-as-library",
+        "-swift-version",
+        "6",
+        "-strict-concurrency=complete",
+        "-warnings-as-errors",
+        "-I",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-L",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-lYYModelSwift",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/Validation/remediation/BridgePathsConsumer.swift",
+        "-o",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/BridgePathsConsumer"
+      ],
+      "exitCode": 0,
+      "log": "command-12.log"
+    },
+    {
+      "command": [
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/BridgePathsConsumer",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/BridgePathsConsumer.json"
+      ],
+      "exitCode": 0,
+      "log": "command-13.log"
+    },
+    {
+      "command": [
+        "swiftc",
+        "-O",
+        "-parse-as-library",
+        "-swift-version",
+        "6",
+        "-strict-concurrency=complete",
+        "-warnings-as-errors",
+        "-I",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-L",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-lYYModelSwift",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/Validation/remediation/BridgeConsumer.swift",
+        "-o",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/BridgeConsumer"
+      ],
+      "exitCode": 0,
+      "log": "command-14.log"
+    },
+    {
+      "command": [
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/BridgeConsumer",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/BridgeConsumer.json"
+      ],
+      "exitCode": 0,
+      "log": "command-15.log"
+    },
+    {
+      "command": [
+        "swiftc",
+        "-O",
+        "-parse-as-library",
+        "-swift-version",
+        "6",
+        "-strict-concurrency=complete",
+        "-warnings-as-errors",
+        "-I",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-L",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-lYYModelSwift",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/Validation/remediation/DoubleStressConsumer.swift",
+        "-o",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/DoubleStressConsumer"
+      ],
+      "exitCode": 0,
+      "log": "command-16.log"
+    },
+    {
+      "command": [
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/DoubleStressConsumer",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/DoubleStressConsumer.json"
+      ],
+      "exitCode": 0,
+      "log": "command-17.log"
+    },
+    {
+      "command": [
+        "swiftc",
+        "-O",
+        "-parse-as-library",
+        "-swift-version",
+        "6",
+        "-strict-concurrency=complete",
+        "-warnings-as-errors",
+        "-DPUBLIC_API",
+        "-I",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-L",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-lYYModelSwift",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/Validation/remediation/ExternalRulesE2E.swift",
+        "-o",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/ExternalRulesE2E"
+      ],
+      "exitCode": 0,
+      "log": "command-18.log"
+    },
+    {
+      "command": [
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/ExternalRulesE2E",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/ExternalRulesE2E.json"
+      ],
+      "exitCode": 0,
+      "log": "command-19.log"
+    },
+    {
+      "command": [
+        "swiftc",
+        "-O",
+        "-parse-as-library",
+        "-swift-version",
+        "6",
+        "-strict-concurrency=complete",
+        "-warnings-as-errors",
+        "-I",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-L",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-lYYModelSwift",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/Validation/remediation/CompositionConsumer.swift",
+        "-o",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/CompositionConsumer"
+      ],
+      "exitCode": 0,
+      "log": "command-20.log"
+    },
+    {
+      "command": [
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/CompositionConsumer",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/CompositionConsumer.json"
+      ],
+      "exitCode": 0,
+      "log": "command-21.log"
+    },
+    {
+      "command": [
+        "swiftc",
+        "-O",
+        "-parse-as-library",
+        "-swift-version",
+        "6",
+        "-strict-concurrency=complete",
+        "-warnings-as-errors",
+        "-I",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-L",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-lYYModelSwift",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/Validation/remediation/FastPathConsumer.swift",
+        "-o",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/FastPathConsumer"
+      ],
+      "exitCode": 0,
+      "log": "command-22.log"
+    },
+    {
+      "command": [
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/FastPathConsumer",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/FastPathConsumer.json"
+      ],
+      "exitCode": 0,
+      "log": "command-23.log"
+    },
+    {
+      "command": [
+        "swiftc",
+        "-O",
+        "-parse-as-library",
+        "-swift-version",
+        "6",
+        "-strict-concurrency=complete",
+        "-warnings-as-errors",
+        "-D",
+        "KEY_PATH",
+        "-I",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-L",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-lYYModelSwift",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/Validation/remediation/DesignConsumer.swift",
+        "-o",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/DesignConsumer"
+      ],
+      "exitCode": 0,
+      "log": "command-24.log"
+    },
+    {
+      "command": [
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/DesignConsumer",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/DesignConsumer.json"
+      ],
+      "exitCode": 0,
+      "log": "command-25.log"
+    },
+    {
+      "command": [
+        "swiftc",
+        "-O",
+        "-parse-as-library",
+        "-swift-version",
+        "6",
+        "-strict-concurrency=complete",
+        "-warnings-as-errors",
+        "-I",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-L",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "-lYYModelSwift",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/source/Validation/remediation/NewConsumer.swift",
+        "-o",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/NewConsumer"
+      ],
+      "exitCode": 0,
+      "log": "command-26.log"
+    },
+    {
+      "command": [
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/NewConsumer",
+        "/private/tmp/yymodel-remediation-integrated-20261005-4/NewConsumer.json"
+      ],
+      "exitCode": 0,
+      "log": "command-27.log"
+    }
+  ],
+  "checks": [
+    {
+      "scenario": "set-distinct",
+      "expected": "count=2;bits=4607182418800017408,4607182418800017409",
+      "observed": [
+        {
+          "hook": false,
+          "result": "count=2;bits=4607182418800017408,4607182418800017409",
+          "scenario": "set-distinct"
+        },
+        {
+          "hook": true,
+          "result": "count=2;bits=4607182418800017408,4607182418800017409",
+          "scenario": "set-distinct"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "scenario": "set-single",
+      "expected": "count=1;bits=4607182418800017409",
+      "observed": [
+        {
+          "hook": false,
+          "result": "count=1;bits=4607182418800017409",
+          "scenario": "set-single"
+        },
+        {
+          "hook": true,
+          "result": "count=1;bits=4607182418800017409",
+          "scenario": "set-single"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "scenario": "model-array-path",
+      "expected": "value.Index 0",
+      "observed": [
+        {
+          "hook": false,
+          "result": "value.Index 0",
+          "scenario": "model-array-path"
+        },
+        {
+          "hook": true,
+          "result": "value.Index 0",
+          "scenario": "model-array-path"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "scenario": "model-optional-path",
+      "expected": "value",
+      "observed": [
+        {
+          "hook": false,
+          "result": "value",
+          "scenario": "model-optional-path"
+        },
+        {
+          "hook": true,
+          "result": "value",
+          "scenario": "model-optional-path"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "scenario": "unkeyed-nested-cursor",
+      "expected": "4607182418800017409,4611686018427387905",
+      "observed": [
+        {
+          "hook": false,
+          "result": "4607182418800017409,4611686018427387905",
+          "scenario": "unkeyed-nested-cursor"
+        },
+        {
+          "hook": true,
+          "result": "4607182418800017409,4611686018427387905",
+          "scenario": "unkeyed-nested-cursor"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "scenario": "set-float-distinct",
+      "expected": "count=2;bits=1065353216,1065353217",
+      "observed": [
+        {
+          "hook": false,
+          "result": "count=2;bits=1065353216,1065353217",
+          "scenario": "set-float-distinct"
+        },
+        {
+          "hook": true,
+          "result": "count=2;bits=1065353216,1065353217",
+          "scenario": "set-float-distinct"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "scenario": "dictionary-model-path",
+      "expected": "value.key",
+      "observed": [
+        {
+          "hook": false,
+          "result": "value.key",
+          "scenario": "dictionary-model-path"
+        },
+        {
+          "hook": true,
+          "result": "value.key",
+          "scenario": "dictionary-model-path"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "scenario": "optional-nested-array",
+      "expected": "4607182418800017409",
+      "observed": [
+        {
+          "hook": false,
+          "result": "4607182418800017409",
+          "scenario": "optional-nested-array"
+        },
+        {
+          "hook": true,
+          "result": "4607182418800017409",
+          "scenario": "optional-nested-array"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "scenario": "renamed-parent",
+      "expected": "4607182418800017409",
+      "observed": [
+        {
+          "hook": false,
+          "result": "4607182418800017409",
+          "scenario": "renamed-parent"
+        },
+        {
+          "hook": true,
+          "result": "4607182418800017409",
+          "scenario": "renamed-parent"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "scenario": "snake-parent",
+      "expected": "4607182418800017409",
+      "observed": [
+        {
+          "hook": false,
+          "result": "4607182418800017409",
+          "scenario": "snake-parent"
+        },
+        {
+          "hook": true,
+          "result": "4607182418800017409",
+          "scenario": "snake-parent"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "scenario": "int-dictionary",
+      "expected": "4607182418800017409",
+      "observed": [
+        {
+          "hook": false,
+          "result": "4607182418800017409",
+          "scenario": "int-dictionary"
+        },
+        {
+          "hook": true,
+          "result": "4607182418800017409",
+          "scenario": "int-dictionary"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "scenario": "path-collision",
+      "expected": "4607182418800017409",
+      "observed": [
+        {
+          "hook": false,
+          "result": "4607182418800017409",
+          "scenario": "path-collision"
+        },
+        {
+          "hook": true,
+          "result": "4607182418800017409",
+          "scenario": "path-collision"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "actual": "1.000000000000000031251",
+      "expected": "1.000000000000000031251",
+      "id": "P-03",
+      "passed": true,
+      "scenario": "decimal-object-export"
+    },
+    {
+      "actual": "1.000000000000000031251",
+      "expected": "1.000000000000000031251",
+      "id": "P-03",
+      "passed": true,
+      "scenario": "decimal-encoder-object"
+    },
+    {
+      "actual": "1.000000000000000031251",
+      "expected": "1.000000000000000031251",
+      "id": "P-04",
+      "passed": true,
+      "scenario": "bridge-decimal-hook-false"
+    },
+    {
+      "actual": "1.000000000000000031251",
+      "expected": "1.000000000000000031251",
+      "id": "P-04",
+      "passed": true,
+      "scenario": "bridge-decimal-hook-true"
+    },
+    {
+      "actual": "1065353217",
+      "expected": "1065353217",
+      "id": "P-06",
+      "passed": true,
+      "scenario": "float-1.0000000596046448-hook-false"
+    },
+    {
+      "actual": "1065353217",
+      "expected": "1065353217",
+      "id": "P-06",
+      "passed": true,
+      "scenario": "float-1.0000000596046448-hook-true"
+    },
+    {
+      "actual": "1065353217",
+      "expected": "1065353217",
+      "id": "P-06",
+      "passed": true,
+      "scenario": "float-1.000000059604644775390625000000000000000000000000000001-hook-false"
+    },
+    {
+      "actual": "1065353217",
+      "expected": "1065353217",
+      "id": "P-06",
+      "passed": true,
+      "scenario": "float-1.000000059604644775390625000000000000000000000000000001-hook-true"
+    },
+    {
+      "actual": "3212836865",
+      "expected": "3212836865",
+      "id": "P-06",
+      "passed": true,
+      "scenario": "float--1.0000000596046448-hook-false"
+    },
+    {
+      "actual": "3212836865",
+      "expected": "3212836865",
+      "id": "P-06",
+      "passed": true,
+      "scenario": "float--1.0000000596046448-hook-true"
+    },
+    {
+      "actual": "9007199254740991",
+      "expected": "9007199254740991",
+      "passed": true,
+      "scenario": "signed-9007199254740991-hook-false-raw-false"
+    },
+    {
+      "actual": "9007199254740991",
+      "expected": "9007199254740991",
+      "passed": true,
+      "scenario": "signed-9007199254740991-hook-false-raw-true"
+    },
+    {
+      "actual": "9007199254740993",
+      "expected": "9007199254740993",
+      "passed": true,
+      "scenario": "signed-9007199254740993-hook-false-raw-false"
+    },
+    {
+      "actual": "9007199254740993",
+      "expected": "9007199254740993",
+      "passed": true,
+      "scenario": "signed-9007199254740993-hook-false-raw-true"
+    },
+    {
+      "actual": "-9007199254740993",
+      "expected": "-9007199254740993",
+      "passed": true,
+      "scenario": "signed--9007199254740993-hook-false-raw-false"
+    },
+    {
+      "actual": "-9007199254740993",
+      "expected": "-9007199254740993",
+      "passed": true,
+      "scenario": "signed--9007199254740993-hook-false-raw-true"
+    },
+    {
+      "actual": "9223372036854775807",
+      "expected": "9223372036854775807",
+      "passed": true,
+      "scenario": "signed-9223372036854775807-hook-false-raw-false"
+    },
+    {
+      "actual": "9223372036854775807",
+      "expected": "9223372036854775807",
+      "passed": true,
+      "scenario": "signed-9223372036854775807-hook-false-raw-true"
+    },
+    {
+      "actual": "-9223372036854775808",
+      "expected": "-9223372036854775808",
+      "passed": true,
+      "scenario": "signed--9223372036854775808-hook-false-raw-false"
+    },
+    {
+      "actual": "-9223372036854775808",
+      "expected": "-9223372036854775808",
+      "passed": true,
+      "scenario": "signed--9223372036854775808-hook-false-raw-true"
+    },
+    {
+      "actual": "9007199254740993",
+      "expected": "9007199254740993",
+      "passed": true,
+      "scenario": "unsigned-9007199254740993-hook-false-raw-false"
+    },
+    {
+      "actual": "9007199254740993",
+      "expected": "9007199254740993",
+      "passed": true,
+      "scenario": "unsigned-9007199254740993-hook-false-raw-true"
+    },
+    {
+      "actual": "9223372036854775808",
+      "expected": "9223372036854775808",
+      "passed": true,
+      "scenario": "unsigned-9223372036854775808-hook-false-raw-false"
+    },
+    {
+      "actual": "9223372036854775808",
+      "expected": "9223372036854775808",
+      "passed": true,
+      "scenario": "unsigned-9223372036854775808-hook-false-raw-true"
+    },
+    {
+      "actual": "18446744073709551615",
+      "expected": "18446744073709551615",
+      "passed": true,
+      "scenario": "unsigned-18446744073709551615-hook-false-raw-false"
+    },
+    {
+      "actual": "18446744073709551615",
+      "expected": "18446744073709551615",
+      "passed": true,
+      "scenario": "unsigned-18446744073709551615-hook-false-raw-true"
+    },
+    {
+      "actual": "9007199254740993",
+      "expected": "9007199254740993",
+      "passed": true,
+      "scenario": "floating-integer-9007199254740993.0-hook-false"
+    },
+    {
+      "actual": "9007199254740993",
+      "expected": "9007199254740993",
+      "passed": true,
+      "scenario": "floating-integer-9.007199254740993e15-hook-false"
+    },
+    {
+      "actual": "1",
+      "expected": "1",
+      "passed": true,
+      "scenario": "float-boundary-1.401298464324817e-45-hook-false"
+    },
+    {
+      "actual": "2147483649",
+      "expected": "2147483649",
+      "passed": true,
+      "scenario": "float-boundary--1.401298464324817e-45-hook-false"
+    },
+    {
+      "actual": "8388608",
+      "expected": "8388608",
+      "passed": true,
+      "scenario": "float-boundary-1.1754943508222875e-38-hook-false"
+    },
+    {
+      "actual": "2139095039",
+      "expected": "2139095039",
+      "passed": true,
+      "scenario": "float-boundary-3.4028234663852886e38-hook-false"
+    },
+    {
+      "actual": "1065353217",
+      "expected": "1065353217",
+      "passed": true,
+      "scenario": "float-boundary-1.0000000596046448-hook-false"
+    },
+    {
+      "actual": "1",
+      "expected": "1",
+      "passed": true,
+      "scenario": "double-boundary-4.9406564584124654e-324-hook-false"
+    },
+    {
+      "actual": "9223372036854775809",
+      "expected": "9223372036854775809",
+      "passed": true,
+      "scenario": "double-boundary--4.9406564584124654e-324-hook-false"
+    },
+    {
+      "actual": "4503599627370496",
+      "expected": "4503599627370496",
+      "passed": true,
+      "scenario": "double-boundary-2.2250738585072014e-308-hook-false"
+    },
+    {
+      "actual": "9218868437227405311",
+      "expected": "9218868437227405311",
+      "passed": true,
+      "scenario": "double-boundary-1.7976931348623157e308-hook-false"
+    },
+    {
+      "actual": "9007199254740991",
+      "expected": "9007199254740991",
+      "passed": true,
+      "scenario": "signed-9007199254740991-hook-true-raw-false"
+    },
+    {
+      "actual": "9007199254740991",
+      "expected": "9007199254740991",
+      "passed": true,
+      "scenario": "signed-9007199254740991-hook-true-raw-true"
+    },
+    {
+      "actual": "9007199254740993",
+      "expected": "9007199254740993",
+      "passed": true,
+      "scenario": "signed-9007199254740993-hook-true-raw-false"
+    },
+    {
+      "actual": "9007199254740993",
+      "expected": "9007199254740993",
+      "passed": true,
+      "scenario": "signed-9007199254740993-hook-true-raw-true"
+    },
+    {
+      "actual": "-9007199254740993",
+      "expected": "-9007199254740993",
+      "passed": true,
+      "scenario": "signed--9007199254740993-hook-true-raw-false"
+    },
+    {
+      "actual": "-9007199254740993",
+      "expected": "-9007199254740993",
+      "passed": true,
+      "scenario": "signed--9007199254740993-hook-true-raw-true"
+    },
+    {
+      "actual": "9223372036854775807",
+      "expected": "9223372036854775807",
+      "passed": true,
+      "scenario": "signed-9223372036854775807-hook-true-raw-false"
+    },
+    {
+      "actual": "9223372036854775807",
+      "expected": "9223372036854775807",
+      "passed": true,
+      "scenario": "signed-9223372036854775807-hook-true-raw-true"
+    },
+    {
+      "actual": "-9223372036854775808",
+      "expected": "-9223372036854775808",
+      "passed": true,
+      "scenario": "signed--9223372036854775808-hook-true-raw-false"
+    },
+    {
+      "actual": "-9223372036854775808",
+      "expected": "-9223372036854775808",
+      "passed": true,
+      "scenario": "signed--9223372036854775808-hook-true-raw-true"
+    },
+    {
+      "actual": "9007199254740993",
+      "expected": "9007199254740993",
+      "passed": true,
+      "scenario": "unsigned-9007199254740993-hook-true-raw-false"
+    },
+    {
+      "actual": "9007199254740993",
+      "expected": "9007199254740993",
+      "passed": true,
+      "scenario": "unsigned-9007199254740993-hook-true-raw-true"
+    },
+    {
+      "actual": "9223372036854775808",
+      "expected": "9223372036854775808",
+      "passed": true,
+      "scenario": "unsigned-9223372036854775808-hook-true-raw-false"
+    },
+    {
+      "actual": "9223372036854775808",
+      "expected": "9223372036854775808",
+      "passed": true,
+      "scenario": "unsigned-9223372036854775808-hook-true-raw-true"
+    },
+    {
+      "actual": "18446744073709551615",
+      "expected": "18446744073709551615",
+      "passed": true,
+      "scenario": "unsigned-18446744073709551615-hook-true-raw-false"
+    },
+    {
+      "actual": "18446744073709551615",
+      "expected": "18446744073709551615",
+      "passed": true,
+      "scenario": "unsigned-18446744073709551615-hook-true-raw-true"
+    },
+    {
+      "actual": "9007199254740993",
+      "expected": "9007199254740993",
+      "passed": true,
+      "scenario": "floating-integer-9007199254740993.0-hook-true"
+    },
+    {
+      "actual": "9007199254740993",
+      "expected": "9007199254740993",
+      "passed": true,
+      "scenario": "floating-integer-9.007199254740993e15-hook-true"
+    },
+    {
+      "actual": "1",
+      "expected": "1",
+      "passed": true,
+      "scenario": "float-boundary-1.401298464324817e-45-hook-true"
+    },
+    {
+      "actual": "2147483649",
+      "expected": "2147483649",
+      "passed": true,
+      "scenario": "float-boundary--1.401298464324817e-45-hook-true"
+    },
+    {
+      "actual": "8388608",
+      "expected": "8388608",
+      "passed": true,
+      "scenario": "float-boundary-1.1754943508222875e-38-hook-true"
+    },
+    {
+      "actual": "2139095039",
+      "expected": "2139095039",
+      "passed": true,
+      "scenario": "float-boundary-3.4028234663852886e38-hook-true"
+    },
+    {
+      "actual": "1065353217",
+      "expected": "1065353217",
+      "passed": true,
+      "scenario": "float-boundary-1.0000000596046448-hook-true"
+    },
+    {
+      "actual": "1",
+      "expected": "1",
+      "passed": true,
+      "scenario": "double-boundary-4.9406564584124654e-324-hook-true"
+    },
+    {
+      "actual": "9223372036854775809",
+      "expected": "9223372036854775809",
+      "passed": true,
+      "scenario": "double-boundary--4.9406564584124654e-324-hook-true"
+    },
+    {
+      "actual": "4503599627370496",
+      "expected": "4503599627370496",
+      "passed": true,
+      "scenario": "double-boundary-2.2250738585072014e-308-hook-true"
+    },
+    {
+      "actual": "9218868437227405311",
+      "expected": "9218868437227405311",
+      "passed": true,
+      "scenario": "double-boundary-1.7976931348623157e308-hook-true"
+    },
+    {
+      "actual": "9007199254740993",
+      "expected": "9007199254740993",
+      "id": "P-01",
+      "passed": true,
+      "scenario": "p01_large_integer_control"
+    },
+    {
+      "actual": "1",
+      "expected": "1",
+      "id": "P-02",
+      "passed": true,
+      "scenario": "p02_pos_decimal_trunc_data"
+    },
+    {
+      "actual": "-1",
+      "expected": "-1",
+      "id": "P-02",
+      "passed": true,
+      "scenario": "p02_neg_decimal_trunc_data"
+    },
+    {
+      "actual": "1",
+      "expected": "1",
+      "id": "P-02",
+      "passed": true,
+      "scenario": "p02_pos_decimal_trunc_nsnumber"
+    },
+    {
+      "actual": "-1",
+      "expected": "-1",
+      "id": "P-02",
+      "passed": true,
+      "scenario": "p02_neg_decimal_trunc_nsnumber"
+    },
+    {
+      "actual": "1",
+      "expected": "1",
+      "id": "P-02",
+      "passed": true,
+      "scenario": "p02_pos_decimal_trunc_decimalnumber"
+    },
+    {
+      "actual": "-1",
+      "expected": "-1",
+      "id": "P-02",
+      "passed": true,
+      "scenario": "p02_neg_decimal_trunc_decimalnumber"
+    },
+    {
+      "actual": "1.000000000000000031251",
+      "expected": "1.000000000000000031251",
+      "id": "P-03",
+      "passed": true,
+      "scenario": "p03_decimal_export_literal"
+    },
+    {
+      "actual": "1.000000000000000031251",
+      "expected": "1.000000000000000031251",
+      "id": "P-04",
+      "passed": true,
+      "scenario": "p04_custom_strategy_decimal"
+    },
+    {
+      "actual": "1065353217",
+      "expected": "1065353217",
+      "id": "P-06",
+      "passed": true,
+      "scenario": "p06_float_text_bitpattern"
+    },
+    {
+      "actual": "B",
+      "expected": "B",
+      "id": "F-01",
+      "passed": true,
+      "scenario": "f01_raw_key_conflict_exact_first"
+    },
+    {
+      "actual": "id=7,name=ok",
+      "expected": "id=7,name=ok",
+      "id": "F-02",
+      "passed": true,
+      "scenario": "f02_model_external_rule_merge"
+    },
+    {
+      "actual": "rejected_missing_id",
+      "expected": "rejected_missing_id",
+      "id": "F-02",
+      "passed": true,
+      "scenario": "f02_duplicate_external_rule_merge"
+    },
+    {
+      "actual": "snake_case",
+      "expected": "snake_case",
+      "id": "F-03",
+      "passed": true,
+      "scenario": "f03_data_keys_snake_case_preserved"
+    },
+    {
+      "actual": "b",
+      "expected": "b",
+      "id": "F-03",
+      "passed": true,
+      "scenario": "f03_int_key_dict_conflict_exact_winner"
+    },
+    {
+      "actual": "superDecoder_accessible",
+      "expected": "superDecoder_accessible",
+      "id": "F-04",
+      "passed": true,
+      "scenario": "f04_fallback_superdecoder_container"
+    },
+    {
+      "actual": "typeMismatch_thrown",
+      "expected": "typeMismatch_thrown",
+      "id": "F-05",
+      "passed": true,
+      "scenario": "f05_path_shape_error_swallowed"
+    },
+    {
+      "actual": "decoded=1,hook=1",
+      "expected": "decoded=1,hook=1",
+      "id": "F-06",
+      "passed": true,
+      "scenario": "f06_hook_snapshot_subtree_divergence"
+    },
+    {
+      "actual": ".null",
+      "expected": ".null",
+      "id": "F-07",
+      "passed": true,
+      "scenario": "f07_presence_null_array"
+    },
+    {
+      "actual": ".null",
+      "expected": ".null",
+      "id": "F-07",
+      "passed": true,
+      "scenario": "f07_presence_null_dict"
+    },
+    {
+      "actual": ".null",
+      "expected": ".null",
+      "id": "F-07",
+      "passed": true,
+      "scenario": "f07_presence_null_single"
+    },
+    {
+      "actual": "1,2",
+      "expected": "1,2",
+      "id": "F-08",
+      "passed": true,
+      "scenario": "f08_lossy_fallback_priority_inversion"
+    },
+    {
+      "actual": "losses=1",
+      "expected": "losses=1",
+      "id": "F-08",
+      "passed": true,
+      "scenario": "f08_lossy_wrong_container_type"
+    },
+    {
+      "actual": "title=Manager,super=VIP",
+      "expected": "title=Manager,super=VIP",
+      "id": "F-09",
+      "passed": true,
+      "scenario": "f09_business_super_key_hijack"
+    },
+    {
+      "actual": "typeMismatch",
+      "expected": "typeMismatch",
+      "id": "F-10",
+      "passed": true,
+      "scenario": "f10_polymorphic_number_discriminator"
+    },
+    {
+      "actual": "Missing model discriminator",
+      "expected": "Missing model discriminator",
+      "id": "F-10",
+      "passed": true,
+      "scenario": "f10_polymorphic_null_discriminator"
+    },
+    {
+      "actual": "decodeNil=false,decode=absent",
+      "expected": "decodeNil=false,decode=absent",
+      "id": "F-11",
+      "passed": true,
+      "scenario": "f11b_zerofill_decodenil_presence_conflict"
+    },
+    {
+      "actual": "prop",
+      "expected": "prop",
+      "id": "F-11",
+      "passed": true,
+      "scenario": "f11f_allkeys_leaking_physical_aliases"
+    },
+    {
+      "actual": "value.child",
+      "expected": "value.child",
+      "id": "K-03",
+      "passed": true,
+      "scenario": "nested-strategy-error-path-false"
+    },
+    {
+      "actual": "value",
+      "expected": "value",
+      "id": "K-03",
+      "passed": true,
+      "scenario": "dictionary-shape-error-path-false"
+    },
+    {
+      "actual": "4607182418800017409",
+      "expected": "4607182418800017409",
+      "id": "K-04",
+      "passed": true,
+      "scenario": "int-dictionary-renamed-model-false"
+    },
+    {
+      "actual": "value.value",
+      "expected": "value.value",
+      "id": "K-03",
+      "passed": true,
+      "scenario": "same-name-error-path-false"
+    },
+    {
+      "actual": "4607182418800017409",
+      "expected": "4607182418800017409",
+      "id": "K-01",
+      "passed": true,
+      "scenario": "super-physical-node-false"
+    },
+    {
+      "actual": "value.super",
+      "expected": "value.super",
+      "id": "K-03",
+      "passed": true,
+      "scenario": "super-error-path-false"
+    },
+    {
+      "actual": "2",
+      "expected": "2",
+      "id": "K-03",
+      "passed": true,
+      "scenario": "model-init-once-false"
+    },
+    {
+      "actual": "4607182418800017409",
+      "expected": "4607182418800017409",
+      "id": "F-03",
+      "passed": true,
+      "scenario": "int-key-canonical-false-false"
+    },
+    {
+      "actual": "4607182418800017409",
+      "expected": "4607182418800017409",
+      "id": "F-03",
+      "passed": true,
+      "scenario": "int-key-canonical-false-true"
+    },
+    {
+      "actual": "value.child",
+      "expected": "value.child",
+      "id": "K-03",
+      "passed": true,
+      "scenario": "nested-strategy-error-path-true"
+    },
+    {
+      "actual": "value",
+      "expected": "value",
+      "id": "K-03",
+      "passed": true,
+      "scenario": "dictionary-shape-error-path-true"
+    },
+    {
+      "actual": "4607182418800017409",
+      "expected": "4607182418800017409",
+      "id": "K-04",
+      "passed": true,
+      "scenario": "int-dictionary-renamed-model-true"
+    },
+    {
+      "actual": "value.value",
+      "expected": "value.value",
+      "id": "K-03",
+      "passed": true,
+      "scenario": "same-name-error-path-true"
+    },
+    {
+      "actual": "4607182418800017409",
+      "expected": "4607182418800017409",
+      "id": "K-01",
+      "passed": true,
+      "scenario": "super-physical-node-true"
+    },
+    {
+      "actual": "value.super",
+      "expected": "value.super",
+      "id": "K-03",
+      "passed": true,
+      "scenario": "super-error-path-true"
+    },
+    {
+      "actual": "2",
+      "expected": "2",
+      "id": "K-03",
+      "passed": true,
+      "scenario": "model-init-once-true"
+    },
+    {
+      "actual": "4607182418800017409",
+      "expected": "4607182418800017409",
+      "id": "F-03",
+      "passed": true,
+      "scenario": "int-key-canonical-true-false"
+    },
+    {
+      "actual": "4607182418800017409",
+      "expected": "4607182418800017409",
+      "id": "F-03",
+      "passed": true,
+      "scenario": "int-key-canonical-true-true"
+    },
+    {
+      "actual": "null-model-user-error",
+      "expected": "null-model-user-error",
+      "id": "F-07",
+      "passed": true,
+      "scenario": "null-user-error-preserved"
+    },
+    {
+      "actual": "rejected",
+      "expected": "rejected",
+      "id": "F-03",
+      "passed": true,
+      "scenario": "int-dictionary-losing-invalid-alias-false"
+    },
+    {
+      "actual": "rejected",
+      "expected": "rejected",
+      "id": "F-03",
+      "passed": true,
+      "scenario": "int-dictionary-losing-invalid-alias-true"
+    },
+    {
+      "actual": "source=1,model=2",
+      "expected": "source=1,model=2",
+      "id": "F-11d",
+      "passed": true,
+      "scenario": "mutable-hook-input-isolated"
+    },
+    {
+      "actual": "rejected",
+      "expected": "rejected",
+      "id": "F-11c",
+      "passed": true,
+      "scenario": "nested-export-collision-rejected"
+    },
+    {
+      "actual": "0",
+      "expected": "0",
+      "id": "F-11e",
+      "passed": true,
+      "scenario": "dictionary-date-context-parallel"
+    },
+    {
+      "scenario": "BridgePathsConsumer:array",
+      "passed": true
+    },
+    {
+      "scenario": "BridgePathsConsumer:key-renamed",
+      "passed": true
+    },
+    {
+      "scenario": "BridgePathsConsumer:key-type",
+      "passed": true
+    },
+    {
+      "scenario": "BridgePathsConsumer:nested",
+      "passed": true
+    },
+    {
+      "scenario": "BridgePathsConsumer:optional",
+      "passed": true
+    },
+    {
+      "scenario": "BridgePathsConsumer:scalar",
+      "passed": true
+    },
+    {
+      "scenario": "BridgePathsConsumer:unkeyed",
+      "passed": true
+    },
+    {
+      "scenario": "BridgeConsumer:custom-data-hook=false",
+      "passed": true
+    },
+    {
+      "scenario": "BridgeConsumer:custom-date-hook=false",
+      "passed": true
+    },
+    {
+      "scenario": "BridgeConsumer:custom-data-hook=true",
+      "passed": true
+    },
+    {
+      "scenario": "BridgeConsumer:custom-date-hook=true",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1.2345678901234567",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1234.56789012345",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:0.1234567890123456",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:0.9999999999999999",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:2869.256311772298",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:5463.666523199648",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:2001.214458364057",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1675.963050837581",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1067.373025515251",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:610.562167542924",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:2224.265685412035",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:8572.3907453926",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:2075.438792334596",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:3034.230129591216",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:7020.986735122406",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:4510.176433109466",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:2206.973166006082",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:2451.857402201383",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:2898.873032206525",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:7022.204591901582",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1287.108283860807",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:6995.54878258085",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:4987.297839595241",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:6537.438076503699",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:391.8856487865263",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:440.2751599300481",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:9785.964829274248",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:6921.147653156898",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:9431.605359259051",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:2801.582336649221",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:2449.485741687587",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:651.4602938336022",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:7022.777608222756",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:5389.331529905349",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1945.055841922535",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:410.4812284643922",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:6853.180637363517",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:9088.533199574375",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:7711.098417865625",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:6702.918144710675",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:3309.66087760036",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:3287.983848931451",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:3760.85282434601",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1720.270462713203",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:334.1914516308619",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:7053.589341500336",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:5033.224463395943",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1634.188247051254",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1918.372307878725",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:541.6774629702514",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:2739.494904302205",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:6237.680541735404",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:659.6604008187945",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1114.29394870211",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:151.071101444874",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:9982.229053008514",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:4539.980303574732",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:2167.526629361186",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1789.11511644215",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:7013.202902098802",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:884.0583303234395",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:8557.900838844627",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:987.242662506389",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:5607.594203990016",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:3052.361364642865",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:5980.09755249914",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:967.748331127779",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:9873.303712885283",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:6257.4910159748",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:9755.531399931091",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:9181.489553601488",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1205.101768134156",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:6073.979173415431",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:5339.982114205477",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1016.276546522283",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:254.0975571415727",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1234.334440276367",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1988.293363023518",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:599.3731695034132",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1470.21494983439",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1234.314572891897",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:5864.313851718588",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:390.8404824566669",
+      "passed": true
+    },
+    {
+      "scenario": "DoubleStressConsumer:1425.187479812278",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:CollisionRejected",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:DefaultEncoderDecoderDateRoundTrip",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:DictionaryKeysRemainData",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:EncoderSymmetry",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:ExactUInt64",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:ExplicitDefaults",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:ExplicitOptionalNull",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:ExportHookKeyStrategyOnce",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:FoundationObjectMatchesData",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:FractionalTokensDoNotRoundIntoSmallIntegers",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:HookCustomStrategyGenericPath",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:IndependentRules",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:KeyPathExport",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:LegacyZeroFill",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:MalformedNumberRejected",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:MalformedPathSafe",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:NativeRulesRejected",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:NativeScalarCollectionsRejectNonfinite",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:NativeStrategies",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:NativeStrategyObjectContext",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:NestedHookWithKeyStrategy",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:NullAliasStops",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:OrdinaryCodableNestedRules",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:OrdinaryPolymorphicRoundTrip",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:PolymorphicKeyStrategyOnce",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:RangeRejected",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:RawCustomStrategyRemainsStrict",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:RawScalarCollectionsMatchStrictDataNullPolicy",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:ScalarCollectionOverflowRejected",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:ScalarCollectionsPreserveExactAndNullableValues",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:SingleBusinessInit-compatible",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:SingleBusinessInit-legacy",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:SingleBusinessInit-native",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:SnakeCaseObjectMatchesData",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:StrictMissing",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:StrictNull",
+      "passed": true
+    },
+    {
+      "scenario": "ExternalRulesE2E:StrictRootNull",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:enum-default-control",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:optional-enum-default",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:optional-child-default",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:optional-date-default",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:optional-nil-default-control",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:date-default-deferred",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:date-default-seconds",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:date-default-milliseconds",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:date-default-iso8601",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:date-default-automatic",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:child-default-with-child-mapping",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:representable-key-foundation-control",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:representable-key-yy-false",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:representable-key-yy-true",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:configured-mapping-ordinary-control",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:configured-mapping",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:configured-validation-ordinary-control",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:configured-validation",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:configured-encoding-ordinary-control",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:configured-encoding",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:fallback-synthesized-control",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:fallback-contains",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:fallback-decodeNil",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:nested-lossy-registration",
+      "passed": true
+    },
+    {
+      "scenario": "CompositionConsumer:nested-fallback-registration",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:int-null=false-raw=false",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:string-null=false-raw=false",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:bool-null=false-raw=false",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:double-null=false-raw=false",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:int-null=false-raw=true",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:string-null=false-raw=true",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:bool-null=false-raw=true",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:double-null=false-raw=true",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:int-null=true-raw=false",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:string-null=true-raw=false",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:bool-null=true-raw=false",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:double-null=true-raw=false",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:int-null=true-raw=true",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:string-null=true-raw=true",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:bool-null=true-raw=true",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:double-null=true-raw=true",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:default-int-raw=false",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:default-string-raw=false",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:default-int-raw=true",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:default-string-raw=true",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:data-with-willTransform-missing",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:data-with-willTransform-null",
+      "passed": true
+    },
+    {
+      "scenario": "FastPathConsumer:complete-observation-set",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:decimal-plain-12345678901234567890.123456789012345678",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:decimal-will-12345678901234567890.123456789012345678",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:decimal-plain-9007199254740993.125",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:decimal-will-9007199254740993.125",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:decimal-plain-0.123456789012345678",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:decimal-will-0.123456789012345678",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:decimal-plain-0.9999999999999999",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:decimal-will-0.9999999999999999",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:overflow-plain--9223372036854775809.0",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:overflow-will--9223372036854775809.0",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:overflow-plain--9.223372036854775809e18",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:overflow-will--9.223372036854775809e18",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:dotted-mapper",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:dotted-default",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:dotted-required",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:keypath-class-name",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:keypath-class-map",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:keypath-class-map-legacy",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:keypath-class-string-control",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:keypath-computed-name",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:keypath-computed-map",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:keypath-date-default",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:keypath-enum-default",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:keypath-object-default",
+      "passed": true
+    },
+    {
+      "scenario": "DesignConsumer:complete-observation-set",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:foundation-config-{}",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:yy-native-config-{}",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:foundation-config-{\"value\":\"7\"}",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:yy-native-config-{\"value\":\"7\"}",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:foundation-date-encode",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:yy-native-date-encode",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:foundation-date-decode",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:yy-native-date-decode",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:only-config-export-hook=false",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:dual-config-export-hook=false",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:only-config-export-hook=true",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:dual-config-export-hook=true",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:literal-key-foundation",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:literal-key-yy",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:typed-default-without-json",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:typed-default-overwrite-nil",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:fallback-null-direct",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:fallback-null-query",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:double-plain-1.00000000000000011102230246251565404236316680908203125",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:double-hook-1.00000000000000011102230246251565404236316680908203125",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:double-plain-1.000000000000000111022302462515654042363166809082031251",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:double-hook-1.000000000000000111022302462515654042363166809082031251",
+      "passed": true
+    },
+    {
+      "scenario": "NewConsumer:complete-observation-set",
+      "passed": true
+    }
+  ],
+  "passed": true
+}

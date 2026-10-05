@@ -1,0 +1,122 @@
+[
+  {
+    "hook" : false,
+    "result" : "count=2;bits=4607182418800017408,4607182418800017409",
+    "scenario" : "set-distinct"
+  },
+  {
+    "hook" : true,
+    "result" : "count=2;bits=4607182418800017408,4607182418800017409",
+    "scenario" : "set-distinct"
+  },
+  {
+    "hook" : false,
+    "result" : "count=1;bits=4607182418800017409",
+    "scenario" : "set-single"
+  },
+  {
+    "hook" : true,
+    "result" : "count=1;bits=4607182418800017409",
+    "scenario" : "set-single"
+  },
+  {
+    "hook" : false,
+    "result" : "4607182418800017409",
+    "scenario" : "optional-nested-array"
+  },
+  {
+    "hook" : true,
+    "result" : "4607182418800017408",
+    "scenario" : "optional-nested-array"
+  },
+  {
+    "hook" : false,
+    "result" : "4607182418800017409",
+    "scenario" : "renamed-parent"
+  },
+  {
+    "hook" : true,
+    "result" : "4607182418800017409",
+    "scenario" : "renamed-parent"
+  },
+  {
+    "hook" : false,
+    "result" : "4607182418800017409",
+    "scenario" : "snake-parent"
+  },
+  {
+    "hook" : true,
+    "result" : "4607182418800017409",
+    "scenario" : "snake-parent"
+  },
+  {
+    "hook" : false,
+    "result" : "value.Index 0",
+    "scenario" : "model-array-path"
+  },
+  {
+    "hook" : true,
+    "result" : "value.Index 0",
+    "scenario" : "model-array-path"
+  },
+  {
+    "hook" : false,
+    "result" : "value",
+    "scenario" : "model-optional-path"
+  },
+  {
+    "hook" : true,
+    "result" : "value",
+    "scenario" : "model-optional-path"
+  },
+  {
+    "hook" : false,
+    "result" : "4607182418800017409",
+    "scenario" : "int-dictionary"
+  },
+  {
+    "hook" : true,
+    "result" : "4607182418800017408",
+    "scenario" : "int-dictionary"
+  },
+  {
+    "hook" : false,
+    "result" : "4607182418800017409",
+    "scenario" : "path-collision"
+  },
+  {
+    "hook" : true,
+    "result" : "4607182418800017409",
+    "scenario" : "path-collision"
+  },
+  {
+    "hook" : false,
+    "result" : "4607182418800017409,4611686018427387905",
+    "scenario" : "unkeyed-nested-cursor"
+  },
+  {
+    "hook" : true,
+    "result" : "4607182418800017408,4611686018427387904",
+    "scenario" : "unkeyed-nested-cursor"
+  },
+  {
+    "hook" : false,
+    "result" : "count=2;bits=1065353216,1065353217",
+    "scenario" : "set-float-distinct"
+  },
+  {
+    "hook" : true,
+    "result" : "count=1;bits=1065353216",
+    "scenario" : "set-float-distinct"
+  },
+  {
+    "hook" : false,
+    "result" : "value.key",
+    "scenario" : "dictionary-model-path"
+  },
+  {
+    "hook" : true,
+    "result" : "value.key",
+    "scenario" : "dictionary-model-path"
+  }
+]

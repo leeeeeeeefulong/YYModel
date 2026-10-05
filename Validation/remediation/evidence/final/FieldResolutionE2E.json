@@ -1,0 +1,50 @@
+[
+  {
+    "actual" : "shape-error",
+    "expected" : "shape-error",
+    "passed" : true,
+    "scenario" : "optional-mapper-invalid-shape-false"
+  },
+  {
+    "actual" : "7",
+    "expected" : "7",
+    "passed" : true,
+    "scenario" : "typed-default-nested-container-false"
+  },
+  {
+    "actual" : "true",
+    "expected" : "true",
+    "passed" : true,
+    "scenario" : "keyed-user-model-consumes-null-false"
+  },
+  {
+    "actual" : "shape-error",
+    "expected" : "shape-error",
+    "passed" : true,
+    "scenario" : "optional-mapper-invalid-shape-true"
+  },
+  {
+    "actual" : "7",
+    "expected" : "7",
+    "passed" : true,
+    "scenario" : "typed-default-nested-container-true"
+  },
+  {
+    "actual" : "true",
+    "expected" : "true",
+    "passed" : true,
+    "scenario" : "keyed-user-model-consumes-null-true"
+  },
+  {
+    "actual" : "1",
+    "expected" : "1",
+    "passed" : true,
+    "scenario" : "repeated-registration-default-snapshot"
+  },
+  {
+    "actual" : "1,0,0",
+    "expected" : "1,0,0",
+    "passed" : true,
+    "scenario" : "loss-report-invocation-isolation"
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "bytes" : 11758,
+  "engine" : "native",
+  "error" : "DecodingError.keyNotFound: Key 'latitude' not found in keyed decoding container. Path: payload.locations[0]. Debug description: No value associated with key CodingKeys(stringValue: \"latitude\", intValue: nil) (\"latitude\").",
+  "iterationsPerSample" : 0
+}

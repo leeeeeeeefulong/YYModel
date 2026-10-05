@@ -1,0 +1,38 @@
+[
+  {
+    "actual" : "{\"prefix_blob\":\"data\",\"prefix_stamp\":\"date\"}|model=1,date=1,data=1,key=2",
+    "expected" : "{\"prefix_blob\":\"data\",\"prefix_stamp\":\"date\"}|model=1,date=1,data=1,key=2",
+    "passed" : true,
+    "scenario" : "encoding-callbacks-and-physical-keys-false-object-false"
+  },
+  {
+    "actual" : "{\"prefix_blob\":\"data\",\"prefix_stamp\":\"date\"}|model=1,date=1,data=1,key=2",
+    "expected" : "{\"prefix_blob\":\"data\",\"prefix_stamp\":\"date\"}|model=1,date=1,data=1,key=2",
+    "passed" : true,
+    "scenario" : "encoding-callbacks-and-physical-keys-false-object-true"
+  },
+  {
+    "actual" : "{\"prefix_blob\":\"data\",\"prefix_stamp\":\"date\"}|model=1,date=1,data=1,key=2",
+    "expected" : "{\"prefix_blob\":\"data\",\"prefix_stamp\":\"date\"}|model=1,date=1,data=1,key=2",
+    "passed" : true,
+    "scenario" : "encoding-callbacks-and-physical-keys-true-object-false"
+  },
+  {
+    "actual" : "{\"prefix_blob\":\"data\",\"prefix_stamp\":\"date\"}|model=1,date=1,data=1,key=2",
+    "expected" : "{\"prefix_blob\":\"data\",\"prefix_stamp\":\"date\"}|model=1,date=1,data=1,key=2",
+    "passed" : true,
+    "scenario" : "encoding-callbacks-and-physical-keys-true-object-true"
+  },
+  {
+    "actual" : "{\"prefix_type\":\"member\",\"prefix_value\":7}",
+    "expected" : "{\"prefix_type\":\"member\",\"prefix_value\":7}",
+    "passed" : true,
+    "scenario" : "polymorphic-physical-keys-once"
+  },
+  {
+    "actual" : "4607182418800017409,123.45",
+    "expected" : "4607182418800017409,123.45",
+    "passed" : true,
+    "scenario" : "hook-moves-number-preserving-literal"
+  }
+]

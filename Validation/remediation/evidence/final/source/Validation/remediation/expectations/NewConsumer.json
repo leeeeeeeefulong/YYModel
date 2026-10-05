@@ -1,0 +1,104 @@
+[
+  {
+    "error" : "DecodingError.keyNotFound: Key 'value' not found in keyed decoding container. Debug description: No value associated with key K(stringValue: \"value\", intValue: nil) (\"value\").",
+    "name" : "foundation-config-{}"
+  },
+  {
+    "error" : "DecodingError.keyNotFound: Key 'value' not found in keyed decoding container. Debug description: No value associated with key K(stringValue: \"value\", intValue: nil) (\"value\").",
+    "name" : "yy-native-config-{}"
+  },
+  {
+    "error" : "DecodingError.typeMismatch: expected value of type Int. Path: value. Debug description: Expected to decode Int but found a string instead.",
+    "name" : "foundation-config-{\"value\":\"7\"}"
+  },
+  {
+    "error" : "DecodingError.typeMismatch: expected value of type Int. Path: value. Debug description: Expected to decode Int but found a string instead.",
+    "name" : "yy-native-config-{\"value\":\"7\"}"
+  },
+  {
+    "name" : "foundation-date-encode",
+    "result" : "{\"value\":-978307193}"
+  },
+  {
+    "name" : "yy-native-date-encode",
+    "result" : "{\"value\":-978307193}"
+  },
+  {
+    "name" : "foundation-date-decode",
+    "result" : 978307200
+  },
+  {
+    "name" : "yy-native-date-decode",
+    "result" : 978307200
+  },
+  {
+    "name" : "only-config-export-hook=false",
+    "result" : "{\"value\":7}"
+  },
+  {
+    "name" : "dual-config-export-hook=false",
+    "result" : "{\"v\":7,\"unit\":\"configured\"}"
+  },
+  {
+    "name" : "only-config-export-hook=true",
+    "result" : "{\"value\":7}"
+  },
+  {
+    "name" : "dual-config-export-hook=true",
+    "result" : "{\"unit\":\"configured\",\"v\":7}"
+  },
+  {
+    "name" : "literal-key-foundation",
+    "result" : [
+      {
+        "01" : "1"
+      },
+      {
+        "1" : "2"
+      }
+    ]
+  },
+  {
+    "name" : "literal-key-yy",
+    "result" : [
+      {
+        "01" : "1"
+      },
+      {
+        "1" : "2"
+      }
+    ]
+  },
+  {
+    "name" : "typed-default-without-json",
+    "result" : 7
+  },
+  {
+    "name" : "typed-default-overwrite-nil",
+    "result" : "nil"
+  },
+  {
+    "name" : "fallback-null-direct",
+    "result" : 7
+  },
+  {
+    "name" : "fallback-null-query",
+    "result" : 7
+  },
+  {
+    "name" : "double-plain-1.00000000000000011102230246251565404236316680908203125",
+    "result" : "4607182418800017408"
+  },
+  {
+    "name" : "double-hook-1.00000000000000011102230246251565404236316680908203125",
+    "result" : "4607182418800017408"
+  },
+  {
+    "name" : "double-plain-1.000000000000000111022302462515654042363166809082031251",
+    "result" : "4607182418800017409"
+  },
+  {
+    "name" : "double-hook-1.000000000000000111022302462515654042363166809082031251",
+    "result" : "4607182418800017409"
+  }
+]

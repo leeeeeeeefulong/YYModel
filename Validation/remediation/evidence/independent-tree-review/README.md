@@ -1,0 +1,1 @@
+Read-only independent review of immutable integrated-8. Four tree protocol bugs plus false mapper conflict on same logical key reuse confirmed through public APIs. Migrated consumers into repository, expected45 new assertions. Agent review is not formal external release signoff.

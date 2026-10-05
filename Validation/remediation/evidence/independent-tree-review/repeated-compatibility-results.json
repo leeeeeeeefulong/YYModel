@@ -1,0 +1,68 @@
+[
+  {
+    "actual" : "{\"payload\":{\"first\":1,\"second\":2}}",
+    "expected" : "{\"payload\":{\"first\":1,\"second\":2}}",
+    "passed" : true,
+    "scenario" : "same-key-no-mapper-Data"
+  },
+  {
+    "actual" : "{\"payload\":{\"second\":2}}",
+    "expected" : "{\"payload\":{\"first\":1,\"second\":2}}",
+    "passed" : false,
+    "scenario" : "same-key-no-mapper-JSONObject"
+  },
+  {
+    "actual" : "{\"payload\":[1,2]}",
+    "expected" : "{\"payload\":[1,2]}",
+    "passed" : true,
+    "scenario" : "same-array-no-mapper-Data"
+  },
+  {
+    "actual" : "{\"payload\":[2]}",
+    "expected" : "{\"payload\":[1,2]}",
+    "passed" : false,
+    "scenario" : "same-array-no-mapper-JSONObject"
+  },
+  {
+    "actual" : "rejected",
+    "error" : "Conflicting export path: envelope",
+    "expected" : "{\"envelope\":{\"first\":1,\"second\":2}}",
+    "passed" : false,
+    "scenario" : "same-key-mapped-Data"
+  },
+  {
+    "actual" : "rejected",
+    "error" : "Conflicting export path: envelope",
+    "expected" : "{\"envelope\":{\"first\":1,\"second\":2}}",
+    "passed" : false,
+    "scenario" : "same-key-mapped-JSONObject"
+  },
+  {
+    "actual" : "rejected",
+    "error" : "Conflicting export path: envelope",
+    "expected" : "{\"envelope\":[1,2]}",
+    "passed" : false,
+    "scenario" : "same-array-mapped-Data"
+  },
+  {
+    "actual" : "rejected",
+    "error" : "Conflicting export path: envelope",
+    "expected" : "{\"envelope\":[1,2]}",
+    "passed" : false,
+    "scenario" : "same-array-mapped-JSONObject"
+  },
+  {
+    "actual" : "rejected",
+    "error" : "Conflicting export path: envelope",
+    "expected" : "rejected",
+    "passed" : true,
+    "scenario" : "distinct-fields-collide-Data"
+  },
+  {
+    "actual" : "rejected",
+    "error" : "Conflicting export path: envelope",
+    "expected" : "rejected",
+    "passed" : true,
+    "scenario" : "distinct-fields-collide-JSONObject"
+  }
+]
