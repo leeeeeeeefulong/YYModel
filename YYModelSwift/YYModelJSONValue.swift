@@ -62,8 +62,8 @@ struct YYModelPolicy {
     var typedDefaults: [String: Any] = [:]
     func allows(_ key: String) -> Bool { !blacklist.contains(key) && (whitelist?.contains(key) ?? true) }
     func paths(_ key: String) -> [[String]] { mapper[key]?.paths ?? [[key]] }
-    func validate() throws {
-        if whitelist?.isEmpty == true { throw YYModelFailure.invalidObject("Empty whitelist rejects the model") }
+    func validate(for type: Any.Type) throws {
+        if whitelist?.isEmpty == true { throw YYJSONRulesError.rule(.emptyWhitelist, type, "Empty whitelist rejects the model") }
         // An empty key means KeyPath name derivation failed (a nested key path expands to
         // "inner.deep" and is deliberately mapped to "" so it lands here).
         //
@@ -73,17 +73,17 @@ struct YYModelPolicy {
         // the KeyPath entry, which enforces it in `propertyName`.
         for key in Set(mapper.keys).union(defaults.keys).union(typedDefaults.keys).union(fallbacks.keys).union(lossy).union(required).union(blacklist).union(whitelist ?? []) {
             guard !key.isEmpty else {
-                throw YYModelFailure.invalidObject(
+                throw YYJSONRulesError.rule(.emptyKey, type,
                     "Empty configuration key: a nested key path was used where a top-level property is required"
                 )
             }
         }
         for (key, value) in mapper {
             guard !key.isEmpty, !value.paths.isEmpty, value.paths.allSatisfy({ !$0.isEmpty && $0.allSatisfy { !$0.isEmpty } }) else {
-                throw YYModelFailure.invalidObject("Invalid mapper path for \(key)")
+                throw YYJSONRulesError.rule(.invalidMapperPath, type, "Invalid mapper path for \(key)")
             }
         }
-        for key in required where !allows(key) { throw YYModelFailure.invalidObject("Required property excluded: \(key)") }
+        for key in required where !allows(key) { throw YYJSONRulesError.rule(.requiredExcluded, type, "Required property excluded: \(key)") }
     }
 }
 
@@ -95,7 +95,7 @@ indirect enum YYModelJSONValue: Codable {
     case decimalDouble(Decimal, Double, Float?)
     case array([Self]), object([String: Self])
     init(from decoder: Decoder) throws {
-        if let raw = decoder as? _YYDecoder { try self.init(raw.value); return }
+        if let raw = decoder as? _YYDecoder { self = try yy_decodingJSONValue(at: raw.codingPath) { try Self(raw.value) }; return }
         if let container = try? decoder.container(keyedBy: YYModelCodingKey.self) {
             self = .object(try Dictionary(uniqueKeysWithValues: container.allKeys.map { key in (key.stringValue, try container.decode(Self.self, forKey: key)) })); return
         }
@@ -117,7 +117,7 @@ indirect enum YYModelJSONValue: Codable {
             let exact = NSDecimalNumber(decimal: v)
             let text = exact.stringValue
             let double = try c.decode(Double.self)
-            guard double.isFinite else { throw YYModelFailure.invalidObject("Non-finite number") }
+            guard double.isFinite else { throw DecodingError.yy_corrupted(decoder.codingPath, "Non-finite number") }
 
             let literalFloat = try? c.decode(Float.self)
             if let literalFloat, literalFloat.bitPattern != Float(double).bitPattern {
@@ -141,7 +141,7 @@ indirect enum YYModelJSONValue: Codable {
                 self = .decimalDouble(v, double, literalFloat)
             }
         }
-        else { let v = try c.decode(Double.self); guard v.isFinite else { throw YYModelFailure.invalidObject("Non-finite number") }; self = .number(v) }
+        else { let v = try c.decode(Double.self); guard v.isFinite else { throw DecodingError.yy_corrupted(decoder.codingPath, "Non-finite number") }; self = .number(v) }
     }
     init(_ value: Any) throws {
         if value is NSNull { self = .null }
@@ -417,7 +417,7 @@ private struct YYModelNegativeZeroRestoring: Decodable {
     let value: Any
     init(from decoder: Decoder) throws {
         guard let input = decoder.userInfo[Self.key] as? YYModelNegativeZeroInput else {
-            throw YYModelFailure.invalidObject("Missing signed-zero input")
+            throw DecodingError.yy_corrupted(decoder.codingPath, "Missing signed-zero input")
         }
         value = try Self.restoring(input.value, from: decoder)
     }

@@ -43,7 +43,7 @@ enum YYModelNativeBridge {
         }
         if case .custom(let callback) = options.dateDecodingStrategy { decoder.dateDecodingStrategy = .custom { try callback(YYModelPrefixDecoder(base: $0, prefix: state.path)) } }
         if case .custom(let callback) = options.dataDecodingStrategy { decoder.dataDecodingStrategy = .custom { try callback(YYModelPrefixDecoder(base: $0, prefix: state.path)) } }
-        let data = try JSONEncoder().encode(YYModelJSONValue(raw.value))
+        let data = try JSONEncoder().encode(yy_decodingJSONValue(at: raw.codingPath) { try YYModelJSONValue(raw.value) })
         return try decoder.decode(YYModelNativeStrategyResult<T>.self, from: data).value
     }
 }
@@ -105,7 +105,7 @@ private struct YYModelNativeStrategyResult<T: Decodable>: Decodable {
     init(from decoder: Decoder) throws {
         guard let state = decoder.userInfo[YYModelNativeBridge.key] as? YYModelNativeStrategyState,
               let result = try state.transform(YYModelPrefixDecoder(base: decoder, prefix: state.path, physical: state.rawValue, physicalPath: [])) as? T else {
-            throw YYModelFailure.invalidObject("Unexpected native strategy result")
+            throw DecodingError.yy_corrupted(decoder.codingPath, "Unexpected native strategy result")
         }
         value = result
     }

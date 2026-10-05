@@ -16,9 +16,9 @@ enum YYModelEncode {
         if !skipHook, let hook = rule?.export {
             let treeEncoder = context.exportTreeEncoder(at: encoder)
             try YYModelEncodingBox(value: value, date: date, skipHook: true).encode(to: treeEncoder)
-            guard var object = treeEncoder.value.raw as? [String: Any] else { throw YYModelFailure.invalidObject("Expected export object") }
-            guard try hook(value, &object) else { throw YYModelFailure.invalidObject("transformTo rejected model") }
-            try YYModelJSONValue(object).encode(to: encoder)
+            guard var object = treeEncoder.value.raw as? [String: Any] else { throw YYJSONRulesError.encoding(.exportNotObject, encoder.codingPath, "Expected export object") }
+            guard try hook(value, &object) else { throw YYJSONRulesError.encoding(.transformToRejected, encoder.codingPath, "transformTo rejected model") }
+            try yy_encodingJSONValue(at: encoder.codingPath) { try YYModelJSONValue(object) }.encode(to: encoder)
             return
         }
         if let dispatch = rule?.polymorphicEncode { try dispatch(value, encoder); return }
@@ -65,9 +65,9 @@ enum YYModelEncode {
         if !skipHook, let hook = rule?.export {
             let treeEncoder = context.exportTreeEncoder(at: encoder)
             try YYModelConfigurationExportBox(value: value, date: date, configuration: configuration).encode(to: treeEncoder)
-            guard var object = treeEncoder.value.raw as? [String: Any] else { throw YYModelFailure.invalidObject("Expected export object") }
-            guard try hook(value, &object) else { throw YYModelFailure.invalidObject("transformTo rejected model") }
-            try YYModelJSONValue(object).encode(to: encoder)
+            guard var object = treeEncoder.value.raw as? [String: Any] else { throw YYJSONRulesError.encoding(.exportNotObject, encoder.codingPath, "Expected export object") }
+            guard try hook(value, &object) else { throw YYJSONRulesError.encoding(.transformToRejected, encoder.codingPath, "transformTo rejected model") }
+            try yy_encodingJSONValue(at: encoder.codingPath) { try YYModelJSONValue(object) }.encode(to: encoder)
             return
         }
         let state = YYModelEncodingState()
@@ -109,10 +109,10 @@ final class YYModelEncodingState {
     }
     func reserve(_ path: [String], owner: String) throws {
         if let error { throw error }
-        guard !path.isEmpty, path.allSatisfy({ !$0.isEmpty }) else { throw YYModelFailure.invalidObject("Empty export path") }
+        guard !path.isEmpty, path.allSatisfy({ !$0.isEmpty }) else { throw YYJSONRulesError.encodingRejected(.exportPathConflict, codingPath: path, detail: "Empty export path") }
         if paths[path] == owner { return }
         if paths.keys.contains(where: { $0.starts(with: path) || path.starts(with: $0) }) {
-            throw YYModelFailure.invalidObject("Conflicting export path: \(path.joined(separator: "."))")
+            throw YYJSONRulesError.encodingRejected(.exportPathConflict, codingPath: path, detail: "Conflicting export path: \(path.joined(separator: "."))")
         }
         paths[path] = owner
     }

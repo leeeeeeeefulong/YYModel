@@ -96,7 +96,7 @@ public extension YYModelCodable {
     static func yy_modelArray(withJSON json: Any) -> [Self]? { try? yy_decodeArray(withJSON: json) }
     func yy_encode() throws -> [String: Any] {
         let tree = try YYJSONEncoder(mode: .legacy).encodeTree(self)
-        guard let dictionary = tree.raw as? [String: Any] else { throw YYModelFailure.invalidObject("Model must export an object") }
+        guard let dictionary = tree.raw as? [String: Any] else { throw YYJSONRulesError.encoding(.exportNotObject, [], "Model must export an object") }
         return dictionary
     }
     func yy_modelToJSONObject() -> [String: Any]? { try? yy_encode() }
@@ -120,6 +120,9 @@ public enum YYModelJSON {
     }
 }
 
+/// Internal transport for a Foundation value that has no JSON representation. It never
+/// crosses the public API: decode call sites convert it to `DecodingError.dataCorrupted`
+/// and encode/rule call sites to `YYJSONRulesError` (see `yy_decodingJSONValue`).
 enum YYModelFailure: Error, CustomStringConvertible {
     case invalidObject(String)
     var description: String { switch self { case .invalidObject(let message): return message } }

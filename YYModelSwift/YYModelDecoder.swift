@@ -31,10 +31,12 @@ enum YYModelConfigurationDecode {
         var source = decoder
         var object: [String: Any]?
         if let rule, rule.needsInput {
-            guard let dictionary = try YYModelJSONInput.object(from: decoder) as? [String: Any] else { throw YYModelFailure.invalidObject("Expected rule object") }
+            guard let dictionary = try YYModelJSONInput.object(from: decoder) as? [String: Any] else {
+                throw DecodingError.typeMismatch([String: Any].self, .init(codingPath: decoder.codingPath, debugDescription: "Expected an object for a model with dictionary hooks"))
+            }
             object = dictionary
             if let hook = rule.will {
-                guard let transformed = try hook(dictionary) else { throw YYModelFailure.invalidObject("willTransform rejected model") }
+                guard let transformed = try hook(dictionary) else { throw DecodingError.yy_corrupted(decoder.codingPath, "willTransform rejected model") }
                 object = transformed
                 source = context.rawDecoder(transformed, path: decoder.codingPath, userInfo: decoder.userInfo)
             }
@@ -43,7 +45,7 @@ enum YYModelConfigurationDecode {
         if !policy.required.isEmpty { try adapter.validateRequired() }
         let result = try T(from: adapter, configuration: configuration)
         if let finish = rule?.finish {
-            guard let value = try finish(result, object) as? T else { throw YYModelFailure.invalidObject("Unexpected transformed type") }
+            guard let value = try finish(result, object, decoder.codingPath) as? T else { throw DecodingError.yy_corrupted(decoder.codingPath, "Unexpected transformed type") }
             return value
         }
         return result
@@ -111,7 +113,7 @@ enum YYModelDecode {
             throw DecodingError.valueNotFound(type, .init(codingPath: decoder.codingPath, debugDescription: "Null scalar"))
         }
         if !(decoder is _YYDecoder), let collection = type as? YYModelScalarCollection.Type, collection.scalarCompatible {
-            guard let value = try collection.decodeScalars(from: decoder) as? T else { throw YYModelFailure.invalidObject("Unexpected scalar collection") }
+            guard let value = try collection.decodeScalars(from: decoder) as? T else { throw DecodingError.yy_corrupted(decoder.codingPath, "Unexpected scalar collection") }
             return value
         }
         if let raw = decoder as? _YYDecoder { return try YYJSONValueDecoder.decode(type, from: raw.value, codingPath: decoder.codingPath, userInfo: decoder.userInfo) }
@@ -132,17 +134,19 @@ enum YYModelDecode {
         var source = decoder
         var object: [String: Any]?
         if let rule, rule.needsInput {
-            guard let dictionary = try YYModelJSONInput.object(from: decoder) as? [String: Any] else { throw YYModelFailure.invalidObject("Expected rule object") }
+            guard let dictionary = try YYModelJSONInput.object(from: decoder) as? [String: Any] else {
+                throw DecodingError.typeMismatch([String: Any].self, .init(codingPath: decoder.codingPath, debugDescription: "Expected an object for a model with dictionary hooks"))
+            }
             object = dictionary
             if let hook = rule.will {
-                guard let transformed = try hook(dictionary) else { throw YYModelFailure.invalidObject("willTransform rejected model") }
+                guard let transformed = try hook(dictionary) else { throw DecodingError.yy_corrupted(decoder.codingPath, "willTransform rejected model") }
                 object = transformed
                 source = context.rawDecoder(transformed, path: decoder.codingPath, userInfo: decoder.userInfo)
             }
         }
         let result: T
         if let dispatch = rule?.polymorphicDecode {
-            guard let value = try dispatch(source) as? T else { throw YYModelFailure.invalidObject("Unexpected polymorphic type") }
+            guard let value = try dispatch(source) as? T else { throw DecodingError.yy_corrupted(source.codingPath, "Unexpected polymorphic type") }
             result = value
         } else if (try? source.singleValueContainer().decodeNil()) == true {
             if let presenceType = type as? any YYModelPresenceType.Type { result = presenceType.yy_null as! T }
@@ -186,7 +190,7 @@ enum YYModelDecode {
             result = try validateScalar(value, path: source.codingPath)
         } else if rule == nil, !(source is _YYDecoder), let collection = type as? YYModelScalarCollection.Type,
                   collection.scalarCompatible {
-            guard let value = try collection.decodeScalars(from: source) as? T else { throw YYModelFailure.invalidObject("Unexpected scalar collection") }
+            guard let value = try collection.decodeScalars(from: source) as? T else { throw DecodingError.yy_corrupted(source.codingPath, "Unexpected scalar collection") }
             result = value
         } else if let dictionary = type as? YYModelDictionaryDecoding.Type,
                   let value = try dictionary.decodeDictionary(from: source, date: policy.date) as? T { result = value }
@@ -196,7 +200,7 @@ enum YYModelDecode {
             result = try T(from: adapter)
         }
         if let finish = rule?.finish {
-            guard let value = try finish(result, object) as? T else { throw YYModelFailure.invalidObject("Unexpected transformed type") }
+            guard let value = try finish(result, object, decoder.codingPath) as? T else { throw DecodingError.yy_corrupted(decoder.codingPath, "Unexpected transformed type") }
             return value
         }
         return result

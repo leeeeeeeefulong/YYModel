@@ -25,7 +25,7 @@ public struct YYJSONRules: @unchecked Sendable {
     /// Names refer to CodingKey.stringValue. The first existing alias wins, including null.
     public func forType<Model>(_ type: Model.Type, configure: (inout YYModelConfiguration<Model>) throws -> Void) throws -> Self {
         guard !YYJSONValueDecoder.isLeaf(type), !(type is YYModelNativeCollection.Type) else {
-            throw YYModelFailure.invalidObject("Register rules on model types; scalar/collection policies belong to their containing model")
+            throw YYJSONRulesError.rule(.ruleTargetNotModel, type, "Register rules on model types; scalar/collection policies belong to their containing model")
         }
         var configuration: YYModelConfiguration<Model>
         if let previous = entries[ObjectIdentifier(type)],
@@ -41,7 +41,7 @@ public struct YYJSONRules: @unchecked Sendable {
         var result = self
         var rule = try YYJSONTypeRule(configuration)
         if let previous = entries[ObjectIdentifier(type)], previous.polymorphicDecode != nil {
-            try rule.validatePolymorphic()
+            try rule.validatePolymorphic(for: type)
             rule.polymorphicDecode = previous.polymorphicDecode; rule.polymorphicEncode = previous.polymorphicEncode
         }
         result.entries[ObjectIdentifier(type)] = rule
@@ -50,14 +50,14 @@ public struct YYJSONRules: @unchecked Sendable {
 
     /// Dispatch an ordinary Codable enum/base value using explicit payload registrations.
     public func polymorphic<Root: Codable>(_ type: Root.Type, discriminator: YYModelKey = "type", variants: [String: YYModelVariant<Root>]) throws -> Self {
-        try YYModelPolicy(mapper: ["discriminator": discriminator]).validate()
-        guard !variants.isEmpty else { throw YYModelFailure.invalidObject("Empty polymorphic variants") }
+        try YYModelPolicy(mapper: ["discriminator": discriminator]).validate(for: type)
+        guard !variants.isEmpty else { throw YYJSONRulesError.rule(.emptyPolymorphicVariants, type, "Empty polymorphic variants") }
         var result = self
         var rule = result.entries[ObjectIdentifier(type)] ?? YYJSONTypeRule()
-        try rule.validatePolymorphic()
+        try rule.validatePolymorphic(for: type)
         rule.polymorphicDecode = { try YYModelPolymorphism.decode(from: $0, discriminator: discriminator, variants: variants) }
         rule.polymorphicEncode = { value, encoder in
-            guard let root = value as? Root else { throw YYModelFailure.invalidObject("Unexpected polymorphic value") }
+            guard let root = value as? Root else { throw YYJSONRulesError.encoding(.unexpectedValue, encoder.codingPath, "Unexpected polymorphic value") }
             try YYModelPolymorphism.encode(root, to: encoder, discriminator: discriminator, variants: variants)
         }
         result.entries[ObjectIdentifier(type)] = rule
@@ -71,7 +71,8 @@ struct YYJSONTypeRule {
     var inheritsDate = true
     var will: (([String: Any]) throws -> [String: Any]?)?
     var needsInput = false
-    var finish: ((Any, [String: Any]?) throws -> Any)?
+    /// Typed transform/didTransform/validate. Decode-time rejections are `dataCorrupted` at `codingPath`.
+    var finish: ((Any, [String: Any]?, [CodingKey]) throws -> Any)?
     var export: ((Any, inout [String: Any]) throws -> Bool)?
     var polymorphicDecode: ((Decoder) throws -> Any)?
     var polymorphicEncode: ((Any, Encoder) throws -> Void)?
@@ -79,7 +80,9 @@ struct YYJSONTypeRule {
     init() {}
     init<M>(_ configuration: YYModelConfiguration<M>) throws {
         // Snapshot JSON values, rather than retaining mutable NSMutableDictionary/Array defaults.
-        let defaults = try configuration.defaultValues.mapValues { try YYModelJSONValue($0).raw }
+        let defaults: [String: Any]
+        do { defaults = try configuration.defaultValues.mapValues { try YYModelJSONValue($0).raw } }
+        catch let failure as YYModelFailure { throw YYJSONRulesError.rule(.invalidDefaultValue, M.self, failure.description) }
         var snapshot = configuration
         snapshot.defaultValues = defaults
         self.typedSnapshot = snapshot
@@ -93,30 +96,30 @@ struct YYJSONTypeRule {
                                // validated as JSON and never pass through YYModelJSONValue.
                                typedDefaults: configuration.typedDefaultValues)
         inheritsDate = configuration.explicitDateStrategy == nil
-        try policy.validate()
+        try policy.validate(for: M.self)
         will = configuration.willTransform
         needsInput = configuration.didTransform != nil || will != nil
         if configuration.transform != nil || configuration.validate != nil || configuration.didTransform != nil {
-            finish = { value, input in
-                guard var model = value as? M else { throw YYModelFailure.invalidObject("Unexpected rule type") }
+            finish = { value, input, codingPath in
+                guard var model = value as? M else { throw DecodingError.yy_corrupted(codingPath, "Unexpected rule type") }
                 try configuration.transform?(&model)
-                if let hook = configuration.didTransform, let input, try !hook(&model, input) { throw YYModelFailure.invalidObject("didTransform rejected model") }
+                if let hook = configuration.didTransform, let input, try !hook(&model, input) { throw DecodingError.yy_corrupted(codingPath, "didTransform rejected model") }
                 try configuration.validate?(model)
                 return model
             }
         }
         if let hook = configuration.transformTo {
             export = { value, object in
-                guard let model = value as? M else { throw YYModelFailure.invalidObject("Unexpected export type") }
+                guard let model = value as? M else { throw YYJSONRulesError.encoding(.unexpectedValue, [], "Unexpected export type") }
                 return try hook(model, &object)
             }
         }
     }
-    func validatePolymorphic() throws {
+    func validatePolymorphic(for type: Any.Type) throws {
         guard policy.mapper.isEmpty, policy.blacklist.isEmpty, policy.whitelist == nil,
               policy.required.isEmpty, policy.defaults.isEmpty, policy.fieldDates.isEmpty,
               inheritsDate || policy.date == .native || policy.date == .automatic else {
-            throw YYModelFailure.invalidObject("Declare polymorphic field/date policies on payload types")
+            throw YYJSONRulesError.rule(.polymorphicRootPolicy, type, "Declare polymorphic field/date policies on payload types")
         }
     }
     func resolved(defaults: YYModelPolicy) -> YYModelPolicy {
@@ -231,7 +234,7 @@ final class YYJSONContext: @unchecked Sendable {
 extension YYModelCodable {
     static func _yyRule() throws -> YYJSONTypeRule {
         let rule = try YYJSONTypeRule(yy_modelConfiguration)
-        if Self.self is any YYModelPolymorphic.Type { try rule.validatePolymorphic() }
+        if Self.self is any YYModelPolymorphic.Type { try rule.validatePolymorphic(for: Self.self) }
         return rule
     }
 }

@@ -24,7 +24,7 @@ public struct YYJSONEncoder: @unchecked Sendable {
     public func encode<T: Encodable>(_ value: T) throws -> Data {
         let encoder = foundationEncoder()
         if mode == .native {
-            guard rules.isEmpty else { throw YYModelFailure.invalidObject("YY rules require compatible mode") }
+            guard rules.isEmpty else { throw YYJSONRulesError.rule(.rulesRequireCompatibleMode, T.self, "YY rules require compatible mode") }
             return try encoder.encode(value)
         }
         let context = YYJSONContext(mode: mode, rules: rules, encoder: foundationEncoder())
@@ -42,7 +42,7 @@ public struct YYJSONEncoder: @unchecked Sendable {
             userInfo: userInfo
         )
         if mode == .native {
-            guard rules.isEmpty else { throw YYModelFailure.invalidObject("YY rules require compatible mode") }
+            guard rules.isEmpty else { throw YYJSONRulesError.rule(.rulesRequireCompatibleMode, T.self, "YY rules require compatible mode") }
             try YYModelTreeBoxer.encode(value, into: treeEncoder.box, at: [], options: treeEncoder.options, userInfo: treeEncoder.userInfo)
             guard treeEncoder.box.hasValue else {
                 throw EncodingError.invalidValue(value, .init(codingPath: [], debugDescription: "Top-level value did not encode any values"))

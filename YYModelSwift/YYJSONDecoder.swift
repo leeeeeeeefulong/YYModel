@@ -88,7 +88,7 @@ public struct YYJSONDecoder: @unchecked Sendable {
     }
     public func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
         if mode == .native {
-            guard rules.isEmpty else { throw YYModelFailure.invalidObject("YY rules require compatible mode") }
+            guard rules.isEmpty else { throw YYJSONRulesError.rule(.rulesRequireCompatibleMode, T.self, "YY rules require compatible mode") }
             return try foundationDecoder().decode(type, from: data)
         }
         let useIntegerTokens: Bool
@@ -124,7 +124,7 @@ public struct YYJSONDecoder: @unchecked Sendable {
         if let data = object as? Data { return try decode(type, from: data) }
         if let text = object as? String { return try decode(type, from: text) }
         if mode == .native {
-            guard rules.isEmpty else { throw YYModelFailure.invalidObject("YY rules require compatible mode") }
+            guard rules.isEmpty else { throw YYJSONRulesError.rule(.rulesRequireCompatibleMode, T.self, "YY rules require compatible mode") }
             return try decode(type, from: JSONSerialization.data(withJSONObject: object, options: [.fragmentsAllowed]))
         }
         return try decodeRaw(type, from: object)
