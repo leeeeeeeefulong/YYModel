@@ -42,7 +42,9 @@ import Foundation
 //  · 参考实现指出「属性包装器 + Codable」会强制键必须存在（即使是 Optional 也会抛
 //    keyNotFound），因此这里刻意用**普通枚举类型**而非 @propertyWrapper。
 //  · **Native 模式不可用**：`.native` 下 `YYModelPresence` 缺失键抛 `keyNotFound`
-//    而非返回 `.absent`（因为 Foundation 不识别该类型）。编码时 `.absent` 写为 null。
+//    而非返回 `.absent`（因为 Foundation 不识别该类型）。编码时 `.absent` 与 `.null`
+//    都写为 null（Native 容器不做字段跳过）。`.compatible`/`.legacy` 下 .absent 的键
+//    完全省略；`.null` 写为显式 null。
 //    Presence 只在 `.compatible` 和 `.legacy` 模式下提供完整三态语义。
 // ============================================================================
 

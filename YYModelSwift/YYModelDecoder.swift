@@ -354,7 +354,7 @@ struct YYModelKeyedDecoder<Key: CodingKey>: KeyedDecodingContainerProtocol {
 
     func decodeNil(forKey key: Key) throws -> Bool {
         guard policy.allows(key.stringValue) else {
-            throw DecodingError.keyNotFound(key, .init(codingPath: codingPath, debugDescription: "Key not allowed"))
+            throw DecodingError.keyNotFound(key, .init(codingPath: codingPath, debugDescription: "Excluded by blacklist; supply a default or make the property Optional"))
         }
         switch resolver.resolve(key.stringValue) {
         case .invalidPath(let error):
@@ -480,7 +480,8 @@ struct YYModelKeyedDecoder<Key: CodingKey>: KeyedDecodingContainerProtocol {
 
     private func zeroFilled<T: Decodable>(_ type: T.Type, forKey key: Key) throws -> T {
         if let zero = YYJSONValueDecoder.zero(type) { return zero }
-        let empty: Any = String(describing: type).hasPrefix("Array<") || String(describing: type).hasPrefix("Set<") ? [Any]() : [String: Any]()
+        // P3-3: protocol-based container zero-fill instead of String(describing:) sniffing.
+        let empty: Any = (type is any YYModelEmptySequence.Type) ? [Any]() : [String: Any]()
         return try YYModelDecode.value(type, from: context.rawDecoder(empty, path: codingPath + [key], userInfo: userInfo), date: policy.fieldDates[key.stringValue] ?? policy.date)
     }
 
