@@ -41,6 +41,9 @@ import Foundation
 //  · 不要把三态字段加入 `requiredProperties` —— 容忍缺失正是它的目的，两者矛盾。
 //  · 参考实现指出「属性包装器 + Codable」会强制键必须存在（即使是 Optional 也会抛
 //    keyNotFound），因此这里刻意用**普通枚举类型**而非 @propertyWrapper。
+//  · **Native 模式不可用**：`.native` 下 `YYModelPresence` 缺失键抛 `keyNotFound`
+//    而非返回 `.absent`（因为 Foundation 不识别该类型）。编码时 `.absent` 写为 null。
+//    Presence 只在 `.compatible` 和 `.legacy` 模式下提供完整三态语义。
 // ============================================================================
 
 /// 一个字段在 JSON 中的三种状态。

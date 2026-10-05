@@ -50,3 +50,15 @@ extension Dictionary: YYModelScalarCollection where Key: Decodable, Value: Decod
         return result
     }
 }
+
+// Marker so `YYJSONValueDecoder.missing` (P3-3) can keep Set zero-filling as an empty array
+// without relying on String(describing:) prefix sniffing.
+protocol YYModelEmptySequence {
+    static var emptyJSON: Any { get }
+}
+extension Array: YYModelEmptySequence where Element: Decodable {
+    static var emptyJSON: Any { [Any]() }
+}
+extension Set: YYModelEmptySequence {
+    static var emptyJSON: Any { [Any]() }
+}

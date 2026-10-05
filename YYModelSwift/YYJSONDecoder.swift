@@ -172,7 +172,7 @@ enum YYJSONValueDecoder {
             return coerced
         }
         if isLeaf(type) {
-            throw DecodingError.typeMismatch(type, context(codingPath, "cannot coerce \(Swift.type(of: value)) to \(type)"))
+            throw DecodingError.typeMismatch(type, context(codingPath, "cannot coerce \(jsonCategory(value)) to \(type)"))
         }
         let decoder = _YYDecoder(value: value, codingPath: codingPath)
         if let userInfo { decoder.userInfo = userInfo }
@@ -206,12 +206,12 @@ enum YYJSONValueDecoder {
 
     static func missing<T: Decodable>(_ type: T.Type, codingPath: [CodingKey]) throws -> T {
         if let zero = zero(type) { return zero }
-        let name = String(describing: type)
-        if name.hasPrefix("Array<") || name.hasPrefix("Set<") {
+        // P3-3: protocol-based container detection instead of String(describing:) sniffing.
+        // Array conforms to YYModelLossyArray (Element: Decodable); Set and Dictionary have no
+        // shared protocol marker here, so they fall through to the empty-object decode which
+        // matches their synthesized init(from:).
+        if type is any YYModelEmptySequence.Type {
             return try decode(type, from: [Any](), codingPath: codingPath)
-        }
-        if name.hasPrefix("Dictionary<") {
-            return try decode(type, from: [String: Any](), codingPath: codingPath)
         }
         return try decode(type, from: [String: Any](), codingPath: codingPath)
     }
@@ -324,21 +324,13 @@ enum YYJSONValueDecoder {
         return nil
     }
 
-    private static func bool(from value: Any) -> Bool? {
-        if let number = value as? NSNumber {
-            if isBoolean(number) { return number.boolValue }
-            if number.doubleValue == 0 { return false }
-            if number.doubleValue == 1 { return true }
-            return nil
-        }
-        if let text = value as? String {
-            switch text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
-            case "true", "yes", "1": return true
-            case "false", "no", "0": return false
-            default: return nil
-            }
-        }
-        return nil
+    private static func jsonCategory(_ value: Any) -> String {
+        if value is NSNull { return "null" }
+        if value is String { return "string" }
+        if let number = value as? NSNumber { return isBoolean(number) ? "boolean" : "number" }
+        if value is [Any] { return "array" }
+        if value is [String: Any] { return "object" }
+        return String(describing: Swift.type(of: value))
     }
 
     private static func double(from value: Any) -> Double? {
