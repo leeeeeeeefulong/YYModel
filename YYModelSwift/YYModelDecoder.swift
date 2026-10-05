@@ -220,8 +220,13 @@ struct YYModelDecoder: Decoder {
     func validateRequired() throws {
         let container = YYModelKeyedDecoder<YYModelCodingKey>(base: try base.container(keyedBy: YYModelCodingKey.self), policy: policy, context: YYJSONContext.from(base), userInfo: userInfo)
         for key in policy.required {
-            guard let field = try container.field(key), try !field.0.decodeNil(forKey: field.1) else {
-                throw DecodingError.keyNotFound(YYModelCodingKey(key), .init(codingPath: codingPath, debugDescription: "Required property missing or null"))
+            guard let field = try container.field(key) else {
+                // P2-2: absent key → keyNotFound (Foundation semantics)
+                throw DecodingError.keyNotFound(YYModelCodingKey(key), .init(codingPath: codingPath, debugDescription: "Required property missing"))
+            }
+            if try field.0.decodeNil(forKey: field.1) {
+                // P2-2: present but null → valueNotFound at the key's path
+                throw DecodingError.valueNotFound(Any.self, .init(codingPath: field.0.codingPath + [field.1], debugDescription: "Required property is null"))
             }
         }
     }
@@ -414,9 +419,15 @@ struct YYModelKeyedDecoder<Key: CodingKey>: KeyedDecodingContainerProtocol {
         }
         if !policy.fallbacks.isEmpty, let fallback = policy.fallbacks[name] {
             let date = policy.fieldDates[name] ?? policy.date
-            if case .present(let container, let fieldKey) = resolution,
-               let decoded = try? YYModelDecode.value(type, from: container.superDecoder(forKey: fieldKey), date: date) {
-                return decoded
+            if case .present(let container, let fieldKey) = resolution {
+                do {
+                    return try YYModelDecode.value(type, from: container.superDecoder(forKey: fieldKey), date: date)
+                } catch {
+                    // P1-3: record fallback activation so callers know a value was substituted.
+                    let report = userInfo[YYModelLossReport.key] as? YYModelLossReport
+                    report?.record(property: name, index: -1, reason: "fallback applied: \(error)")
+                    // fall through to fallback value below
+                }
             }
             if fallback is NSNull, let optional = T.self as? ExpressibleByNilLiteral.Type {
                 return optional.init(nilLiteral: ()) as! T
@@ -496,9 +507,13 @@ struct YYModelKeyedDecoder<Key: CodingKey>: KeyedDecodingContainerProtocol {
         }
         if !policy.fallbacks.isEmpty, let fallback = policy.fallbacks[name] {
             let date = policy.fieldDates[name] ?? policy.date
-            if case .present(let container, let fieldKey) = resolution,
-               let decoded = try? YYModelDecode.value(type, from: container.superDecoder(forKey: fieldKey), date: date) {
-                return decoded
+            if case .present(let container, let fieldKey) = resolution {
+                do {
+                    return try YYModelDecode.value(type, from: container.superDecoder(forKey: fieldKey), date: date)
+                } catch {
+                    let report = userInfo[YYModelLossReport.key] as? YYModelLossReport
+                    report?.record(property: name, index: -1, reason: "fallback applied: \(error)")
+                }
             }
             if fallback is NSNull { return nil }
             guard let value = fallback as? T else {
