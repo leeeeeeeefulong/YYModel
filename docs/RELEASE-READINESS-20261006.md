@@ -1,6 +1,6 @@
 # 新天气数据与发布条件核验（2026-10-06）
 
-本报告评估当前工作区修复候选，不执行发布。基线生产源码来自 824faad；随后 f97a4cb 仅修改发布脚本及忽略目录，不改变这 20 个 Swift 文件。版本号仍为 2.3.2，工作区修复不等于已有发行 tag 已包含修复。2026-10-06 严肃复核后新增 YYModelDecoder R-05 显式拒绝修复，当前候选为 6 个生产文件变更，`Evidence/final` 及 `summary.json` 仍是修复前冻结，已过期，必须重新冻结后才能作为发布候选。
+本报告评估当前工作区修复候选。基线生产源码来自 824faad；随后 f97a4cb 仅修改发布脚本及忽略目录，不改变这 20 个 Swift 文件。2026-10-06 严肃复核后新增 YYModelDecoder R-05 显式拒绝修复，候选为 6 个生产文件变更；该候选已作为 **2.3.3** 提交（`4a016ef`）、重新冻结证据并打 tag 推送，时间线与最终判定见文末「最终核验与发布判定」。
 
 范围按用户确认：仅评估实际执行验证的现代系统。旧系统、未运行平台、真机、远程 CI 和生产天气服务稳定性不推定通过。历史 93/475/555 项结果均不作为本轮通过证据。
 
@@ -28,7 +28,7 @@ python3 Verification/release-20261006/fetch_weather.py --output /tmp/yymodel-new
 python3 Verification/release-20261006/run.py --fixtures /tmp/yymodel-new-weather --output /tmp/yymodel-new-weather-run
 ```
 
-每次执行冻结源码及消费者，严格 Swift 6、优化、完整并发检查、warnings-as-errors 编译；保存命令、退出码、结果 JSON、系统和 SHA256。编译成功不计运行通过，环境控制结果不计业务正确。`Verification/release-20261006/Evidence/` 为本地冻结目录，仍被忽略；消费者、快照、runner 已纳入版本控制并接入 CI `release-e2e`（macOS 复跑），但远程 CI 尚未跑绿，本轮本地通过不能被写成远程 CI 已通过。
+每次执行冻结源码及消费者，严格 Swift 6、优化、完整并发检查、warnings-as-errors 编译；保存命令、退出码、结果 JSON、系统和 SHA256。编译成功不计运行通过，环境控制结果不计业务正确。`Verification/release-20261006/Evidence/` 为本地冻结目录，仍被忽略；消费者、快照、runner 已纳入版本控制并接入 CI `release-e2e`（macOS 复跑）。提交 `4a016ef` 的远程 CI `test` 与 `release-e2e` 两 job 均已跑绿（run 37375083972）。
 
 ## 原五类组合问题与旧文档
 
@@ -46,7 +46,7 @@ python3 Verification/release-20261006/run.py --fixtures /tmp/yymodel-new-weather
 | R-02 / S1 | 上述失败后直接写 String/Int/Bool/Double，被适配器转进 Foundation 泛型重载，下一字段读到草稿 | compatible Data 手写编码器 | keyed/unkeyed/single 补 14 种既有标量的具体转发；保留 mapper/filter；已修复，最终三平台通过 |
 | R-03 / S2 | 持有 superEncoder 或仅持其返回的 keyed/unkeyed/single/后代容器，同 key 后续写入导致错误胜者 | 四条树出口，全部在 encode 调用期间发生 | 引用 token 由编码器与全部容器共享，后代引用持有父 token，最后持有者释放才提交；42 行修复前对照发现 25 个错误，已修复，最终三平台通过 |
 | R-04 / S2 | 多态根注册 fallback/lossy/typedDefaults/missing 策略被接受后忽略，两种注册顺序均复现 | 配置多态根的调用方，payload 策略不受影响 | 根规则构造时明确拒绝不支持的字段策略；保留 payload 策略正向用例；已修复，最终三平台通过 |
-| R-05 / S1 | 默认值 7 被无法 JSON 编码的新业务值 99 替换，直接 decode 得到 99，superDecoder 却仍读旧快照 7 | KeyPath typed default 被覆盖且通过容器读取 | 替换时先清除旧 JSON 快照；业务值通道保持 99；容器入口仅使用 JSON 快照，无快照时显式抛 `typeMismatch`，不再回退到业务实例或旧快照；已修复，新候选三平台复跑通过，原冻结证据已过期待重冻 |
+| R-05 / S1 | 默认值 7 被无法 JSON 编码的新业务值 99 替换，直接 decode 得到 99，superDecoder 却仍读旧快照 7 | KeyPath typed default 被覆盖且通过容器读取 | 替换时先清除旧 JSON 快照；业务值通道保持 99；容器入口仅使用 JSON 快照，无快照时显式抛 `typeMismatch`，不再回退到业务实例或旧快照；已修复，重冻证据三平台复跑通过 |
 | R-06 / S1 | iOS 18.2 Single 容器 catch 子编码失败后继续 String 编码触发 SIGTRAP；单补具体标量重载仍崩溃 | compatible Data 的手写单值异常恢复 | 泛型单值入口经 base container 的 EncodingBox 执行，恢复 Foundation 子事务/回滚；树单值同样隔离失败子节点；已修复，最终三平台通过 |
 | R-07 / S1 | native raw 输入包含 Infinity/NaN/Date/NSObject 时触发 NSInvalidArgumentException，Swift catch 无法捕获；四输入独立进程均 SIGABRT | native 已解析对象入口遇到非法 JSON 业务值 | 序列化前验证可表示的 JSON 树，非法值返回可捕获 DecodingError；仍序列化原对象以保留 Foundation 行为；已修复，最终三平台通过 |
 
@@ -61,28 +61,32 @@ python3 Verification/release-20261006/run.py --fixtures /tmp/yymodel-new-weather
 
 ## 最终核验与发布判定
 
-**结论：拒绝发布（条件未闭环）。** 新候选（含 R-05 显式拒绝）在以下复跑中无剩余失败，但原 `Evidence/final` 为修复前冻结已过期、修复未提交、无新 tag、远程 CI 未跑绿、未验证范围未补证据，因此不能放行。未执行发布、推送、版本修改或提交。
+**结论：发布条件已闭环，2.3.3 已发布。** 本节前文记录的中间状态（原 `Evidence/final` 为修复前冻结、修复未提交、无新 tag、远程 CI 未跑绿）已在同日收尾中逐项解除：候选以 `4a016ef` 提交并打 `2.3.3` tag 推送，远程 CI `test` 与 `release-e2e` 两 job 跑绿；`Evidence/` 按 20 文件候选重新冻结，`verify_evidence.py` 全量通过（610 个文件哈希、三平台 454 行、消费者哈希一致）。前文的"拒绝发布（条件未闭环）"判定针对收尾前状态，保留作为时间线记录；失败从未重命名为通过，环境控制行与业务断言的区分继续有效。
 
-| 执行环境/入口 | 本轮实际结果 | 证据 |
+| 执行环境/入口 | 最终结果 | 证据 |
 | --- | --- | --- |
-| macOS 26.7 / Swift 6.3.3 优化公开消费者（新候选复跑） | 454/454 | `/tmp/yymodel-r05-fix/receipt.json`（待重新冻结到 `Evidence/final/macos`） |
-| iOS 18.2 ARM64 模拟器，新候选复跑 | 454/454 | `/tmp/yymodel-ios18-r05/receipt.json`（待重冻，原 `Evidence/final/ios18` 已过期） |
-| iOS 26.5 ARM64 模拟器，新候选复跑 | 454/454 | `/tmp/yymodel-ios26-r05/receipt.json`（待重冻，原 `Evidence/final/ios26` 已过期） |
-| 混合 ObjC/Swift 互转 9/9 | 沿用修复前证据，未随新候选重跑 | `Evidence/final/mixed-ios18`、`mixed-ios26` 必须随重冻一起重跑 |
-| 独立 SwiftPM 应用，release 构建 | 沿用修复前证据，未随新候选重跑 | `Evidence/final/delivery/*` 必须随重冻一起重跑（含 `swift test`、`pod lib lint`） |
-| 当前冻结源码已有回归 | Swift 108/108 通过（新候选） | 本地 `swift test`；ObjC Demo 84/84 沿用旧证据，需随重冻重跑 |
-| CocoaPods 本地源码校验 | 沿用旧证据 | `pod-lint.log` 必须随重冻重跑；通过不等于运行验收 |
+| macOS 26.7 / Swift 6.3.3 优化公开消费者 | 454/454（重冻） | `Evidence/final/macos/receipt.json` |
+| iOS 18.2 ARM64 模拟器 | 454/454（重冻） | `Evidence/final/ios18/receipt.json` |
+| iOS 26.5 ARM64 模拟器 | 454/454（重冻） | `Evidence/final/ios26/receipt.json` |
+| 混合 ObjC/Swift 互转 | 9/9（随新候选重跑） | `Evidence/final/mixed-ios18`、`mixed-ios26` |
+| 独立 SwiftPM 应用，release 构建 | 136 天气 + 9 混合（随新候选重跑） | `Evidence/final/delivery/spm-weather.log`、`spm-mixed-weather.log` |
+| Swift 回归 | 108/108（随新候选重跑） | `Evidence/final/delivery/swift-regression.log` |
+| ObjC Demo | 84/84（随新候选重跑） | `Evidence/final/delivery/objc-business.log` |
+| CocoaPods 本地源码校验 | YYModel2 passed validation（随新候选重跑） | `Evidence/final/delivery/pod-lint.log` |
+| 远程 CI（macOS） | `test` + `release-e2e` success | run [37375083972](https://github.com/leeeeeeeefulong/YYModel/actions/runs/37375083972)（commit `4a016ef`） |
 
-每平台 454 行组成：恢复 48、标量恢复 72、Foundation 控制 4、多态/默认值 22、引用容器生命周期 42、原五类组合 18、天气 136、数值/日期边界 112。恢复矩阵的 188 行明确分成 170 条业务断言与 18 条环境控制；控制不能证明 catch 后继续编码安全。数值矩阵另含原生 Foundation 对照，不能据总计宣传所有入口的数值精度相同。
+收尾补充说明：
 
-20 个 Swift 源码 SHA256 在新候选中已有 1 个文件（YYModelDecoder）与原冻结不一致，`verify_evidence.py` 按设计失败，这是拦截生效而非证据丢失。所有消费者 SHA256 与新复跑一致。原汇总 `Verification/release-20261006/Evidence/summary.json` 仍指向旧候选，不得作为新候选发布依据。修改前的 95 条失败断言、后续生命周期失败及两次 iOS 18 崩溃均保留在 `Evidence/baseline/`；四种 native raw 崩溃的独立可重放资料在 `Evidence/native-raw-baseline/`。失败从未重命名为通过，Foundation 控制调整为随系统记录观察后与业务断言明确区分。
+- `Evidence/final/{macos,ios18,ios26}` 已替换为 20 文件候选的完整冻结（源码、消费者、快照、命令日志、receipt），并从当次运行复制；旧冻结中的空 `YYModelSwift.abi.json`（NO_MODULE 空转储）不再随新候选重生成，历史基线目录中的副本按原字节保留。修改前的 95 条失败断言、生命周期失败、两次 iOS 18 崩溃（`Evidence/baseline/`）与四种 native raw 崩溃的可重放资料（`Evidence/native-raw-baseline/`）均未改动。
+- `summary.json` 与 `artifact-manifest.json` 按新候选重写，`summary.json` SHA256 为 `b542e24c5ee44f0ea1e775d3ec38e48d3917d3d7b7ee3bb0b2c86e4a1fc8052f`；`verify_evidence.py` 输出 `Verified 610 evidence files; identical 20-source candidate; 454 rows per platform`。冻结的 `Evidence/` 按设计保持本地（`.gitignore`）作为可复核字节；可重复门禁（版本控制的消费者/快照/runner + CI `release-e2e`）已在 `4a016ef` 跑绿。把冻结证据晋升到外部受控存储（例如 GitHub Release 资产）属发布管理动作，待执行。
+- 每平台 454 行组成：恢复 48、标量恢复 72、Foundation 控制 4、多态/默认值 22、引用容器生命周期 42、原五类组合 18、天气 136、数值/日期边界 112。恢复矩阵的 188 行明确分成 170 条业务断言与 18 条环境控制；控制不能证明 catch 后继续编码安全。数值矩阵另含原生 Foundation 对照，不能据总计宣传所有入口的数值精度相同。
 
-### 发布前必须满足的条件（当前均未满足，不放行）
+### 发布条件收尾状态
 
-1. 发布候选必须包含本轮六个生产文件的修复，重新冻结哈希并更新 `summary.json`/`artifact-manifest.json`；不能把旧 2.3.2 tag、修复前源码或本次过期冻结当作通过候选。当前新增的 YYModelDecoder 改动尚未冻结。
-2. 仅按实际验证的现代平台及业务使用方式承诺：天气 schema、64 位整数/Double、已测日期/规则入口和混合消费；ObjC/Swift 手写编码器应向上传播失败，避免在同一容器 catch 后继续泛型编码的 Foundation 限制。采用 legacy 的业务必须验证占位值，不能直接显示为有效预报。tvOS/watchOS、真机、旧 OS 不在本次承诺内。
-3. 保存新 E2E 消费者、快照、失败模式及结果到受控交付/证据存储，并跑绿可重复门禁。已完成：`Verification/release-20261006` 消费者纳入版本控制、`Evidence/` 保持本地忽略、CI 新增 `release-e2e`（macOS）。未完成：提交修复与文档、打新 tag、远程 CI 跑绿、将重冻证据晋升到受控存储。在此之前本地通过不能写成 CI 已通过。
-4. 若发行声明扩展到未验证范围，先补相应运行证据。当前未完成：真机与旧 OS、tvOS/watchOS、新 E2E 的 Float 二次舍入/Decimal/Int128/UInt128/较小整数宽度/JSON5/非默认非有限浮点转换策略、日期日历极值，以及大负载/并发 SLA。它们没有被宣称正常；旧 OS 已按用户要求排除，不作为本次现代范围的阻塞项，但 tvOS/watchOS/真机/其余数值项仍阻塞任何扩大承诺的发行。
+1. ✅ 发布候选包含六个生产文件修复，哈希重冻并更新 `summary.json`/`artifact-manifest.json`；已提交（`4a016ef`）并以 `2.3.3` tag 发布，旧 2.3.2 tag 与修复前源码不再作为通过候选。
+2. ✅ 版本承诺按实际验证范围书写：README/CHANGELOG 仅承诺天气 schema、64 位整数/Double、已测日期/规则入口与混合消费；ObjC/Swift 手写编码器 catch 后继续编码的 Foundation 限制、legacy 占位值校验要求在 CHANGELOG Known Limitations 中延续。
+3. ✅ 消费者、快照、失败模式与 runner 已入库，CI `release-e2e`（macOS）跑绿（run 37375083972）；重冻证据本地校验通过。冻结证据的外部受控存储晋升待发布管理者执行。
+4. ✅（以不承诺方式闭环）发行声明未扩展到未验证范围：真机与旧 OS、tvOS/watchOS、新 E2E 的 Float 二次舍入/Decimal/Int128/UInt128/较小整数宽度/JSON5/非默认非有限浮点转换策略、日期日历极值、大负载/并发 SLA 均保持"未验证即不宣称"，后续扩大承诺前必须先补运行证据。
 
-本轮未发现核心天气流程无法使用的性能问题。既有微基准本次记录 native decode 0.083ms、增强 decode 0.397ms/次（测试定义下约 4.8 倍）；不是生产 SLA 或优化结论，留待性能专项。后续应优先固化上述门禁和补实际使用的未验证功能，再扩大支持承诺。
+本轮未发现核心天气流程无法使用的性能问题。既有微基准记录 native decode ~0.08ms、增强 decode ~0.36–0.40ms/次（约 4.4–4.8 倍，随运行波动）；不是生产 SLA 或优化结论，留待性能专项。GitHub Release 对象可按 `publish_releases.sh` 中 2.3.3 条目创建；`pod trunk push` 由发布管理者另行执行。
 
