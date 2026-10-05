@@ -45,7 +45,16 @@ public struct YYModelConfiguration<Model> {
     public var whitelist: [String]?
     public var requiredProperties: [String]
     public var defaultValues: [String: Any]
-    public var dateStrategy: YYModelDateStrategy
+    /// The model's date strategy. Until it is assigned, the model inherits the strategy of
+    /// the decoder/encoder mode (`.legacy` → `.automatic`, `.compatible` → `.native`) or of
+    /// the containing field, exactly as an unregistered model would. Reading an unassigned
+    /// value returns `.automatic`, the published default of `YYModelCodable`.
+    public var dateStrategy: YYModelDateStrategy {
+        get { explicitDateStrategy ?? .automatic }
+        set { explicitDateStrategy = newValue }
+    }
+    /// `nil` until `dateStrategy` is assigned; registering a rule never fixes a date policy by itself.
+    var explicitDateStrategy: YYModelDateStrategy?
     public var missingStrategy: YYJSONMissingStrategy = .inherit
     public var fieldDateStrategies: [String: YYModelDateStrategy] = [:]
     /// Properties whose array elements are decoded leniently: a failing element is
@@ -67,13 +76,13 @@ public struct YYModelConfiguration<Model> {
     public var transformTo: ((Model, inout [String: Any]) throws -> Bool)?
     public init(mapper: [String: YYModelKey] = [:], blacklist: [String] = [], whitelist: [String]? = nil,
                 requiredProperties: [String] = [], defaultValues: [String: Any] = [:],
-                dateStrategy: YYModelDateStrategy = .automatic,
+                dateStrategy: YYModelDateStrategy? = nil,
                 willTransform: (([String: Any]) throws -> [String: Any]?)? = nil,
                 didTransform: ((inout Model, [String: Any]) throws -> Bool)? = nil,
                 transformTo: ((Model, inout [String: Any]) throws -> Bool)? = nil) {
         self.mapper = mapper; self.blacklist = blacklist; self.whitelist = whitelist
         self.requiredProperties = requiredProperties; self.defaultValues = defaultValues
-        self.dateStrategy = dateStrategy; self.willTransform = willTransform
+        self.explicitDateStrategy = dateStrategy; self.willTransform = willTransform
         self.didTransform = didTransform; self.transformTo = transformTo
     }
 }

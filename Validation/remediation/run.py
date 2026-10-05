@@ -106,7 +106,8 @@ for consumer in ['NumericE2E', 'NumericBoundaryE2E', 'FloatMidpointE2E', 'Regist
 for consumer, extra in [('BridgePathsConsumer', []), ('BridgeConsumer', []),
                         ('DoubleStressConsumer', []), ('ExternalRulesE2E', ['-DPUBLIC_API']),
                         ('CompositionConsumer', []), ('FastPathConsumer', []),
-                        ('DesignConsumer', ['-D', 'KEY_PATH']), ('NewConsumer', [])]:
+                        ('DesignConsumer', ['-D', 'KEY_PATH']), ('NewConsumer', []),
+                        ('AutomaticDatesConsumer', [])]:
     run(['swiftc', *flags, *extra, '-I', out, '-L', out, '-lYYModelSwift',
          '-Xlinker', '-rpath', '-Xlinker', out, harness[consumer + '.swift'],
          '-o', out / consumer])

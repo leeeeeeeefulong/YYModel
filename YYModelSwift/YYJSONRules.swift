@@ -35,7 +35,7 @@ public struct YYJSONRules: @unchecked Sendable {
                   let baseConfig = baseHelper._yy_baseConfiguration() as? YYModelConfiguration<Model> {
             configuration = baseConfig
         } else {
-            configuration = YYModelConfiguration<Model>(dateStrategy: .native)
+            configuration = YYModelConfiguration<Model>()
         }
         try configure(&configuration)
         var result = self
@@ -67,6 +67,8 @@ public struct YYJSONRules: @unchecked Sendable {
 
 struct YYJSONTypeRule {
     var policy = YYModelPolicy(date: .native, missing: .inherit)
+    /// True until the configuration assigns `dateStrategy`; `resolved` then takes the mode's date.
+    var inheritsDate = true
     var will: (([String: Any]) throws -> [String: Any]?)?
     var needsInput = false
     var finish: ((Any, [String: Any]?) throws -> Any)?
@@ -83,13 +85,14 @@ struct YYJSONTypeRule {
         self.typedSnapshot = snapshot
         policy = YYModelPolicy(mapper: configuration.mapper, blacklist: Set(configuration.blacklist),
                                whitelist: configuration.whitelist.map(Set.init), required: Set(configuration.requiredProperties),
-                               defaults: defaults, date: configuration.dateStrategy, missing: configuration.missingStrategy,
+                               defaults: defaults, date: configuration.explicitDateStrategy ?? .native, missing: configuration.missingStrategy,
                                fieldDates: configuration.fieldDateStrategies,
                                lossy: Set(configuration.lossyProperties),
                                fallbacks: configuration.fallbackValues,
                                // Business values are returned verbatim (R5); they are NOT
                                // validated as JSON and never pass through YYModelJSONValue.
                                typedDefaults: configuration.typedDefaultValues)
+        inheritsDate = configuration.explicitDateStrategy == nil
         try policy.validate()
         will = configuration.willTransform
         needsInput = configuration.didTransform != nil || will != nil
@@ -112,13 +115,16 @@ struct YYJSONTypeRule {
     func validatePolymorphic() throws {
         guard policy.mapper.isEmpty, policy.blacklist.isEmpty, policy.whitelist == nil,
               policy.required.isEmpty, policy.defaults.isEmpty, policy.fieldDates.isEmpty,
-              policy.date == .native || policy.date == .automatic else {
+              inheritsDate || policy.date == .native || policy.date == .automatic else {
             throw YYModelFailure.invalidObject("Declare polymorphic field/date policies on payload types")
         }
     }
     func resolved(defaults: YYModelPolicy) -> YYModelPolicy {
         var result = policy
         if result.missing == .inherit { result.missing = defaults.missing }
+        // P0-1: an unassigned date strategy follows the mode (or the containing field),
+        // so registering a mapper never moves `.legacy` dates onto Foundation's 2001 epoch.
+        if inheritsDate { result.date = defaults.date }
         return result
     }
 }

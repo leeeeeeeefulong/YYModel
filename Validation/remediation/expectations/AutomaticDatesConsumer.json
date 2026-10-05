@@ -1,0 +1,58 @@
+[
+  {
+    "name" : "legacy-norules-seconds",
+    "result" : 1700000000
+  },
+  {
+    "name" : "legacy-rules-seconds",
+    "result" : 1700000000
+  },
+  {
+    "name" : "legacy-rules-alias-seconds",
+    "result" : 1700000000
+  },
+  {
+    "name" : "legacy-rules-iso",
+    "result" : 1791158400
+  },
+  {
+    "name" : "legacy-norules-encode",
+    "result" : "{\"d\":7}"
+  },
+  {
+    "name" : "legacy-rules-encode",
+    "result" : "{\"d\":7}"
+  },
+  {
+    "name" : "legacy-yymodelcodable-seconds",
+    "result" : 1700000000
+  },
+  {
+    "name" : "compatible-norules-seconds",
+    "result" : 2678307200
+  },
+  {
+    "name" : "compatible-rules-seconds",
+    "result" : 2678307200
+  },
+  {
+    "name" : "compatible-yymodelcodable-seconds",
+    "result" : 2678307200
+  },
+  {
+    "name" : "compatible-rules-encode",
+    "result" : "{\"d\":-978307193}"
+  },
+  {
+    "name" : "compatible-explicit-automatic",
+    "result" : 1700000000
+  },
+  {
+    "name" : "legacy-explicit-native",
+    "result" : 2678307200
+  },
+  {
+    "name" : "compatible-nested-field-millis",
+    "result" : 1700000000
+  }
+]
